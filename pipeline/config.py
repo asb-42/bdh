@@ -136,6 +136,39 @@ def param_count(model) -> int:
     return sum(p.numel() for p in model.parameters())
 
 
+def estimate_bdh_flops(cfg: Config, b: int, t: int) -> int:
+    """Estimated FLOPs for one forward+backward step of BDH (quadratic attention)."""
+    d, nh, mult = cfg.n_embd, cfg.n_head, cfg.mlp_internal_dim_multiplier
+    n = mult * d // nh
+    per_layer = 3 * (b * nh * t * d * n) + b * nh * t * t * n + b * nh * t * t * d
+    return int(cfg.n_layer * per_layer * 2 * 3)  # *2 MAC->FLOP, *3 fwd+bwd
+
+
+def estimate_bdh_linear_flops(cfg: Config, b: int, t: int) -> int:
+    """Estimated FLOPs for one forward+backward step of BDH with chunked linear attention."""
+    d, nh, mult = cfg.n_embd, cfg.n_head, cfg.mlp_internal_dim_multiplier
+    n = mult * d // nh
+    c = min(cfg.chunk_size, t)
+    per_layer = 3 * (b * nh * t * d * n) + b * nh * t * (c * (n + d) + 2 * d * n)
+    return int(cfg.n_layer * per_layer * 2 * 3)
+
+
+def estimate_transformer_flops(cfg: Config, b: int, t: int) -> int:
+    """Estimated FLOPs for one forward+backward step of the GPT baseline."""
+    d = cfg.n_embd
+    n_layer = cfg.baseline_n_layer if cfg.baseline_n_layer > 0 else match_transformer_layers(cfg)
+    per_block = 12 * b * t * d * d + 2 * b * t * t * d
+    return int(n_layer * per_block * 2 * 3)
+
+
+def estimate_flops(cfg: Config, b: int, t: int) -> int:
+    if cfg.model == "bdh":
+        return estimate_bdh_flops(cfg, b, t)
+    if cfg.model == "bdh-linear":
+        return estimate_bdh_linear_flops(cfg, b, t)
+    return estimate_transformer_flops(cfg, b, t)
+
+
 def _add_arg(parser, name, default):
     if isinstance(default, bool):
         parser.add_argument(f"--{name.replace('_', '-')}", action=argparse.BooleanOptionalAction, default=default)

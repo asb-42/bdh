@@ -3,25 +3,29 @@
 Usage:
     python -m pipeline.run train --model bdh --dataset shakespeare [--max-iters N ...]
     python -m pipeline.run eval  --model bdh --dataset shakespeare [--tag best]
+    python -m pipeline.run bench --model bdh [--batch-size 32 --block-size 128]
 """
 
 import sys
 
+from pipeline.bench import bench
 from pipeline.config import parse_args
 from pipeline.eval import evaluate
 from pipeline.train import train
 
 
 def main() -> int:
-    if len(sys.argv) < 2 or sys.argv[1] not in ("train", "eval"):
+    if len(sys.argv) < 2 or sys.argv[1] not in ("train", "eval", "bench"):
         print(__doc__)
         return 1
     cmd = sys.argv[1]
     cfg = parse_args(sys.argv[2:])
     if cmd == "train":
         train(cfg)
-    else:
+    elif cmd == "eval":
         evaluate(cfg, tag=cfg.tag, num_samples=cfg.num_samples, max_new_tokens=cfg.max_new_tokens)
+    else:
+        bench(cfg)
     return 0
 
 
