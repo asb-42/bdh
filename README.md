@@ -21,6 +21,8 @@ BDH represents a **scale-free, locally interacting network of neurons** capable 
 - **GPU-friendly state-space formulation** for efficient implementation
 - **Interpretable activations** that are sparse and positive
 
+> **Implementation note:** the code in this repository implements **BDH-GPU**, the tensor-friendly, state-space baseline variant of BDH (see the paper's BDH-GPU section and its PyTorch appendix). The full graph-based BDH model — including its explicit excitatory/inhibitory graphs and Hebbian plasticity rules — is presented in the paper but not reproduced here.
+
 BDH formalizes a bridge between **neural computation and machine-based language understanding**. It shows how **macro reasoning behavior** in large AI models emerges from **micro-level neuron dynamics**, guided by principles of graph theory and local computation.
 
 Empirically, BDH matches **GPT-2–scale Transformers** across language and translation tasks at equivalent parameter scales (10M–1B).

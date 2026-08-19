@@ -14,11 +14,10 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # On a Mac you can also try
 # device=torch.device('mps')
 
-dtype = (
-    "bfloat16"
-    if torch.cuda.is_available() and torch.cuda.is_bf16_supported()
-    else "float16"
-)  # 'float32', 'bfloat16', or 'float16', the latter will auto implement a GradScaler
+if torch.cuda.is_available():
+    dtype = "bfloat16" if torch.cuda.is_bf16_supported() else "float16"
+else:
+    dtype = "float32"
 ptdtype = {
     "float32": torch.float32,
     "bfloat16": torch.bfloat16,
@@ -31,6 +30,8 @@ ctx = (
 )
 scaler = torch.amp.GradScaler(device=device.type, enabled=(dtype == "float16"))
 torch.manual_seed(1337)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed_all(1337)
 torch.backends.cuda.matmul.allow_tf32 = True  # allow tf32 on matmul
 torch.backends.cudnn.allow_tf32 = True  # allow tf32 on cudnn
 print(f"Using device: {device} with dtype {dtype}")
@@ -52,13 +53,21 @@ input_file_path = os.path.join(os.path.dirname(__file__), "input.txt")
 def fetch_data():
     if not os.path.exists(input_file_path):
         data_url = "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt"
+        response = requests.get(data_url)
+        response.raise_for_status()
         with open(input_file_path, "w") as f:
-            f.write(requests.get(data_url).text)
+            f.write(response.text)
+
+
+_memmap_data = None
 
 
 def get_batch(split):
-    # treat the file as bytes
-    data = np.memmap(input_file_path, dtype=np.uint8, mode="r")
+    global _memmap_data
+    if _memmap_data is None:
+        # treat the file as bytes
+        _memmap_data = np.memmap(input_file_path, dtype=np.uint8, mode="r")
+    data = _memmap_data
     if split == "train":
         data = data[: int(0.9 * len(data))]
     else:
@@ -83,10 +92,6 @@ def get_batch(split):
     return x, y
 
 
-def eval(model):
-    model.eval()
-
-
 if __name__ == "__main__":
     fetch_data()
 
@@ -104,7 +109,7 @@ if __name__ == "__main__":
         with ctx:
             logits, loss = model(x, y)
         x, y = get_batch("train")
-        loss_acc += loss
+        loss_acc += loss.detach()
         loss_steps += 1
         scaler.scale(loss).backward()
         scaler.step(optimizer)

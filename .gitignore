@@ -1,1 +1,8 @@
 input.txt
+__pycache__/
+data/
+out/
+.jspace/
+.kilo/
+.kilocode/
+.skills/
