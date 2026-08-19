@@ -1,7 +1,6 @@
 """Byte-level datasets for the pipeline (no tokenizer; vocab is the raw 256 bytes)."""
 
 import os
-import zipfile
 
 import numpy as np
 import requests
@@ -10,7 +9,12 @@ import torch
 SHAKESPEARE_URL = (
     "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt"
 )
-WIKITEXT_URL = "https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-2-raw-v1.zip"
+# HuggingFace datasets-server parquet mirrors of Salesforce/wikitext (the original
+# research.metamind.io S3 bucket is not reachable from all environments).
+WIKITEXT_PARQUET_BASE = (
+    "https://huggingface.co/datasets/Salesforce/wikitext/resolve/"
+    "refs%2Fconvert%2Fparquet/wikitext-2-raw-v1"
+)
 
 
 def _download(url: str, dest: str) -> None:
@@ -30,20 +34,17 @@ def _prepare_shakespeare(data_dir: str):
 
 
 def _prepare_wikitext2(data_dir: str):
-    zpath = os.path.join(data_dir, "wikitext-2-raw-v1.zip")
-    if not os.path.exists(zpath):
-        _download(WIKITEXT_URL, zpath)
-    with zipfile.ZipFile(zpath) as zf:
-        names = zf.namelist()
+    import pyarrow.parquet as pq
 
-        def read_part(key):
-            for name in names:
-                base = os.path.basename(name)
-                if base.endswith(".raw") and key in base:
-                    return zf.read(name)
-            raise FileNotFoundError(f"no {key} split in {zpath}")
+    def load_split(split):
+        path = os.path.join(data_dir, f"wikitext2-{split}.parquet")
+        if not os.path.exists(path):
+            _download(f"{WIKITEXT_PARQUET_BASE}/{split}/0000.parquet", path)
+        table = pq.read_table(path)
+        lines = [row.rstrip("\n") for row in table.column("text").to_pylist()]
+        return "\n".join(lines).encode("utf-8")
 
-        return read_part("train"), read_part("valid"), read_part("test")
+    return load_split("train"), load_split("validation"), load_split("test")
 
 
 class ByteDataset:
