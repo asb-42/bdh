@@ -11,9 +11,11 @@ which, with the same absolute-position RoPE, reproduces exactly the causal
 attention scores ``sum_{tau<t} v_tau (q_t . k_tau)`` of the quadratic form.
 
 This makes attention linear in the sequence length ``T`` (with ``O(chunk^2)``
-intra-chunk cost) instead of quadratic. Everything else (the low-rank encoder /
-decoder MLP, gating, LayerNorms, residual structure) is inherited unchanged from
-``bdh.BDH``.
+intra-chunk cost) instead of quadratic. The recurrent state is accumulated in
+fp32 (even under autocast) since it sums outer products over all chunks; the
+per-chunk matmuls stay in the input dtype. Everything else (the low-rank
+encoder / decoder MLP, gating, LayerNorms, residual structure) is inherited
+unchanged from ``bdh.BDH``.
 """
 
 import torch
@@ -50,15 +52,19 @@ class LinearAttention(nn.Module):
         qk = Attention.rope(r_phases, Q)  # Q == K, so a single RoPE'd tensor
 
         c = self.chunk_size
-        state = torch.zeros(B, nh, D, N, device=qk.device, dtype=qk.dtype)
+        # The recurrent state sums outer products over all T/c chunks, so it is
+        # accumulated in fp32 (outside autocast) to avoid bf16 drift on long
+        # sequences; per-chunk matmuls stay in the input dtype.
+        state = torch.zeros(B, nh, D, N, device=qk.device, dtype=torch.float32)
         outs = []
         for i in range(0, T, c):
             qi = qk[:, :, i : i + c]  # (B, nh, c, N)
             vi = V[:, :, i : i + c]  # (B, 1, c, D)
             intra = (qi @ qi.mT).tril(-1) @ vi  # (B, nh, c, D), causal within chunk
-            inter = (state @ qi.mT).transpose(-1, -2)  # (B, nh, c, D), from earlier chunks
+            inter = (state.to(qi.dtype) @ qi.mT).transpose(-1, -2)  # (B, nh, c, D), from earlier chunks
             outs.append(inter + intra)
-            state = state + vi.mT @ qi  # (B, nh, D, N) outer-product update
+            with torch.autocast(device_type=qk.device.type, enabled=False):
+                state = state + vi.float().mT @ qi.float()  # (B, nh, D, N) outer-product update
         return torch.cat(outs, dim=2)
 
 
