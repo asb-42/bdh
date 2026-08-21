@@ -16,6 +16,7 @@ class BDHConfig:
     n_head: int = 4
     mlp_internal_dim_multiplier: int = 128
     vocab_size: int = 256
+    block_size: int | None = None  # max context for generation; None = unbounded
 
 
 def get_freqs(n, theta, dtype):
@@ -158,14 +159,22 @@ class BDH(nn.Module):
         temperature: float = 1.0,
         top_k: int | None = None,
     ) -> torch.Tensor:
-        for _ in range(max_new_tokens):
-            idx_cond = idx
-            logits, _ = self(idx_cond)
-            logits = logits[:, -1, :] / temperature
-            if top_k is not None:
-                values, _ = torch.topk(logits, min(top_k, logits.size(-1)))
-                logits[logits < values[:, [-1]]] = float("-inf")
-            probs = F.softmax(logits, dim=-1)
-            idx_next = torch.multinomial(probs, num_samples=1)
-            idx = torch.cat((idx, idx_next), dim=1)
+        was_training = self.training
+        self.eval()
+        try:
+            for _ in range(max_new_tokens):
+                idx_cond = idx
+                if self.config.block_size is not None:
+                    idx_cond = idx_cond[:, -self.config.block_size :]
+                logits, _ = self(idx_cond)
+                logits = logits[:, -1, :] / temperature
+                if top_k is not None:
+                    values, _ = torch.topk(logits, min(top_k, logits.size(-1)))
+                    logits[logits < values[:, [-1]]] = float("-inf")
+                probs = F.softmax(logits, dim=-1)
+                idx_next = torch.multinomial(probs, num_samples=1)
+                idx = torch.cat((idx, idx_next), dim=1)
+        finally:
+            if was_training:
+                self.train()
         return idx

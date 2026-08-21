@@ -53,7 +53,7 @@ input_file_path = os.path.join(os.path.dirname(__file__), "input.txt")
 def fetch_data():
     if not os.path.exists(input_file_path):
         data_url = "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt"
-        response = requests.get(data_url)
+        response = requests.get(data_url, timeout=60)
         response.raise_for_status()
         with open(input_file_path, "w") as f:
             f.write(response.text)

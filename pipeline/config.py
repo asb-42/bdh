@@ -77,6 +77,7 @@ def build_model(cfg: Config):
                 n_head=cfg.n_head,
                 mlp_internal_dim_multiplier=cfg.mlp_internal_dim_multiplier,
                 vocab_size=cfg.vocab_size,
+                block_size=cfg.block_size,
             )
         )
         return model
@@ -92,6 +93,7 @@ def build_model(cfg: Config):
                 n_head=cfg.n_head,
                 mlp_internal_dim_multiplier=cfg.mlp_internal_dim_multiplier,
                 vocab_size=cfg.vocab_size,
+                block_size=cfg.block_size,
             ),
             chunk_size=cfg.chunk_size,
         )

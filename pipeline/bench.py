@@ -11,6 +11,7 @@ Run via:  python -m pipeline.run bench --model bdh --batch-size 32 --block-size 
 """
 
 import time
+from contextlib import nullcontext
 
 import torch
 
@@ -36,34 +37,34 @@ def bench(cfg: Config, warmup: int = 3, steps: int = 10) -> None:
 
     x, y = data.get_batch("train", cfg.block_size, cfg.batch_size, device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)
+    # fp16 autocast needs loss scaling to avoid inf gradients (and the inf-handling
+    # code paths that come with them); bf16/fp32 don't.
+    scaler = torch.amp.GradScaler(device=device.type, enabled=(dtype == torch.float16))
 
     def step():
-        with torch.amp.autocast(device_type=device.type, dtype=dtype) if device.type == "cuda" else _null():
+        with torch.amp.autocast(device_type=device.type, dtype=dtype) if device.type == "cuda" else nullcontext():
             _, loss = model(x, y)
-        loss.backward()
-        optimizer.step()
+        scaler.scale(loss).backward()
+        scaler.step(optimizer)
+        scaler.update()
         optimizer.zero_grad(set_to_none=True)
 
     if cfg.compile:
-        model = torch.compile(model)
+        model = torch.compile(model)  # note: step() closes over `model`, so it picks this up
 
     for _ in range(warmup):
         step()
 
+    if device.type == "cuda":
+        torch.cuda.synchronize()
     t0 = time.time()
     for _ in range(steps):
         step()
+    if device.type == "cuda":
+        torch.cuda.synchronize()
     dt = (time.time() - t0) / steps
 
     print(f"model={cfg.model} dataset={cfg.dataset} device={device} dtype={dtype} compile={cfg.compile}")
     print(f"params={n_params:,}  block={cfg.block_size}  batch={cfg.batch_size}")
     print(f"per-step {dt * 1000:.1f} ms | est FLOPs/step {flops / 1e12:.3f} T | "
           f"effective {flops / dt / 1e12:.2f} TFLOP/s")
-
-
-class _null:
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *args):
-        return False
