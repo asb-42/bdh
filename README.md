@@ -85,6 +85,20 @@ pip install -r requirements.txt
 python train.py
 ```
 
+For the full pipeline (LR schedule, gradient clipping, eval, perplexity reporting,
+the linear-attention variant, and a parameter-matched GPT baseline), use the CLI:
+
+```bash
+# train on wikitext-2
+python -m pipeline.run train --model bdh --dataset wikitext2
+
+# evaluate a checkpoint (perplexity + generated samples)
+python -m pipeline.run eval --model bdh --dataset wikitext2 --tag best
+
+# benchmark BDH vs BDH-linear vs GPT
+python -m pipeline.run bench --model bdh
+```
+
 <!--For visualization and interpretability analysis, explore the example notebooks in `notebooks/`.-->
 
 

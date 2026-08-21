@@ -1,5 +1,6 @@
 """Training loop for BDH and the Transformer baseline (shared, model-agnostic)."""
 
+import dataclasses
 import math
 import os
 import time
@@ -42,7 +43,9 @@ def checkpoint_path(cfg: Config, tag: str) -> str:
 def save_checkpoint(cfg: Config, model, optimizer, step: int, best_val: float, tag: str) -> None:
     torch.save(
         {
-            "cfg": cfg,
+            # plain dict (not a pickled dataclass) so the checkpoint can be loaded
+            # with torch.load(..., weights_only=True)
+            "cfg": dataclasses.asdict(cfg),
             "step": step,
             "best_val": best_val,
             "model_state": model.state_dict(),

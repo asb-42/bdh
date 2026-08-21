@@ -41,6 +41,8 @@ def _prepare_wikitext2(data_dir: str):
         if not os.path.exists(path):
             _download(f"{WIKITEXT_PARQUET_BASE}/{split}/0000.parquet", path)
         table = pq.read_table(path)
+        # Intentional normalization: strip each row's trailing newlines and rejoin
+        # with single newlines so blank-line runs collapse to one.
         lines = [row.rstrip("\n") for row in table.column("text").to_pylist()]
         return "\n".join(lines).encode("utf-8")
 

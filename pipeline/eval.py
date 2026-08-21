@@ -15,8 +15,15 @@ def load_checkpoint(cfg: Config, tag: str):
     path = checkpoint_path(cfg, tag)
     if not os.path.exists(path):
         raise FileNotFoundError(f"no checkpoint at {path}")
-    ckpt = torch.load(path, map_location="cpu", weights_only=False)
-    model = build_model(ckpt["cfg"]).to("cpu")
+    try:
+        ckpt = torch.load(path, map_location="cpu", weights_only=True)
+    except Exception:
+        # older checkpoints may contain a pickled Config dataclass
+        ckpt = torch.load(path, map_location="cpu", weights_only=False)
+    model_cfg = ckpt["cfg"]
+    if isinstance(model_cfg, dict):
+        model_cfg = Config(**model_cfg)
+    model = build_model(model_cfg).to("cpu")
     model.load_state_dict(ckpt["model_state"])
     return model, ckpt
 

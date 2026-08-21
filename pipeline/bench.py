@@ -3,9 +3,11 @@
 Used to establish the BDH-vs-GPT cost baseline on whatever hardware is available
 (CPU or GPU). Reports:
   - params
-  - ms/step (forward+backward, after warmup)
-  - estimated FLOPs/step (forward+backward)
+  - ms/step (forward+backward+optimizer, after warmup)
+  - estimated FLOPs/step (forward+backward; optimizer cost not included)
   - effective TFLOP/s
+
+Uses synthetic random tokens (no dataset download is needed to benchmark).
 
 Run via:  python -m pipeline.run bench --model bdh --batch-size 32 --block-size 128
 """
@@ -23,19 +25,18 @@ from pipeline.config import (
     resolve_device,
     resolve_dtype,
 )
-from pipeline.data import load_dataset
 
 
 def bench(cfg: Config, warmup: int = 3, steps: int = 10) -> None:
     device = resolve_device(cfg)
     dtype = resolve_dtype(cfg, device)
-    data = load_dataset(cfg)
 
     model = build_model(cfg).to(device)
     n_params = param_count(model)
     flops = estimate_flops(cfg, cfg.batch_size, cfg.block_size)
 
-    x, y = data.get_batch("train", cfg.block_size, cfg.batch_size, device)
+    x = torch.randint(0, cfg.vocab_size, (cfg.batch_size, cfg.block_size), device=device)
+    y = torch.randint(0, cfg.vocab_size, (cfg.batch_size, cfg.block_size), device=device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)
     # fp16 autocast needs loss scaling to avoid inf gradients (and the inf-handling
     # code paths that come with them); bf16/fp32 don't.
@@ -64,7 +65,7 @@ def bench(cfg: Config, warmup: int = 3, steps: int = 10) -> None:
         torch.cuda.synchronize()
     dt = (time.time() - t0) / steps
 
-    print(f"model={cfg.model} dataset={cfg.dataset} device={device} dtype={dtype} compile={cfg.compile}")
+    print(f"model={cfg.model} dataset={cfg.dataset} (synthetic data) device={device} dtype={dtype} compile={cfg.compile}")
     print(f"params={n_params:,}  block={cfg.block_size}  batch={cfg.batch_size}")
-    print(f"per-step {dt * 1000:.1f} ms | est FLOPs/step {flops / 1e12:.3f} T | "
+    print(f"per-step {dt * 1000:.1f} ms (incl. optimizer) | est FLOPs/step {flops / 1e12:.3f} T | "
           f"effective {flops / dt / 1e12:.2f} TFLOP/s")
