@@ -5,6 +5,7 @@ Usage:
     python -m pipeline.run eval  --model bdh --dataset shakespeare [--tag best]
     python -m pipeline.run bench --model bdh [--batch-size 32 --block-size 128]
     python -m pipeline.run merge --ckpt-a out/a_best.pt --ckpt-b out/b_best.pt --out out/merged.pt
+    python -m pipeline.run analyze --ckpt out/bdh_best.pt --sparsity | --graph | --synapse l:h:i:j
 """
 
 import argparse
@@ -29,12 +30,15 @@ def _merge_cli(argv: list[str]) -> int:
 
 
 def main() -> int:
-    if len(sys.argv) < 2 or sys.argv[1] not in ("train", "eval", "bench", "merge"):
+    if len(sys.argv) < 2 or sys.argv[1] not in ("train", "eval", "bench", "merge", "analyze"):
         print(__doc__)
         return 1
     cmd = sys.argv[1]
     if cmd == "merge":
         return _merge_cli(sys.argv[2:])
+    if cmd == "analyze":
+        from pipeline.analyze import main as analyze_main
+        return analyze_main(sys.argv[2:])
     cfg = parse_args(sys.argv[2:])
     if cmd == "train":
         train(cfg)
