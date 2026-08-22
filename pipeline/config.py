@@ -9,7 +9,7 @@ import torch
 
 @dataclass
 class Config:
-    model: str = "bdh"                     # bdh | transformer
+    model: str = "bdh"                     # bdh | bdh-linear | bdh-prime | transformer
     dataset: str = "shakespeare"           # shakespeare | wikitext2
     n_layer: int = 4
     n_embd: int = 96
@@ -107,6 +107,25 @@ def build_model(cfg: Config):
             chunk_size=cfg.chunk_size,
         )
         return model
+    if cfg.model == "bdh-prime":
+        from bdh import BDHConfig
+        from bdh_prime import BDHPrime
+
+        model = BDHPrime(
+            BDHConfig(
+                n_layer=cfg.n_layer,
+                n_embd=cfg.n_embd,
+                dropout=cfg.dropout,
+                n_head=cfg.n_head,
+                mlp_internal_dim_multiplier=cfg.mlp_internal_dim_multiplier,
+                vocab_size=cfg.vocab_size,
+                block_size=cfg.block_size,
+                no_bptt=cfg.no_bptt,
+                alibi_slope=cfg.alibi_slope,
+            ),
+            chunk_size=cfg.chunk_size,
+        )
+        return model
     if cfg.model == "transformer":
         from pipeline.transformer import GPT, GPTConfig
 
@@ -175,7 +194,9 @@ def estimate_transformer_flops(cfg: Config, b: int, t: int) -> int:
 def estimate_flops(cfg: Config, b: int, t: int) -> int:
     if cfg.model == "bdh":
         return estimate_bdh_flops(cfg, b, t)
-    if cfg.model == "bdh-linear":
+    if cfg.model == "bdh-linear" or cfg.model == "bdh-prime":
+        # gated scan is per-token; treat cost as the linear-attention estimate
+        # (upper bound for the vanilla scan, lower bound for the gated one)
         return estimate_bdh_linear_flops(cfg, b, t)
     return estimate_transformer_flops(cfg, b, t)
 
