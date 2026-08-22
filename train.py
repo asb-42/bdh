@@ -107,7 +107,7 @@ if __name__ == "__main__":
     loss_steps = 0
     for step in range(MAX_ITERS):
         with ctx:
-            logits, loss = model(x, y)
+            logits, loss, _ = model(x, y)
         x, y = get_batch("train")
         loss_acc += loss.detach()
         loss_steps += 1

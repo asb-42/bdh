@@ -44,7 +44,7 @@ def bench(cfg: Config, warmup: int = 3, steps: int = 10) -> None:
 
     def step():
         with torch.amp.autocast(device_type=device.type, dtype=dtype) if device.type == "cuda" else nullcontext():
-            _, loss = model(x, y)
+            _, loss, _ = model(x, y)
         scaler.scale(loss).backward()
         scaler.step(optimizer)
         scaler.update()

@@ -42,6 +42,9 @@ class Config:
     tag: str = "best"                      # checkpoint tag for eval
     num_samples: int = 3                   # eval: number of generated samples
     max_new_tokens: int = 200              # eval: tokens to generate per sample
+    carry_state: bool = False              # carry attention state across minibatches (paper App. B)
+    sequential_batches: bool = False       # temporally coherent batches (continuation streams)
+    tbptt_horizon: int = 1                 # minibatches per truncated-BPTT window (1 = detach every step)
 
 
 def estimate_bdh_params(cfg: Config) -> int:

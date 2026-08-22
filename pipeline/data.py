@@ -49,6 +49,35 @@ def _prepare_wikitext2(data_dir: str):
     return load_split("train"), load_split("validation"), load_split("test")
 
 
+class ByteStream:
+    """Sequential (temporally coherent) batch stream over one split.
+
+    Serves batch b as the continuation of batch b-1 along `batch_size`
+    independent streams, mirroring the paper's training setup (Appendix B):
+    subsequent minibatches are related, so a carried attention state can
+    meaningfully persist across them.
+    """
+
+    def __init__(self, data: np.ndarray, block_size: int, batch_size: int):
+        self.data = data
+        self.block_size = block_size
+        self.batch_size = batch_size
+        span = max(1, (len(data) - 2 * block_size - 1) // batch_size)
+        self.cursors = np.arange(batch_size) * span
+
+    def next_batch(self, device):
+        xs, ys = [], []
+        for i in range(self.batch_size):
+            c = int(self.cursors[i])
+            xs.append(torch.from_numpy(self.data[c : c + self.block_size].astype(np.int64)))
+            ys.append(
+                torch.from_numpy(self.data[c + 1 : c + 1 + self.block_size].astype(np.int64))
+            )
+            nxt = c + self.block_size
+            self.cursors[i] = nxt if nxt + self.block_size + 1 < len(self.data) else 0
+        return torch.stack(xs).to(device), torch.stack(ys).to(device)
+
+
 class ByteDataset:
     def __init__(self, train: bytes, val: bytes, test: bytes | None = None):
         self.train = np.frombuffer(train, dtype=np.uint8)
@@ -68,6 +97,9 @@ class ByteDataset:
             [torch.from_numpy(data[i + 1 : i + 1 + block_size].astype(np.int64)) for i in ix]
         )
         return x.to(device), y.to(device)
+
+    def make_stream(self, split, block_size, batch_size) -> ByteStream:
+        return ByteStream(getattr(self, split), block_size, batch_size)
 
 
 def load_dataset(cfg) -> ByteDataset:

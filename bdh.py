@@ -17,6 +17,37 @@ class BDHConfig:
     mlp_internal_dim_multiplier: int = 128
     vocab_size: int = 256
     block_size: int | None = None  # max context for generation; None = unbounded
+    attn_window: int = 1024  # quadratic attention: max cached past tokens (0 = unlimited)
+
+
+def detach_state(state):
+    """Detach a model state (as returned by ``BDH.forward``) from the autograd graph."""
+    if state is None:
+        return None
+    layers = []
+    for s in state["layers"]:
+        if s is None:
+            layers.append(None)
+        elif isinstance(s, dict):
+            layers.append({k: v.detach() for k, v in s.items()})
+        else:
+            layers.append(s.detach())
+    return {"pos": state["pos"], "layers": layers}
+
+
+def state_to_cpu(state):
+    """Move a detached model state to CPU (for checkpointing)."""
+    if state is None:
+        return None
+    layers = []
+    for s in state["layers"]:
+        if s is None:
+            layers.append(None)
+        elif isinstance(s, dict):
+            layers.append({k: v.cpu() for k, v in s.items()})
+        else:
+            layers.append(s.cpu())
+    return {"pos": state["pos"], "layers": layers}
 
 
 def get_freqs(n, theta, dtype):
@@ -54,25 +85,42 @@ class Attention(torch.nn.Module):
         phases_cos, phases_sin = Attention.phases_cos_sin(phases)
         return (v * phases_cos).to(v.dtype) + (v_rot * phases_sin).to(v.dtype)
 
-    def forward(self, Q, K, V):
+    def forward(self, Q, V, state=None, pos_offset=0):
+        """Causal attention of Q over V, optionally attending to cached past tokens.
+
+        state: None or {"k": rotated past keys (B,nh,S,N), "v": past values (B,1,S,D)}.
+        pos_offset: absolute position of the first query token (continues across
+            calls when state is carried over).
+        Returns (output, new_state).
+        """
         assert self.freqs.dtype == torch.float32
-        assert K is Q
         _, _, T, _ = Q.size()
 
         r_phases = (
             torch.arange(
-                0,
-                T,
+                pos_offset,
+                pos_offset + T,
                 device=self.freqs.device,
                 dtype=self.freqs.dtype,
             ).view(1, 1, -1, 1)
         ) * self.freqs
         QR = self.rope(r_phases, Q)
-        KR = QR
 
-        # Current attention
-        scores = (QR @ KR.mT).tril(diagonal=-1)
-        return scores @ V
+        if state is None:
+            scores = (QR @ QR.mT).tril(diagonal=-1)
+            out = scores @ V
+            new_state = {"k": QR, "v": V}
+        else:
+            Kc, Vc = state["k"], state["v"]
+            # Past keys were rotated at their (absolute) positions, so the dot
+            # product against QR reproduces the RoPE-relative scores U^{t-tau}.
+            scores_past = QR @ Kc.mT
+            scores_intra = (QR @ QR.mT).tril(diagonal=-1)
+            out = torch.cat([scores_past, scores_intra], dim=-1) @ torch.cat(
+                [Vc, V], dim=2
+            )
+            new_state = {"k": torch.cat([Kc, QR], dim=2), "v": torch.cat([Vc, V], dim=2)}
+        return out, new_state
 
 
 class BDH(nn.Module):
@@ -107,7 +155,15 @@ class BDH(nn.Module):
         elif isinstance(module, nn.Embedding):
             nn.init.normal_(module.weight, mean=0.0, std=0.02)
 
-    def forward(self, idx, targets=None):
+    def forward(self, idx, targets=None, state=None):
+        """State-space forward pass.
+
+        state: None, or {"pos": int, "layers": [per-layer attention state]} as
+        returned by a previous call. Carrying state across calls continues both
+        the absolute RoPE positions and the attention memory (the paper's
+        recurrent state rho), enabling state carry-over / truncated BPTT.
+        Returns (logits, loss, new_state).
+        """
         C = self.config
 
         B, T = idx.size()
@@ -115,21 +171,43 @@ class BDH(nn.Module):
         nh = C.n_head
         N = D * C.mlp_internal_dim_multiplier // nh
 
+        if state is None:
+            pos = 0
+            layer_states = [None] * C.n_layer
+        else:
+            pos = state["pos"]
+            layer_states = state["layers"]
+
         x = self.embed(idx).unsqueeze(1)
 
         # actually helps with training
         x = self.ln(x)  # B, 1, T, D
 
+        new_layers = []
         for level in range(C.n_layer):
+            layer_state = layer_states[level]
+            if (
+                layer_state is not None
+                and isinstance(layer_state, dict)
+                and C.attn_window
+                and layer_state["k"].size(2) > C.attn_window
+            ):
+                layer_state = {
+                    "k": layer_state["k"][:, :, -C.attn_window :],
+                    "v": layer_state["v"][:, :, -C.attn_window :],
+                }
+
             x_latent = x @ self.encoder
 
             x_sparse = F.relu(x_latent)  # B, nh, T, N
 
-            yKV = self.attn(
-                Q=x_sparse,
-                K=x_sparse,
-                V=x,
+            yKV, layer_new_state = self.attn(
+                x_sparse,
+                x,
+                state=layer_state,
+                pos_offset=pos,
             )
+            new_layers.append(layer_new_state)
             yKV = self.ln(yKV)
 
             y_latent = yKV @ self.encoder_v
@@ -149,7 +227,8 @@ class BDH(nn.Module):
         if targets is not None:
             loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
 
-        return logits, loss
+        new_state = {"pos": pos + T, "layers": new_layers}
+        return logits, loss, new_state
 
     @torch.no_grad()
     def generate(
@@ -166,7 +245,7 @@ class BDH(nn.Module):
                 idx_cond = idx
                 if self.config.block_size is not None:
                     idx_cond = idx_cond[:, -self.config.block_size :]
-                logits, _ = self(idx_cond)
+                logits, _, _ = self(idx_cond)
                 logits = logits[:, -1, :] / temperature
                 if top_k is not None:
                     values, _ = torch.topk(logits, min(top_k, logits.size(-1)))

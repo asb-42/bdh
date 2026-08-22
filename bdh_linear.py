@@ -37,35 +37,47 @@ class LinearAttention(nn.Module):
             get_freqs(N, theta=2**16, dtype=torch.float32).view(1, 1, 1, N)
         )
 
-    def forward(self, Q, K, V):
+    def forward(self, Q, V, state=None, pos_offset=0):
+        """Chunked linear-attention scan, optionally continuing from carried state.
+
+        state: None or the recurrent attention state rho (B, nh, D, N), float32,
+        as returned by a previous call. pos_offset continues absolute RoPE
+        positions across calls. Returns (output, new_state).
+        """
         assert self.freqs.dtype == torch.float32
-        assert K is Q
         B, _, T, N = Q.size()
         nh = self.config.n_head
         D = V.size(-1)
 
         r_phases = (
-            torch.arange(0, T, device=self.freqs.device, dtype=self.freqs.dtype).view(
-                1, 1, -1, 1
-            )
+            torch.arange(
+                pos_offset,
+                pos_offset + T,
+                device=self.freqs.device,
+                dtype=self.freqs.dtype,
+            ).view(1, 1, -1, 1)
         ) * self.freqs
-        qk = Attention.rope(r_phases, Q)  # Q == K, so a single RoPE'd tensor
+        qk = Attention.rope(r_phases, Q)
 
         c = self.chunk_size
-        # The recurrent state sums outer products over all T/c chunks, so it is
-        # accumulated in fp32 (outside autocast) to avoid bf16 drift on long
-        # sequences; per-chunk matmuls stay in the input dtype.
-        state = torch.zeros(B, nh, D, N, device=qk.device, dtype=torch.float32)
+        # The recurrent state sums outer products over all chunks (and, when
+        # carried over, over all previous calls), so it is accumulated in fp32
+        # (outside autocast) to avoid bf16 drift on long sequences; per-chunk
+        # matmuls stay in the input dtype.
+        if state is not None:
+            rho = state
+        else:
+            rho = torch.zeros(B, nh, D, N, device=qk.device, dtype=torch.float32)
         outs = []
         for i in range(0, T, c):
             qi = qk[:, :, i : i + c]  # (B, nh, c, N)
             vi = V[:, :, i : i + c]  # (B, 1, c, D)
             intra = (qi @ qi.mT).tril(-1) @ vi  # (B, nh, c, D), causal within chunk
-            inter = (state.to(qi.dtype) @ qi.mT).transpose(-1, -2)  # (B, nh, c, D), from earlier chunks
+            inter = (rho.to(qi.dtype) @ qi.mT).transpose(-1, -2)  # (B, nh, c, D), from earlier chunks/calls
             outs.append(inter + intra)
             with torch.autocast(device_type=qk.device.type, enabled=False):
-                state = state + vi.float().mT @ qi.float()  # (B, nh, D, N) outer-product update
-        return torch.cat(outs, dim=2)
+                rho = rho + vi.float().mT @ qi.float()  # (B, nh, D, N) outer-product update
+        return torch.cat(outs, dim=2), rho
 
 
 class BDHLinear(BDH):

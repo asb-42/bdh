@@ -8,6 +8,8 @@ from contextlib import nullcontext
 
 import torch
 
+from bdh import detach_state, state_to_cpu
+
 from pipeline import config as cfg_mod
 from pipeline.config import Config, build_model, param_count, resolve_device, resolve_dtype
 from pipeline.data import load_dataset
@@ -29,7 +31,7 @@ def estimate_loss(model, data, cfg: Config, device, ctx, split: str) -> float:
     for _ in range(cfg.eval_iters):
         x, y = data.get_batch(split, cfg.block_size, cfg.batch_size, device)
         with ctx:
-            _, loss = model(x, y)
+            _, loss, _ = model(x, y)
         losses.append(loss.item())
     model.train()
     return sum(losses) / len(losses)
@@ -40,7 +42,8 @@ def checkpoint_path(cfg: Config, tag: str) -> str:
     return os.path.join(cfg.out_dir, f"{cfg.model}_{cfg.dataset}_{tag}.pt")
 
 
-def save_checkpoint(cfg: Config, model, optimizer, step: int, best_val: float, tag: str) -> None:
+def save_checkpoint(cfg: Config, model, optimizer, step: int, best_val: float, tag: str,
+                    state=None) -> None:
     torch.save(
         {
             # plain dict (not a pickled dataclass) so the checkpoint can be loaded
@@ -50,6 +53,7 @@ def save_checkpoint(cfg: Config, model, optimizer, step: int, best_val: float, t
             "best_val": best_val,
             "model_state": model.state_dict(),
             "optimizer_state": optimizer.state_dict(),
+            "state": state,  # carried attention state (CPU tensors), or None
         },
         checkpoint_path(cfg, tag),
     )
@@ -93,24 +97,61 @@ def train(cfg: Config) -> None:
     best_val = float("inf")
     t0 = time.time()
     running_loss = 0.0
-    x, y = data.get_batch("train", cfg.block_size, cfg.batch_size, device)
+    stream = (
+        data.make_stream("train", cfg.block_size, cfg.batch_size)
+        if cfg.sequential_batches
+        else None
+    )
+    if cfg.carry_state and stream is None:
+        print("warning: --carry-state without --sequential-batches carries state across "
+              "unrelated random batches; consider --sequential-batches")
 
-    for step in range(cfg.max_iters):
-        lr = get_lr(step, cfg)
-        for group in optimizer.param_groups:
-            group["lr"] = lr
+    state = None          # carried attention state (graph-attached within a TBPTT window)
+    window_loss = None    # accumulated loss over the current TBPTT window
+    horizon = max(1, cfg.tbptt_horizon)
 
-        with ctx:
-            _, loss = model(x, y)
-        x, y = data.get_batch("train", cfg.block_size, cfg.batch_size, device)
-
-        scaler.scale(loss).backward()
+    def optimizer_step():
         if cfg.grad_clip > 0:
             scaler.unscale_(optimizer)
             torch.nn.utils.clip_grad_norm_(raw_model.parameters(), cfg.grad_clip)
         scaler.step(optimizer)
         scaler.update()
         optimizer.zero_grad(set_to_none=True)
+
+    for step in range(cfg.max_iters):
+        lr = get_lr(step, cfg)
+        for group in optimizer.param_groups:
+            group["lr"] = lr
+
+        if stream is not None:
+            x, y = stream.next_batch(device)
+        else:
+            x, y = data.get_batch("train", cfg.block_size, cfg.batch_size, device)
+
+        with ctx:
+            _, loss, new_state = model(x, y, state)
+
+        if cfg.carry_state and horizon > 1:
+            # Truncated BPTT: accumulate the loss over `horizon` minibatches (the
+            # graph stays attached through the carried state), then backprop and
+            # step once at the window boundary.
+            window_loss = loss if window_loss is None else window_loss + loss
+            state = new_state
+            if (step + 1) % horizon == 0 or step == cfg.max_iters - 1:
+                scaler.scale(window_loss).backward()
+                optimizer_step()
+                window_loss = None
+                state = detach_state(state)
+        elif cfg.carry_state:
+            # horizon == 1: carry state forward but detach it every step
+            # ("almost no BPTT" through state; context still persists).
+            scaler.scale(loss).backward()
+            optimizer_step()
+            state = detach_state(new_state)
+        else:
+            state = None
+            scaler.scale(loss).backward()
+            optimizer_step()
 
         running_loss += loss.detach().item()
 
@@ -131,8 +172,12 @@ def train(cfg: Config) -> None:
             print("".join(parts))
             if val_loss < best_val:
                 best_val = val_loss
-                save_checkpoint(cfg, raw_model, optimizer, step + 1, best_val, "best")
+                save_checkpoint(
+                    cfg, raw_model, optimizer, step + 1, best_val, "best",
+                    state=state_to_cpu(detach_state(state)) if cfg.carry_state else None,
+                )
 
-    save_checkpoint(cfg, raw_model, optimizer, cfg.max_iters, best_val, "last")
+    save_checkpoint(cfg, raw_model, optimizer, cfg.max_iters, best_val, "last",
+                    state=state_to_cpu(detach_state(state)) if cfg.carry_state else None)
     print(f"done. best val_loss {best_val:.4f} (ppl {math.exp(best_val):.2f}) -> "
           f"{checkpoint_path(cfg, 'best')}")

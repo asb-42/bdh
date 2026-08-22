@@ -92,7 +92,9 @@ class GPT(nn.Module):
         elif isinstance(module, nn.Embedding):
             nn.init.normal_(module.weight, mean=0.0, std=0.02)
 
-    def forward(self, idx, targets=None):
+    def forward(self, idx, targets=None, state=None):
+        """Same interface as bdh.BDH.forward; the Transformer carries no state
+        (its KV-cache is not part of the shared state-space interface)."""
         b, t = idx.shape
         assert t <= self.cfg.block_size, "sequence longer than block_size"
         pos = torch.arange(0, t, dtype=torch.long, device=idx.device)
@@ -103,7 +105,7 @@ class GPT(nn.Module):
         loss = None
         if targets is not None:
             loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
-        return logits, loss
+        return logits, loss, None
 
     @torch.no_grad()
     def generate(self, idx, max_new_tokens, temperature=1.0, top_k=None):
