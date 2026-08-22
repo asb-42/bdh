@@ -113,15 +113,25 @@ params on the repo's wikitext benchmark.
 
 ## Execution order & commits
 
-| Order | Phase | Effort | Risk |
-|-------|-------|--------|------|
-| 1 | Phase 1 (TBPTT + carry-over) | medium | medium — touches model API |
-| 2 | Phase 2 (no-BPTT flag) | tiny | none |
-| 3 | Phase 3 (ALiBi) | small | low |
-| 4 | Phase 4 (merging) | small | low |
-| 5 | Phase 5 (tooling) | medium | low |
-| 6 | Phase 6 (BDH-GPU′) | large | medium |
+| Order | Phase | Effort | Risk | Status |
+|-------|-------|--------|------|--------|
+| 1 | Phase 1 (TBPTT + carry-over) | medium | medium — touches model API | ✅ done (`eef5f7e`) |
+| 2 | Phase 2 (no-BPTT flag) | tiny | none | ✅ done (`9b28ed6`) |
+| 3 | Phase 3 (ALiBi) | small | low | ✅ done (`c282338`) |
+| 4 | Phase 4 (merging) | small | low | ✅ done (`22f7276`) |
+| 5 | Phase 5 (tooling) | medium | low | ✅ done (`de0d04f`) |
+| 6 | Phase 6 (BDH-GPU′) | large | medium | ✅ done (`067fe9f`) |
 
 One commit per phase. Phases 1–2 share test infrastructure (stateful forward),
 so they land back-to-back. Every phase keeps the existing stateless behavior as
 the default so current scripts/CLIs remain valid.
+
+## Known follow-ups
+
+- Gated scan in `bdh_prime.py` is a per-token recurrence; a fused parallel
+  scan would be needed for GPU-scale training of BDH-GPU′.
+- ALiBi damping uses a uniform rate across heads; per-head (or per-edge,
+  paper-faithful u(i,j)) rates are a natural extension.
+- Quadratic-path state carry-over keeps an unbounded KV cache when
+  `attn_window=0`; window trimming is approximate w.r.t. full attention only
+  when decay is disabled.
