@@ -45,6 +45,7 @@ class Config:
     carry_state: bool = False              # carry attention state across minibatches (paper App. B)
     sequential_batches: bool = False       # temporally coherent batches (continuation streams)
     tbptt_horizon: int = 1                 # minibatches per truncated-BPTT window (1 = detach every step)
+    no_bptt: bool = False                  # detach K/V inside attention: no backprop through time (paper Sec. 5.2)
 
 
 def estimate_bdh_params(cfg: Config) -> int:
@@ -81,6 +82,7 @@ def build_model(cfg: Config):
                 mlp_internal_dim_multiplier=cfg.mlp_internal_dim_multiplier,
                 vocab_size=cfg.vocab_size,
                 block_size=cfg.block_size,
+                no_bptt=cfg.no_bptt,
             )
         )
         return model
@@ -97,6 +99,7 @@ def build_model(cfg: Config):
                 mlp_internal_dim_multiplier=cfg.mlp_internal_dim_multiplier,
                 vocab_size=cfg.vocab_size,
                 block_size=cfg.block_size,
+                no_bptt=cfg.no_bptt,
             ),
             chunk_size=cfg.chunk_size,
         )

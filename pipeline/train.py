@@ -108,7 +108,9 @@ def train(cfg: Config) -> None:
 
     state = None          # carried attention state (graph-attached within a TBPTT window)
     window_loss = None    # accumulated loss over the current TBPTT window
-    horizon = max(1, cfg.tbptt_horizon)
+    # --no-bptt cuts gradients through time inside attention, so a multi-step
+    # TBPTT window would be pointless; force per-step detachment.
+    horizon = 1 if cfg.no_bptt else max(1, cfg.tbptt_horizon)
 
     def optimizer_step():
         if cfg.grad_clip > 0:

@@ -18,6 +18,7 @@ class BDHConfig:
     vocab_size: int = 256
     block_size: int | None = None  # max context for generation; None = unbounded
     attn_window: int = 1024  # quadratic attention: max cached past tokens (0 = unlimited)
+    no_bptt: bool = False  # detach K/V in attention: no backprop through time (paper Sec. 5.2)
 
 
 def detach_state(state):
@@ -105,21 +106,28 @@ class Attention(torch.nn.Module):
             ).view(1, 1, -1, 1)
         ) * self.freqs
         QR = self.rope(r_phases, Q)
+        if self.config.no_bptt:
+            # Paper Sec. 5.2: detach keys and values so no gradient flows back
+            # through time; the current-token query path keeps its gradient.
+            QR_k = QR.detach()
+            V = V.detach()
+        else:
+            QR_k = QR
 
         if state is None:
-            scores = (QR @ QR.mT).tril(diagonal=-1)
+            scores = (QR @ QR_k.mT).tril(diagonal=-1)
             out = scores @ V
-            new_state = {"k": QR, "v": V}
+            new_state = {"k": QR_k, "v": V}
         else:
             Kc, Vc = state["k"], state["v"]
             # Past keys were rotated at their (absolute) positions, so the dot
             # product against QR reproduces the RoPE-relative scores U^{t-tau}.
             scores_past = QR @ Kc.mT
-            scores_intra = (QR @ QR.mT).tril(diagonal=-1)
+            scores_intra = (QR @ QR_k.mT).tril(diagonal=-1)
             out = torch.cat([scores_past, scores_intra], dim=-1) @ torch.cat(
                 [Vc, V], dim=2
             )
-            new_state = {"k": torch.cat([Kc, QR], dim=2), "v": torch.cat([Vc, V], dim=2)}
+            new_state = {"k": torch.cat([Kc, QR_k], dim=2), "v": torch.cat([Vc, V], dim=2)}
         return out, new_state
 
 

@@ -65,18 +65,25 @@ class LinearAttention(nn.Module):
         # (outside autocast) to avoid bf16 drift on long sequences; per-chunk
         # matmuls stay in the input dtype.
         if state is not None:
-            rho = state
+            rho = state.detach() if self.config.no_bptt else state
         else:
             rho = torch.zeros(B, nh, D, N, device=qk.device, dtype=torch.float32)
         outs = []
         for i in range(0, T, c):
             qi = qk[:, :, i : i + c]  # (B, nh, c, N)
             vi = V[:, :, i : i + c]  # (B, 1, c, D)
-            intra = (qi @ qi.mT).tril(-1) @ vi  # (B, nh, c, D), causal within chunk
+            if self.config.no_bptt:
+                # Paper Sec. 5.2: detach keys and values so no gradient flows
+                # back through time; the query side keeps its gradient.
+                qi_k = qi.detach()
+                vi = vi.detach()
+            else:
+                qi_k = qi
+            intra = (qi @ qi_k.mT).tril(-1) @ vi  # (B, nh, c, D), causal within chunk
             inter = (rho.to(qi.dtype) @ qi.mT).transpose(-1, -2)  # (B, nh, c, D), from earlier chunks/calls
             outs.append(inter + intra)
             with torch.autocast(device_type=qk.device.type, enabled=False):
-                rho = rho + vi.float().mT @ qi.float()  # (B, nh, D, N) outer-product update
+                rho = rho + vi.float().mT @ qi_k.float()  # (B, nh, D, N) outer-product update
         return torch.cat(outs, dim=2), rho
 
 
