@@ -64,14 +64,19 @@ class LinearAttention(nn.Module):
         # carried over, over all previous calls), so it is accumulated in fp32
         # (outside autocast) to avoid bf16 drift on long sequences; per-chunk
         # matmuls stay in the input dtype.
+        gamma = None
+        if self.config.alibi_slope > 0.0:
+            gamma = float(torch.exp(torch.tensor(-self.config.alibi_slope)))
+
         if state is not None:
             rho = state.detach() if self.config.no_bptt else state
         else:
             rho = torch.zeros(B, nh, D, N, device=qk.device, dtype=torch.float32)
         outs = []
         for i in range(0, T, c):
-            qi = qk[:, :, i : i + c]  # (B, nh, c, N)
-            vi = V[:, :, i : i + c]  # (B, 1, c, D)
+            ce = min(c, T - i)  # effective chunk size (last chunk may be short)
+            qi = qk[:, :, i : i + ce]  # (B, nh, ce, N)
+            vi = V[:, :, i : i + ce]  # (B, 1, ce, D)
             if self.config.no_bptt:
                 # Paper Sec. 5.2: detach keys and values so no gradient flows
                 # back through time; the query side keeps its gradient.
@@ -79,11 +84,31 @@ class LinearAttention(nn.Module):
                 vi = vi.detach()
             else:
                 qi_k = qi
-            intra = (qi @ qi_k.mT).tril(-1) @ vi  # (B, nh, c, D), causal within chunk
-            inter = (rho.to(qi.dtype) @ qi.mT).transpose(-1, -2)  # (B, nh, c, D), from earlier chunks/calls
+
+            if gamma is None:
+                intra = (qi @ qi_k.mT).tril(-1) @ vi  # (B, nh, ce, D)
+                inter = (rho.to(qi.dtype) @ qi.mT).transpose(-1, -2)
+                with torch.autocast(device_type=qk.device.type, enabled=False):
+                    rho = rho + vi.float().mT @ qi_k.float()
+            else:
+                dev, dt = qi.device, qi.dtype
+                idx = torch.arange(ce, device=dev, dtype=dt)
+                # ALiBi damping (paper Sec. 4.1): each token's contribution to a
+                # query decays as gamma^(elapsed distance).
+                #   read at query j:  gamma^j * rho  +  sum_{m<j} gamma^(j-m) v_m k_m
+                #   state update:     rho <- gamma^ce * rho + sum_m gamma^(ce-m) v_m k_m
+                decay_intra = (gamma ** (idx.unsqueeze(-1) - idx.unsqueeze(0))).tril(-1)
+                intra = ((qi @ qi_k.mT) * decay_intra) @ vi
+                g_pow = gamma ** idx  # gamma^j
+                inter = (rho.to(dt) @ (qi * g_pow.view(1, 1, -1, 1)).mT).transpose(-1, -2)
+                outs.append(inter + intra)
+                with torch.autocast(device_type=qk.device.type, enabled=False):
+                    w = (gamma ** (ce - 1 - idx)).view(1, 1, -1, 1)
+                    upd = (vi.float() * w).mT @ qi_k.float()
+                    rho = (gamma**ce) * rho + gamma * upd
+                continue
+
             outs.append(inter + intra)
-            with torch.autocast(device_type=qk.device.type, enabled=False):
-                rho = rho + vi.float().mT @ qi_k.float()  # (B, nh, D, N) outer-product update
         return torch.cat(outs, dim=2), rho
 
 

@@ -19,6 +19,11 @@ class BDHConfig:
     block_size: int | None = None  # max context for generation; None = unbounded
     attn_window: int = 1024  # quadratic attention: max cached past tokens (0 = unlimited)
     no_bptt: bool = False  # detach K/V in attention: no backprop through time (paper Sec. 5.2)
+    # ALiBi-style exponential damping of attention state (paper Sec. 4.1: RoPE +
+    # ALiBi damp stale context). 0.0 disables; otherwise gamma = exp(-alibi_slope)
+    # decays each token's contribution by elapsed distance (uniform rate across
+    # heads; the paper allows per-edge u(i,j) in full generality).
+    alibi_slope: float = 0.0
 
 
 def detach_state(state):
@@ -114,21 +119,42 @@ class Attention(torch.nn.Module):
         else:
             QR_k = QR
 
+        gamma = None
+        if self.config.alibi_slope > 0.0:
+            gamma = float(torch.exp(torch.tensor(-self.config.alibi_slope)))
+
         if state is None:
             scores = (QR @ QR_k.mT).tril(diagonal=-1)
+            if gamma is not None:
+                scores = scores * self._intra_decay(T, gamma, QR.device, QR.dtype)
             out = scores @ V
             new_state = {"k": QR_k, "v": V}
         else:
             Kc, Vc = state["k"], state["v"]
+            S = Kc.size(2)
             # Past keys were rotated at their (absolute) positions, so the dot
             # product against QR reproduces the RoPE-relative scores U^{t-tau}.
             scores_past = QR @ Kc.mT
             scores_intra = (QR @ QR_k.mT).tril(diagonal=-1)
+            if gamma is not None:
+                # decay by elapsed distance: gamma^(i + S - s) for cached key s
+                past_d = gamma ** torch.arange(
+                    S, 0, -1, device=QR.device, dtype=QR.dtype
+                ) * (gamma ** torch.arange(T, device=QR.device, dtype=QR.dtype)).unsqueeze(-1)
+                scores_past = scores_past * past_d
+                scores_intra = scores_intra * self._intra_decay(T, gamma, QR.device, QR.dtype)
             out = torch.cat([scores_past, scores_intra], dim=-1) @ torch.cat(
                 [Vc, V], dim=2
             )
             new_state = {"k": torch.cat([Kc, QR_k], dim=2), "v": torch.cat([Vc, V], dim=2)}
         return out, new_state
+
+    @staticmethod
+    def _intra_decay(T, gamma, device, dtype):
+        """D[i, j] = gamma^(i-j) for j < i (strictly causal), else 0."""
+        idx = torch.arange(T, device=device, dtype=dtype)
+        D = gamma ** (idx.unsqueeze(-1) - idx.unsqueeze(0))
+        return D.tril(diagonal=-1)
 
 
 class BDH(nn.Module):

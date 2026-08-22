@@ -46,6 +46,7 @@ class Config:
     sequential_batches: bool = False       # temporally coherent batches (continuation streams)
     tbptt_horizon: int = 1                 # minibatches per truncated-BPTT window (1 = detach every step)
     no_bptt: bool = False                  # detach K/V inside attention: no backprop through time (paper Sec. 5.2)
+    alibi_slope: float = 0.0               # ALiBi-style exponential damping of attention state (0 = off)
 
 
 def estimate_bdh_params(cfg: Config) -> int:
@@ -83,6 +84,7 @@ def build_model(cfg: Config):
                 vocab_size=cfg.vocab_size,
                 block_size=cfg.block_size,
                 no_bptt=cfg.no_bptt,
+                alibi_slope=cfg.alibi_slope,
             )
         )
         return model
@@ -100,6 +102,7 @@ def build_model(cfg: Config):
                 vocab_size=cfg.vocab_size,
                 block_size=cfg.block_size,
                 no_bptt=cfg.no_bptt,
+                alibi_slope=cfg.alibi_slope,
             ),
             chunk_size=cfg.chunk_size,
         )
