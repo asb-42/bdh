@@ -110,4 +110,9 @@ def load_dataset(cfg) -> ByteDataset:
         train, val, test = _prepare_wikitext2(cfg.data_dir)
     else:
         raise ValueError(f"unknown dataset: {cfg.dataset}")
+    if getattr(cfg, "train_slice", ""):
+        a, b = (float(p) for p in cfg.train_slice.split(":"))
+        if not (0 <= a < b <= 1):
+            raise ValueError(f"invalid --train-slice {cfg.train_slice!r} (need 0 <= a < b <= 1)")
+        train = train[int(a * len(train)):int(b * len(train))]
     return ByteDataset(train, val, test)

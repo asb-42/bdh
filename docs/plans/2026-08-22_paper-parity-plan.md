@@ -197,3 +197,23 @@ the default so current scripts/CLIs remain valid.
     loading checkpoints ad hoc — a default-shakespeare loader produced
     plausible-looking but cross-dataset losses (~3.0) that briefly looked like
     checkpoint corruption.
+- **2026-08-23 (long-context study, §7.3, §7.5):**
+  - **Long-context carry:** on 30k-token sequential test streams the
+    alibi005 model improves −0.086 nats from batch 1 to late-stream; window
+    sweep 512–4096 is byte-identical because exp(−0.05·d) kills attention
+    contributions within a few hundred tokens (window size moot under
+    damping). No-damping model gains more from context but from a much worse
+    cold start; random-crop control degrades +0.69 under imposed state.
+  - **§7.3 interpretability** (`alibi005`, plus new `bdh-linear lina005`,
+    val **1.1166** — best of session): real-text xy sparsity **97.4%**;
+    neuron graph at β=0.30 → power-law α≈1.94, Newman modularity **0.25**
+    (β sweep 0.25/0.30/0.40 in `out/logs` history); monosemantic synapses:
+    data-driven France-vs-Germany selection found selective synapses
+    (layer1/head3 (60,1): +34.3 FR vs +10.0 DE; layer0/head2 flips toward DE)
+    incl. suppressive responses (−51); all top hits share source neuron i=60,
+    suggesting topic-hub structure. Fixed `label_partition` bincount crash.
+  - **§7.5 merging** (needs `--train-slice a:b`, added this session): parents
+    on disjoint wikitext halves → 1.2486 / 1.2548; neuron-dim concatenation
+    merge (50.5M params, 65,536 neurons) → **1.1941 without finetuning**,
+    beating both parents; generations keep proper wikitext article style.
+    Gap to full-data ctrl (1.1222) = cost of splitting the data.

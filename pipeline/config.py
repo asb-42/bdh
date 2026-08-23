@@ -49,6 +49,7 @@ class Config:
     alibi_slope: float = 0.0               # ALiBi-style exponential damping of attention state (0 = off)
     stateful_eval: bool = False            # eval carries attention state across sequential batches of the split
     run_name: str = ""                     # optional tag in checkpoint filenames; isolates concurrent/sequential runs
+    train_slice: str = ""                  # "start:end" fractions of the train split to train on ("" = all)
 
 
 def estimate_bdh_params(cfg: Config) -> int:
