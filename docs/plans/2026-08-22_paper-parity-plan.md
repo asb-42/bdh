@@ -176,3 +176,24 @@ the default so current scripts/CLIs remain valid.
   `bdh_wikitext2_{best,last}.pt`; per-arm copies saved manually. Candidate
   follow-ups: stateful (stream-carrying) eval, per-arm LR tuning, ALiBi sweep
   (handover §7.4), larger attn_window.
+- **2026-08-23 (§7.2 follow-ups: stateful eval, ALiBi, equal-updates):**
+  - Added `--stateful-eval` (stream-carrying evaluation, commit `57e8c1f`) and
+    `--run-name` checkpoint isolation after a chained-arms overwrite lost the h1
+    checkpoint (all arms had shared `bdh_wikitext2_{best,last}.pt`).
+  - **Protocol artifact confirmed:** paired evals show the carry-trained model
+    *improves* under stateful eval (h4-final cold 1.3500 → stateful **1.1900**)
+    while the random-crop model collapses under imposed state (cold 1.1309 →
+    stateful 2.8798). The §7.2 "carry regime hurts" verdict was mostly protocol
+    mismatch; models specialize to their inference regime.
+  - **ALiBi sweep** (h1@b4/20k, stateful eval): slope 0.0 → 1.1406,
+    **0.05 → 1.1177**, 0.10 → 1.1212. Damping helps; best BDH number of the
+    session, ahead of random-crop ctrl (1.1222) and GPT final (1.1235), behind
+    GPT best ckpt (1.0911).
+  - **Equal-updates horizon test:** horizon-2 @ 20k updates / 83.9M tokens →
+    1.1448 vs horizon-1 @ 41.9M → 1.1406. Extra horizon+tokens at equal updates
+    buys nothing on short-context wikitext-2; the earlier horizon ranking was
+    update starvation + protocol, not TBPTT harm.
+  - Debugging note for future sessions: always pass `dataset=` explicitly when
+    loading checkpoints ad hoc — a default-shakespeare loader produced
+    plausible-looking but cross-dataset losses (~3.0) that briefly looked like
+    checkpoint corruption.
