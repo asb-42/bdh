@@ -97,7 +97,7 @@ def label_partition(adj: np.ndarray, iters: int = 15, seed: int = 0) -> np.ndarr
         for i in order:
             if len(neighbors[i]) == 0:
                 continue
-            counts = np.bincount(labels[neighbors[i]])
+            counts = np.bincount(labels[neighbors[i]], minlength=n)
             best = counts.argmax()
             if labels[i] != best and counts[best] > counts[labels[i]]:
                 labels[i] = best
