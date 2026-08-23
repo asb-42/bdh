@@ -47,6 +47,8 @@ class Config:
     tbptt_horizon: int = 1                 # minibatches per truncated-BPTT window (1 = detach every step)
     no_bptt: bool = False                  # detach K/V inside attention: no backprop through time (paper Sec. 5.2)
     alibi_slope: float = 0.0               # ALiBi-style exponential damping of attention state (0 = off)
+    stateful_eval: bool = False            # eval carries attention state across sequential batches of the split
+    run_name: str = ""                     # optional tag in checkpoint filenames; isolates concurrent/sequential runs
 
 
 def estimate_bdh_params(cfg: Config) -> int:

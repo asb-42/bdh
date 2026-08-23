@@ -28,18 +28,34 @@ def get_lr(it: int, cfg: Config) -> float:
 def estimate_loss(model, data, cfg: Config, device, ctx, split: str) -> float:
     model.eval()
     losses = []
-    for _ in range(cfg.eval_iters):
-        x, y = data.get_batch(split, cfg.block_size, cfg.batch_size, device)
-        with ctx:
-            _, loss, _ = model(x, y)
-        losses.append(loss.item())
+    if cfg.stateful_eval:
+        # Stream-carrying evaluation: batches are sequential continuations and
+        # the attention state persists across them (detached), matching the
+        # carried-state training regime instead of penalizing it with a
+        # cold start on unrelated random crops.
+        stream = data.make_stream(split, cfg.block_size, cfg.batch_size)
+        state = None
+        for _ in range(cfg.eval_iters):
+            x, y = stream.next_batch(device)
+            with ctx:
+                _, loss, state = model(x, y, state)
+            losses.append(loss.item())
+    else:
+        for _ in range(cfg.eval_iters):
+            x, y = data.get_batch(split, cfg.block_size, cfg.batch_size, device)
+            with ctx:
+                _, loss, _ = model(x, y)
+            losses.append(loss.item())
     model.train()
     return sum(losses) / len(losses)
 
 
 def checkpoint_path(cfg: Config, tag: str) -> str:
     os.makedirs(cfg.out_dir, exist_ok=True)
-    return os.path.join(cfg.out_dir, f"{cfg.model}_{cfg.dataset}_{tag}.pt")
+    stem = f"{cfg.model}_{cfg.dataset}"
+    if cfg.run_name:
+        stem += f"_{cfg.run_name}"
+    return os.path.join(cfg.out_dir, f"{stem}_{tag}.pt")
 
 
 def save_checkpoint(cfg: Config, model, optimizer, step: int, best_val: float, tag: str,
