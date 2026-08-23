@@ -135,3 +135,44 @@ the default so current scripts/CLIs remain valid.
 - Quadratic-path state carry-over keeps an unbounded KV cache when
   `attn_window=0`; window trimming is approximate w.r.t. full attention only
   when decay is disabled.
+
+## Findings log (append-only)
+
+- **2026-08-23 (RTX 4090, env bring-up):** user-level `~/.pip/pip.conf` (NVIDIA
+  PyIndex leftover) forces an extra index `pypi.ngc.nvidia.com` that does not
+  resolve on this network; neutralized project-locally via `.venv/pip.conf`
+  (site config overrides user). Env: torch 2.13.0+cu130, driver 595.84, sm_89;
+  exactness invariant passes ≤1.34e-07.
+- **2026-08-23 (bench, handover §6):** handover memory guidance corrected — the
+  25M preset needs batch ≤ 8 at block 512 (`bdh-linear` autograd retains a fp32 ρ
+  per chunk per layer ≈ 26 GB at batch 16). Measured ms/step @ batch 8 / block
+  512 / 25M params: `bdh` 82.8, `bdh-linear` 194.8, `transformer` 14.6 →
+  compute-match factors GPT ≈ 5.7×(`bdh`) and ≈ 13.3×(`bdh-linear`) steps.
+  Chunked scan slower than quadratic attention at block 512. Details in
+  HANDOVER §7.
+- **2026-08-23 (§7.1 baseline, wikitext-2):** matched-param + matched-wall-clock
+  comparison at block 512 / batch 8 / bf16 / compile, both models ~25M params
+  (GPT auto-matched to 32 layers). `bdh` 10k steps @ 84 ms: **val 1.1311,
+  test ppl 3.19** (`out/bdh_wikitext2_best.pt`). GPT 57k steps (=5.7×) @ 17 ms:
+  final val 1.1235, best val 1.0911 @45.6k, test ppl 3.11
+  (`out/transformer_wikitext2_best.pt`). Verdict: vanilla BDH trails the GPT
+  baseline by ~0.03–0.04 nats val on short-context LM in this untuned regime.
+  Process note: first GPT run was silently mismatched (manual cmd omitted
+  `--mlp-internal-dim-multiplier` → auto-match built a 4.99M model) — always
+  check the logged params line before comparing. Next lever per handover §7.2:
+  BDH's intended regime is TBPTT + state carry-over, untested here.
+- **2026-08-23 (§7.2 carry-over study):** paper-regime training **hurts** on
+  wikitext-2 at a fixed 41.9M-token budget. Ranking (best val): random-crop
+  b8/10k 1.1311; ctrl b4/20k no-carry **1.1222** (batch size innocent, even
+  slightly better); carry+sequential h1@b4 1.2829, h2@b4 1.3254, h4@b2 1.3428
+  (monotonically worse with horizon; all carry curves still descending at cap —
+  horizon arms get fewer optimizer updates at equal tokens). Attribution: the
+  carry/sequential regime itself costs ~0.16 nats vs the matched control.
+  Suspected mechanisms (untested): cold-start eval penalizes models trained
+  with persistent context (`estimate_loss` uses fresh state on random crops);
+  stale-context noise the paper warns about without ALiBi damping. Memory:
+  TBPTT retains the whole window's graph — h4@b4 OOMs (probe evidence), hence
+  b2 at h4. Checkpoint-name collision found: all runs write
+  `bdh_wikitext2_{best,last}.pt`; per-arm copies saved manually. Candidate
+  follow-ups: stateful (stream-carrying) eval, per-arm LR tuning, ALiBi sweep
+  (handover §7.4), larger attn_window.

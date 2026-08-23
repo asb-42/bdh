@@ -121,11 +121,40 @@ bash scripts/gpu_bench.sh
 6. **Merging** — train two models on disjoint data slices, `python -m pipeline.run merge`, evaluate merged without finetuning (paper Sec. 5.1).
 7. **bdh-prime comparison** — `--model bdh-prime` vs `bdh-linear` at matched params/compute. Note: the gated scan is a per-token recurrence — much slower per step than the chunked vanilla scan; keep models small or budget accordingly.
 
-Memory guidance (4090, 24 GB): the 25M preset (n=32768, d=256, L=6–8, block 512, batch 32) fits comfortably. If raising batch/block, watch ρ memory: `B × nh × N × D × 4 bytes × n_layer` for fp32 state plus autograd graph within the TBPTT window.
+Memory guidance (4090, 24 GB) — **corrected by measurement 2026-08-23**, the original
+"25M preset fits comfortably" claim is wrong on this card:
+
+- batch 32, block 512: OOM for both `bdh` and `bdh-linear` (quadratic path keeps ~1 GB
+  `(B,nh,T,N)` activation tensors × several per layer; see below).
+- batch 16, block 512: `bdh` OK; `bdh-linear` still OOM.
+- batch 8, block 512: all variants fit. **Use batch ≤ 8 for 25M training runs**, or add
+  gradient checkpointing / a larger `--chunk-size` for `bdh-linear`.
+- Dominant `bdh-linear` cost: the chunked scan retains one fp32 ρ tensor
+  `B × nh × D × N × 4 B` ≈ 0.54 GB (batch 16) per chunk *per layer* in the autograd
+  graph → `(T/chunk) × n_layer × 0.54 GB` ≈ 26 GB at batch 16/block 512/chunk 64.
+  Raising `chunk_size` reduces the number of retained ρ tensors (at c² intra-chunk cost).
+
+### Measured benchmark (2026-08-23, RTX 4090, bf16, compile on, block 512, batch 8, 25M params)
+
+| model | params | ms/step | est TFLOP/s | wall-clock vs bdh |
+|---|---|---|---|---|
+| `bdh` (quadratic) | 25.3M | 82.8 | 76.6 | 1× |
+| `bdh-linear` | 25.3M | 194.8 | 33.4 | 2.35× |
+| `transformer` | 25.5M | 14.6 | 56.4 | 0.18× |
+
+Compute-matching factors: GPT needs ≈ **5.7×** the steps of `bdh`, ≈ **13.3×** the steps
+of `bdh-linear`, for equal wall-clock.
+
+Finding: at block 512 the chunked linear scan is *slower* than quadratic attention
+(Python-loop chunk iteration + fp32 ρ chain dominate), despite better asymptotics —
+quadratic `bdh` is the faster choice for short-block training runs; `bdh-linear` pays
+off only for long context / state carry-over regimes.
 
 ## 8. Known limitations / follow-ups
 
 - Gated scan (`bdh_prime.py`) is a per-token Python loop — correct but slow; parallel-scan kernel is the main outstanding engineering item.
+- `bdh-linear` autograd memory: every chunk-level fp32 ρ update stays in the graph (see §7 measured numbers); gradient checkpointing over chunks is the natural fix if batch > 8 is needed at 25M scale.
+- Chunked linear scan is slower than quadratic attention at block 512 on the 4090 (measured, §7) — variant choice should follow context length.
 - ALiBi damping rate is uniform across heads; per-head/per-edge u(i,j) is future work.
 - Quadratic-path KV cache grows unbounded when `attn_window=0` (trimming enabled by default at 1024 tokens; trimming is only exact when ALiBi damping makes distant tokens irrelevant anyway).
 - `scripts/*.sh` presets reference a "DGX Spark" tier that was never validated here; ignore or update.
