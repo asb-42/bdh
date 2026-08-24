@@ -19,7 +19,7 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 
-from bdh import Attention, BDHConfig
+from bdh import Attention, BDHConfig, _k_sparse_relu
 from bdh_linear import BDHLinear, LinearAttention
 
 
@@ -112,12 +112,12 @@ class BDHPrime(BDHLinear):
         new_layers = []
         layer_logits = []
         for level in range(C.n_layer):
-            x_sparse = F.relu(x @ self.encoder)
+            x_sparse = _k_sparse_relu(x @ self.encoder, C.k_sparse_ratio) if C.k_sparse_ratio > 0 else F.relu(x @ self.encoder)
             yKV, layer_new_state = self.attn(x_sparse, x, state=layer_states[level], pos_offset=pos)
             new_layers.append(layer_new_state)
             yKV = self.ln(yKV)
 
-            y_sparse = F.relu(yKV @ self.encoder_v)
+            y_sparse = _k_sparse_relu(yKV @ self.encoder_v, C.k_sparse_ratio) if C.k_sparse_ratio > 0 else F.relu(yKV @ self.encoder_v)
             xy_sparse = self.drop(x_sparse * y_sparse)
 
             yMLP = xy_sparse.transpose(1, 2).reshape(B, 1, T, -1) @ self.decoder

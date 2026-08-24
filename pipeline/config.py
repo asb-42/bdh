@@ -52,6 +52,7 @@ class Config:
     train_slice: str = ""                  # "start:end" fractions of the train split to train on ("" = all)
     init_from: str = ""                    # checkpoint path to initialize model weights from (fresh optimizer)
     europarl_lang_mb: int = 30             # europarl only; per-language train block size in MB
+    k_sparse_ratio: float = 0.0            # BDH only; 0=ReLU, >0=keep top k% activations (straight-through)
 
 
 def estimate_bdh_params(cfg: Config) -> int:
@@ -90,6 +91,7 @@ def build_model(cfg: Config):
                 block_size=cfg.block_size,
                 no_bptt=cfg.no_bptt,
                 alibi_slope=cfg.alibi_slope,
+                k_sparse_ratio=cfg.k_sparse_ratio,
             )
         )
         return model
@@ -108,6 +110,7 @@ def build_model(cfg: Config):
                 block_size=cfg.block_size,
                 no_bptt=cfg.no_bptt,
                 alibi_slope=cfg.alibi_slope,
+                k_sparse_ratio=cfg.k_sparse_ratio,
             ),
             chunk_size=cfg.chunk_size,
         )
@@ -127,6 +130,7 @@ def build_model(cfg: Config):
                 block_size=cfg.block_size,
                 no_bptt=cfg.no_bptt,
                 alibi_slope=cfg.alibi_slope,
+                k_sparse_ratio=cfg.k_sparse_ratio,
             ),
             chunk_size=cfg.chunk_size,
         )

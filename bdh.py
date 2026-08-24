@@ -8,6 +8,14 @@ import torch.nn.functional as F
 from torch import nn
 
 
+def _k_sparse_relu(x, ratio):
+    x_pos = F.relu(x)
+    k = max(1, int(ratio * x_pos.shape[-1]))
+    _, indices = torch.topk(x_pos, k, dim=-1)
+    mask = torch.zeros_like(x_pos).scatter_(-1, indices, 1.0)
+    return x_pos * mask
+
+
 @dataclasses.dataclass
 class BDHConfig:
     n_layer: int = 6
@@ -19,11 +27,8 @@ class BDHConfig:
     block_size: int | None = None  # max context for generation; None = unbounded
     attn_window: int = 1024  # quadratic attention: max cached past tokens (0 = unlimited)
     no_bptt: bool = False  # detach K/V in attention: no backprop through time (paper Sec. 5.2)
-    # ALiBi-style exponential damping of attention state (paper Sec. 4.1: RoPE +
-    # ALiBi damp stale context). 0.0 disables; otherwise gamma = exp(-alibi_slope)
-    # decays each token's contribution by elapsed distance (uniform rate across
-    # heads; the paper allows per-edge u(i,j) in full generality).
     alibi_slope: float = 0.0
+    k_sparse_ratio: float = 0.0  # 0=ReLU, >0=keep top k% activations (straight-through)
 
 
 def detach_state(state):
@@ -233,7 +238,7 @@ class BDH(nn.Module):
 
             x_latent = x @ self.encoder
 
-            x_sparse = F.relu(x_latent)  # B, nh, T, N
+            x_sparse = _k_sparse_relu(x_latent, C.k_sparse_ratio) if C.k_sparse_ratio > 0 else F.relu(x_latent)  # B, nh, T, N
 
             yKV, layer_new_state = self.attn(
                 x_sparse,
@@ -245,7 +250,7 @@ class BDH(nn.Module):
             yKV = self.ln(yKV)
 
             y_latent = yKV @ self.encoder_v
-            y_sparse = F.relu(y_latent)
+            y_sparse = _k_sparse_relu(y_latent, C.k_sparse_ratio) if C.k_sparse_ratio > 0 else F.relu(y_latent)
             xy_sparse = x_sparse * y_sparse  # B, nh, T, N
 
             xy_sparse = self.drop(xy_sparse)
