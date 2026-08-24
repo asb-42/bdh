@@ -20,8 +20,21 @@ Three experiments (E1–E3) were run on RTX 4090 (24 GB) following the 2026-08-2
   "Structure emerges with late training" is falsified for 11 MB corpora.
 - **E3 (Europarl multilingual)**: training 100M on diverse multilingual data (EN/DE/ES,
   90 MB) restores activation sparsity to 94.7% (vs 89.8% on wikitext-2, 97.4% at 25M)
-  and achieves val **0.8219** (ppl 2.27) — far better than wikitext-2's 1.1318. The
-  "structural collapse" was a **data diversity** effect, not a scale effect.
+  and achieves val **0.8219** (ppl 2.27) — far better than wikitext-2's 1.1318.
+  _[Revised by E6/E8, see below: volume is the primary driver; the loss comparison was
+  confounded by corpus difficulty.]_
+- **E6 (volume control — REVERSAL)**: 90 MB **monolingual** English recovers sparsity
+  to **93.7%** — volume alone accounts for most of the recovery; diversity adds only
+  ~1 pp (concentrated in boundary layers). The "diversity restores structure" reading of
+  E3 was overstated. Also: EN-only beats the mixed model *on English* (ppl 2.15 vs 2.33),
+  and Europarl is intrinsically easier text than wikitext-2 — cross-corpus loss
+  comparisons are void.
+- **E7 (per-language diagnostics)**: mixed model per-language ppl de 2.23 / en 2.33 /
+  es 2.23. Zero-shot transfer from the EN-only model: de ppl **21.8**, es ppl **17.6**
+  (vs 2.15 trained) — real but weak; this is the baseline CL-H4 binding must beat.
+- **E8 (top-k × diversity)**: k=5% on mixed Europarl costs +0.074 nats (vs +0.03 on
+  wikitext) and reshapes the weight-affinity graph wholesale (~20× fewer edges at β=0.05)
+  while subsampled α/Q remain intact (1.88/0.21).
 - **E4 (top-k sparsity)**: hard top-5% activation sparsity costs only +0.03 nats
   (val 1.1617 vs ReLU 1.1318) and marginally improves sparsity (90.5% vs 89.8%).
   Viable at negligible quality cost.
@@ -218,17 +231,74 @@ All three are statistically indistinguishable at subsampled comparison.
 
 ### 5.3 Interpretation
 
-**The sparsity difference was a data diversity effect, not a scale effect.** The wikitext-2
-100M model showed 89.8% sparsity because homogeneous English text doesn't force neurons to
-specialize — the wide latent has no reason to develop sparse, modular structure when all
-inputs share the same domain. Europarl's three-language mix forces specialization:
-different languages activate different neuron subsets → higher sparsity → the structural
-properties reappear.
+_[The following was the initial reading; E6 (below) revises it.]_
 
-**The val loss improvement (0.82 vs 1.13) is partly data volume (90 MB vs 11 MB) and partly
-diversity.** More data reduces overfitting; diverse data creates the conditions for
-interpretability. Both effects are real, but the sparsity restoration is specifically a
-diversity effect (the volume difference explains generalization, not sparsity patterns).
+**The sparsity difference appeared to be a data diversity effect.** The wikitext-2
+100M model showed 89.8% sparsity because homogeneous English text doesn't force neurons
+to specialize — the wide latent has no reason to develop sparse, modular structure when
+all inputs share the same domain.
+
+---
+
+## 5b. E6/E8 — Volume control and top-k × diversity (reversal)
+
+### 5b.1 Design
+
+E6 disentangles the volume/diversity confound in E3: 100M BDH on **90 MB monolingual
+English** from the same Europarl corpus family (`--europarl-langs en
+--europarl-lang-mb 90`), identical schedule. E7 evaluates per-language held-out loss.
+E8 reruns mixed-Europarl training with `--k-sparse-ratio 0.05`.
+
+### 5b.2 Results
+
+**Sparsity — volume recovers most of it:**
+
+| model | train data | xy-sparsity |
+|---|---|---|
+| 100M wikitext-2 | 11 MB EN | 89.8% |
+| **100M EN-90MB (E6)** | 90 MB EN | **93.7%** |
+| 100M mixed Europarl | 90 MB EN/DE/ES | 94.7% |
+
+Layer-wise, E6 matches the mixed model in middle layers (95–99%); diversity's extra ~1 pp
+concentrates at boundary layers 0 (80.8% vs 87.5%) and 5 (95.0% vs 93.4%).
+
+**Quality — within-corpus comparisons only:**
+
+| eval | EN-only model | mixed model |
+|---|---|---|
+| EN held-out ppl | **2.15** | 2.33 |
+| DE held-out ppl | 21.76 (zero-shot) | 2.23 |
+| ES held-out ppl | 17.62 (zero-shot) | 2.23 |
+
+Two corrections to earlier readings: (1) monolingual training *beats* multilingual on its
+own language at matched bytes; multilingual buys breadth, not depth. (2) Europarl is
+intrinsically easier text than wikitext-2 (formulaic parliamentary prose) — the earlier
+"0.82 vs 1.13" cross-corpus comparison measured corpus difficulty as much as model quality.
+
+**Zero-shot transfer**: DE/ES ppl of 21.8/17.6 is far above chance (uniform bytes = 256)
+but ~10× worse than trained performance — real but weak cross-lingual structure. This is
+the quantitative baseline for CL-plan H4 binding probes.
+
+**E8 (top-k × Europarl)**: val 0.8958 (+0.074 nats vs ReLU mixed 0.8219) — a larger cost
+than on wikitext-2 (+0.03). Sparsity reaches 95.2%. Most strikingly, top-k training
+changes the weight-affinity graph wholesale: at β=0.05 the edge fraction drops to 0.009
+(~20× fewer edges than every ReLU-trained model), while subsampled α=1.88/Q=0.21 remain
+in family. Hard activation sparsity during training produces qualitatively different —
+sparser, more concentrated — synaptic weight structure.
+
+### 5b.3 Revised interpretation
+
+1. **Data volume is the primary sparsity driver at fixed capacity.** The 25M/11MB point
+   (97.4%) rules out pure size effects; what matters is capacity-to-data ratio. A wide
+   latent over-provisioned relative to its data develops redundant, non-specialized
+   neurons.
+2. **Diversity is secondary**, contributing ~1 pp overall and concentrated where soft
+   sparsity is weakest (network boundaries).
+3. **Multilingualism trades depth for breadth**: worse on every individual language than
+   a monolingual model given the same bytes of that language's family, but competent on
+   all three.
+4. **Never compare losses across corpora** — add corpus-difficulty to the measurement
+   discipline alongside INV-1 protocol congruence.
 
 ---
 
@@ -465,28 +535,40 @@ depth.
 | no-BPTT | 25M | wikitext-2 | +0.004 nats (near-free) |
 | **E1 graph calib** | 25M/100M | wikitext-2 | Collapse was measurement artifact |
 | **E2 overfit** | 100M | wikitext-2 | Val 1.18→2.22 at 50k steps |
-| **E3 Europarl** | 100M | Europarl | Val **0.8219**, sparsity 94.7% |
+| **E3 Europarl** | 100M | Europarl mixed | Val 0.8219, sparsity 94.7% |
 | **E4 top-k** | 100M | wikitext-2 | +0.03 nats, sparsity 90.5% |
 | **E5 depth** | 100M | wikitext-2 | +0.10 nats, 3.4× faster |
+| **E6 volume ctrl** | 100M | Europarl EN-90MB | Sparsity 93.7%: volume primary, diversity secondary |
+| **E7 lang eval** | 100M | Europarl | Zero-shot de/es ppl 21.8/17.6 (H4 baseline) |
+| **E8 topk×div** | 100M | Europarl mixed | +0.074 nats; graph edges −20× at β=0.05 |
 
 ### 12.2 What we learned
 
-1. **Data diversity drives interpretability.** The sparsity/graph phenomena are
-   data-dependent, not scale-dependent. Homogeneous data at 100M degrades structure;
-   diverse data restores it.
+1. **The capacity-to-data ratio drives sparsity, not diversity.** Volume control (E6)
+   recovers most of the sparsity dip; diversity adds ~1 pp at the boundary layers.
+   A wide latent over-provisioned relative to its data goes redundant.
 
-2. **The wide latent is the key ingredient.** Width scaling beats depth scaling at
-   matched params. More layers of smaller-width processing cannot compensate.
-
-3. **Hard sparsity is viable.** Top-5% costs only +0.03 nats and guarantees constant
-   sparsity regardless of regime.
-
-4. **The architecture overfits small data.** 100M on 11 MB hits its limit at ~10k
-   steps. Corpora ≥50 MB needed for 100M-scale experiments.
-
-5. **Graph metrics require scale-aware thresholds.** Fixed absolute β across model
+2. **Graph metrics require scale-aware thresholds.** Fixed absolute β across model
    sizes produces misleading results. Subsampled or mean-degree-matched comparisons
-   are mandatory.
+   are mandatory (E1).
+
+3. **Never compare losses across corpora.** Europarl is easier text than wikitext-2;
+   cross-corpus val comparisons measure corpus difficulty as much as quality (E6/E7).
+
+4. **Multilingualism trades depth for breadth**: worse on each language than a
+   monolingual model trained on equal bytes of it, competent on all three (E7).
+
+5. **The wide latent is the key ingredient.** Width scaling beats depth scaling at
+   matched params (E5).
+
+6. **Hard sparsity is viable but not free everywhere**: +0.03 nats on wikitext-2,
+   +0.074 on Europarl; and it qualitatively reshapes weight structure (E4/E8).
+
+7. **The architecture overfits small data.** 100M on 11 MB saturates at ~10k steps
+   (E2). Corpora ≥50 MB needed for 100M-scale experiments.
+
+8. **Zero-shot cross-lingual transfer is weak but real** (de 21.8 / es 17.6 vs 2.15
+   trained) — the quantitative floor for CL binding probes (E7/H4).
 
 ---
 
