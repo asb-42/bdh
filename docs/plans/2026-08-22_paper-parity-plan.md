@@ -217,3 +217,22 @@ the default so current scripts/CLIs remain valid.
     merge (50.5M params, 65,536 neurons) → **1.1941 without finetuning**,
     beating both parents; generations keep proper wikitext article style.
     Gap to full-data ctrl (1.1222) = cost of splitting the data.
+- **2026-08-23 (§7.4 per-position curves, §7.7 bdh-prime):**
+  - Added `scripts/position_curves.py` (paired warm/cold loss over long
+    sequential streams). Note: run forward-heavy analyses on GPU — torch 2.13
+    CPU bf16 matmul is ~300× slower than fp32.
+  - **§7.4:** damped `lina005` keeps a stable carried-context benefit across a
+    32k-token stream (+0.033 → +0.027 nats, warm < cold in every 4k bucket) —
+    the "flat beyond block size" acceptance holds. Undamped `bdh-linear`
+    **collapsed in training** (val 2.52, plateaued from step ~8k): the linear
+    scan has no attention window, so stale state accumulates unboundedly during
+    optimization; the quadratic path had been silently rescued by its
+    `attn_window=1024` default. Damping is load-bearing for BDH-linear, at the
+    cost of a smaller context delta (+0.03 vs +0.15).
+  - **§7.7:** matched pair at 0.33M params / 2000 steps / identical data:
+    `bdh-prime` val **1.6081** vs `bdh-linear` 1.6348 — gating + per-layer
+    logit merge buys −0.027 nats for ~60× eager step cost (123 vs 2 ms).
+    Prime memory/speed limits: autograd retains one ρ per token per layer
+    (OOM ≳3M params at t128); compiled warmup also impractical. A fused
+    parallel scan remains the missing engineering piece; gating-vs-logit-merge
+    ablation not yet separated.
