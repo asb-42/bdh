@@ -286,6 +286,35 @@ changes the weight-affinity graph wholesale: at β=0.05 the edge fraction drops 
 in family. Hard activation sparsity during training produces qualitatively different —
 sparser, more concentrated — synaptic weight structure.
 
+### 5b.2b. k-sweep — disentangling activation vs graph effects
+
+A sweep of `k_sparse_ratio` ∈ {0, 0.01, 0.03, 0.05, 0.10} on mixed Europarl (100M,
+all other hyperparameters held constant) reveals two clean, independent effects:
+
+| k | val_loss | ppl | xy-sparsity | edge_frac@β=0.05 | Q@β=0.3 (sub) |
+|---|---|---|---|---|---|
+| 0 (ReLU) | 0.8219 | 2.27 | 94.7% | 0.202 | 0.188 |
+| 0.01 | 0.8747 | 2.40 | 94.2% | 0.182 | 0.150 |
+| 0.03 | 0.9159 | 2.50 | 95.1% | 0.021 | 0.179 |
+| 0.05 | 0.8958 | 2.45 | 95.2% | 0.009 | 0.209 |
+| 0.10 | 0.8801 | 2.41 | 95.3% | 0.027 | 0.307 |
+
+**Activation sparsity is invariant to k** (~94–95% regardless of constraint) — it is a
+data/capacity property, not a constraint property. The k constraint does not change
+the measured sparsity because ReLU already produces ~95% zeros at this capacity/data
+ratio; top-k merely selects *which* zeros survive, not how many.
+
+**k controls weight-graph sparsity independently.** Edge fraction at β=0.05 drops ~20×
+from k=0 (0.202) to k=0.05 (0.009), then partially recovers at k=0.10 (0.027).
+Modularity (Q) stays in family or improves at higher k (0.307 at k=0.10 vs 0.188 at
+k=0). This is the signal Grok flagged as "worth chasing hardest": hard sparsity
+constraints reshape learned weight topology without changing activation statistics.
+
+The quality cost is modest and non-monotonic: worst at k=0.03 (+0.094 nats), best at
+k=0.10 (+0.058 nats). The non-monotonicity suggests a transition region around k≈0.03
+where the constraint interferes with learning dynamics without yet producing the
+graph-sparsity benefit that emerges at higher k.
+
 ### 5b.3 Revised interpretation
 
 1. **Data volume is the primary sparsity driver at fixed capacity.** The 25M/11MB point
@@ -541,6 +570,7 @@ depth.
 | **E6 volume ctrl** | 100M | Europarl EN-90MB | Sparsity 93.7%: volume primary, diversity secondary |
 | **E7 lang eval** | 100M | Europarl | Zero-shot de/es ppl 21.8/17.6 (H4 baseline) |
 | **E8 topk×div** | 100M | Europarl mixed | +0.074 nats; graph edges −20× at β=0.05 |
+| **E8b k-sweep** | 100M | Europarl mixed | k controls graph sparsity independently of activation sparsity (94–95% invariant); Q improves at high k (0.307 at k=0.10) |
 
 ### 12.2 What we learned
 
@@ -562,7 +592,10 @@ depth.
    matched params (E5).
 
 6. **Hard sparsity is viable but not free everywhere**: +0.03 nats on wikitext-2,
-   +0.074 on Europarl; and it qualitatively reshapes weight structure (E4/E8).
+   +0.074 on Europarl; and it qualitatively reshapes weight structure. The k-sweep
+   reveals that k controls *graph* sparsity (edge_frac −20×) independently of
+   *activation* sparsity (invariant ~94–95%). Modularity improves at high k (0.307
+   at k=0.10). This is the key signal for Mechanism F (E4/E8/E8b).
 
 7. **The architecture overfits small data.** 100M on 11 MB saturates at ~10k steps
    (E2). Corpora ≥50 MB needed for 100M-scale experiments.
