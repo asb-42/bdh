@@ -236,3 +236,11 @@ the default so current scripts/CLIs remain valid.
     (OOM ≳3M params at t128); compiled warmup also impractical. A fused
     parallel scan remains the missing engineering piece; gating-vs-logit-merge
     ablation not yet separated.
+- **2026-08-23 (§7.3-item: dedicated --no-bptt ablation):** at the matched
+  b4/20k schedule, `--no-bptt` reaches val **1.1266** vs full-BPTT ctrl
+  **1.1222** — only +0.004 nats. Monolingual byte-LM is essentially unharmed
+  by removing within-block K/V gradients; consistent with paper §5.2, where
+  degradation concentrated in cross-language alignment (untestable on
+  wikitext-2). Practical readout: for LM-only training at this scale, the
+  no-BPTT regime costs almost nothing and would make gradient routing far
+  cheaper (paper's motivation). All handover §7 items now complete.
