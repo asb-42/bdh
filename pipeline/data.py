@@ -50,22 +50,20 @@ def _prepare_wikitext2(data_dir: str):
     return load_split("train"), load_split("validation"), load_split("test")
 
 
-def _prepare_europarl(data_dir: str, lang_bytes: int):
-    """Multilingual Europarl v7 (EN/DE/ES) as contiguous per-language blocks.
+def _europarl_blocks(data_dir: str, lang_bytes: int, langs=("en", "de", "es")):
+    """Per-language Europarl v7 blocks: {lang: {train, val, test} bytes}.
 
-    Downloads the de-en and es-en parallel tarballs once, extracts the three
-    monolingual sides, and returns (train, val, test) where each split is the
-    concatenation of equal-sized EN, DE, ES blocks in that order. The last
-    2 MB of each language are held out (1 MB val + 1 MB test) before the
-    train cap, so evaluation text is never seen in training.
+    The last 2 MB of each language are held out (1 MB val + 1 MB test) before
+    the train cap, so evaluation text is never seen in training.
     """
     import tarfile
 
     edir = os.path.join(data_dir, "europarl")
     os.makedirs(edir, exist_ok=True)
     sources = {"en": "de-en", "de": "de-en", "es": "es-en"}
-    sides = {}
-    for lang, pair in sources.items():
+    blocks = {}
+    for lang in langs:
+        pair = sources[lang]
         member = f"europarl-v7.{pair}.{lang}"
         txt = os.path.join(edir, f"{member}.txt")
         if not os.path.exists(txt):
@@ -79,22 +77,28 @@ def _prepare_europarl(data_dir: str, lang_bytes: int):
                 with open(txt, "wb") as f:
                     while chunk := src.read(1 << 24):
                         f.write(chunk)
-        sides[lang] = open(txt, "rb").read()
-
-    train_parts, val_parts, test_parts = [], [], []
-    for lang in ("en", "de", "es"):
-        raw = sides[lang]
+        raw = open(txt, "rb").read()
         need = lang_bytes + 2_000_000
         if len(raw) < need:
             raise ValueError(f"europarl {lang}: {len(raw)} bytes < needed {need}")
-        block = raw[-need:]
-        train_parts.append(block[:-2_000_000])
-        val_parts.append(block[-2_000_000:-1_000_000])
-        test_parts.append(block[-1_000_000:])
-        print(f"europarl {lang}: train {len(block[:-2_000_000]):,} B | "
+        blk = raw[-need:]
+        blocks[lang] = {
+            "train": blk[:-2_000_000],
+            "val": blk[-2_000_000:-1_000_000],
+            "test": blk[-1_000_000:],
+        }
+        print(f"europarl {lang}: train {len(blocks[lang]['train']):,} B | "
               f"val 1,000,000 B | test 1,000,000 B")
+    return blocks
+
+
+def _prepare_europarl(data_dir: str, lang_bytes: int, langs=("en", "de", "es")):
+    """Multilingual Europarl v7 as contiguous per-language blocks (EN, DE, ES)."""
+    blocks = _europarl_blocks(data_dir, lang_bytes, langs)
     sep = b"\n\n"
-    return (sep.join(train_parts), sep.join(val_parts), sep.join(test_parts))
+    return (sep.join(blocks[l]["train"] for l in langs),
+            sep.join(blocks[l]["val"] for l in langs),
+            sep.join(blocks[l]["test"] for l in langs))
 
 
 class ByteStream:
@@ -157,7 +161,8 @@ def load_dataset(cfg) -> ByteDataset:
     elif cfg.dataset == "wikitext2":
         train, val, test = _prepare_wikitext2(cfg.data_dir)
     elif cfg.dataset == "europarl":
-        train, val, test = _prepare_europarl(cfg.data_dir, cfg.europarl_lang_mb * 1_000_000)
+        langs = tuple(s.strip() for s in cfg.europarl_langs.split(",") if s.strip())
+        train, val, test = _prepare_europarl(cfg.data_dir, cfg.europarl_lang_mb * 1_000_000, langs)
     else:
         raise ValueError(f"unknown dataset: {cfg.dataset}")
     if getattr(cfg, "train_slice", ""):

@@ -52,6 +52,7 @@ class Config:
     train_slice: str = ""                  # "start:end" fractions of the train split to train on ("" = all)
     init_from: str = ""                    # checkpoint path to initialize model weights from (fresh optimizer)
     europarl_lang_mb: int = 30             # europarl only; per-language train block size in MB
+    europarl_langs: str = "en,de,es"       # europarl only; comma-separated language sides to include
     k_sparse_ratio: float = 0.0            # BDH only; 0=ReLU, >0=keep top k% activations (straight-through)
 
 
