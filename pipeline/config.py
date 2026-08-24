@@ -50,6 +50,8 @@ class Config:
     stateful_eval: bool = False            # eval carries attention state across sequential batches of the split
     run_name: str = ""                     # optional tag in checkpoint filenames; isolates concurrent/sequential runs
     train_slice: str = ""                  # "start:end" fractions of the train split to train on ("" = all)
+    init_from: str = ""                    # checkpoint path to initialize model weights from (fresh optimizer)
+    europarl_lang_mb: int = 30             # europarl only; per-language train block size in MB
 
 
 def estimate_bdh_params(cfg: Config) -> int:

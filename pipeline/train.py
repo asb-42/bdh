@@ -94,6 +94,10 @@ def train(cfg: Config) -> None:
           + (f" | test bytes {len(data.test)}" if data.test is not None else ""))
 
     raw_model = build_model(cfg).to(device)
+    if cfg.init_from:
+        ckpt = torch.load(cfg.init_from, map_location=device, weights_only=False)
+        raw_model.load_state_dict(ckpt["model_state"])
+        print(f"initialized weights from {cfg.init_from} (ckpt step {ckpt.get('step')})")
     n_params = param_count(raw_model)
     if cfg.model == "transformer" and cfg.baseline_n_layer <= 0:
         n_layers = raw_model.cfg.n_layer
