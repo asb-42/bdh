@@ -54,6 +54,8 @@ class Config:
     europarl_lang_mb: int = 30             # europarl only; per-language train block size in MB
     europarl_langs: str = "en,de,es"       # europarl only; comma-separated language sides to include
     k_sparse_ratio: float = 0.0            # BDH only; 0=ReLU, >0=keep top k% activations (straight-through)
+    gate_from: str = ""                    # comma-separated ckpts with "neuron_importance"; write-gating source
+    gate_alpha: float = 0.0                # write-gating strength; grad *= (1 - alpha * max-normed importance)
 
 
 def estimate_bdh_params(cfg: Config) -> int:

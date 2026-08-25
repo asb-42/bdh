@@ -98,6 +98,30 @@ def train(cfg: Config) -> None:
         ckpt = torch.load(cfg.init_from, map_location=device, weights_only=False)
         raw_model.load_state_dict(ckpt["model_state"])
         print(f"initialized weights from {cfg.init_from} (ckpt step {ckpt.get('step')})")
+
+    # Mechanism C write-gating: scale gradients on neuron-dim parameters by
+    # (1 - alpha * importance), protecting neurons the previous phase(s) rely on.
+    # BDH shares one (encoder, encoder_v, decoder) triple across depth levels, so
+    # three masks cover everything neuron-indexed (decoder rows are h*N + n ordered).
+    gate_param_masks = []
+    if cfg.gate_from:
+        gate_imp = None
+        for path in filter(None, map(str.strip, cfg.gate_from.split(","))):
+            g = torch.load(path, map_location="cpu", weights_only=False)
+            imp = torch.as_tensor(g["neuron_importance"], dtype=torch.float32)
+            if imp.dim() != 2:
+                raise ValueError(f"{path}: neuron_importance must be (nh, N)")
+            gate_imp = imp.clone() if gate_imp is None else torch.maximum(gate_imp, imp)
+        keep = (1.0 - cfg.gate_alpha * gate_imp / gate_imp.max()).clamp_min_(0.0)
+        nh = keep.size(0)
+        gate_param_masks = [
+            (raw_model.encoder, keep.to(device).unsqueeze(1)),      # (nh, D, N) <- (nh, 1, N)
+            (raw_model.encoder_v, keep.to(device).unsqueeze(1)),
+            (raw_model.decoder, keep.to(device).reshape(-1).unsqueeze(1)),  # (nh*N, D) <- (nh*N, 1)
+        ]
+        print(f"write-gating: alpha={cfg.gate_alpha} | sources={cfg.gate_from} | "
+              f"neurons fully frozen {(keep == 0).float().mean():.1%} | "
+              f"mean grad keep {keep.mean():.3f}")
     n_params = param_count(raw_model)
     if cfg.model == "transformer" and cfg.baseline_n_layer <= 0:
         n_layers = raw_model.cfg.n_layer
@@ -135,6 +159,11 @@ def train(cfg: Config) -> None:
     def optimizer_step():
         if cfg.grad_clip > 0:
             scaler.unscale_(optimizer)
+        if gate_param_masks:
+            for p, mk in gate_param_masks:
+                if p.grad is not None:
+                    p.grad.mul_(mk)
+        if cfg.grad_clip > 0:
             torch.nn.utils.clip_grad_norm_(raw_model.parameters(), cfg.grad_clip)
         scaler.step(optimizer)
         scaler.update()
