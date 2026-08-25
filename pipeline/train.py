@@ -93,17 +93,68 @@ def train(cfg: Config) -> None:
     print(f"dataset: {cfg.dataset} | train bytes {len(data.train)} | val bytes {len(data.val)}"
           + (f" | test bytes {len(data.test)}" if data.test is not None else ""))
 
+    # Mechanism C write-gating / Mechanism B grow share the gradient-mask path:
+    # gate_param_masks entries are (param, multiplier) applied before optimizer step.
+    # BDH shares one (encoder, encoder_v, decoder) triple across depth levels, so
+    # three masks cover everything neuron-indexed (decoder rows are h*N + n ordered).
+    gate_param_masks = []
+
+    # Mechanism B/grow: with init_from + grow_mult, widen the latent by fresh
+    # zero-init neurons; old neurons, embed and lm_head are frozen so new-phase
+    # updates can only write into the new capacity (zero forgetting by
+    # construction for the frozen path).
+    grow_src = None
+    if cfg.init_from and cfg.grow_mult > 0:
+        if cfg.gate_from:
+            raise ValueError("--grow-mult and --gate-from are mutually exclusive")
+        grow_src = torch.load(cfg.init_from, map_location="cpu", weights_only=False)
+        base_mult = int(grow_src["cfg"]["mlp_internal_dim_multiplier"])
+        cfg.mlp_internal_dim_multiplier = base_mult + cfg.grow_mult
+
     raw_model = build_model(cfg).to(device)
-    if cfg.init_from:
+    if cfg.init_from and grow_src is None:
         ckpt = torch.load(cfg.init_from, map_location=device, weights_only=False)
         raw_model.load_state_dict(ckpt["model_state"])
         print(f"initialized weights from {cfg.init_from} (ckpt step {ckpt.get('step')})")
 
-    # Mechanism C write-gating: scale gradients on neuron-dim parameters by
-    # (1 - alpha * importance), protecting neurons the previous phase(s) rely on.
-    # BDH shares one (encoder, encoder_v, decoder) triple across depth levels, so
-    # three masks cover everything neuron-indexed (decoder rows are h*N + n ordered).
-    gate_param_masks = []
+    if grow_src is not None:
+        sd = grow_src["model_state"]
+        nh, D = cfg.n_head, cfg.n_embd
+        n_old = base_mult * D // nh
+        n_new = cfg.mlp_internal_dim_multiplier * D // nh
+        with torch.no_grad():
+            raw_model.embed.weight.copy_(sd["embed.weight"])
+            raw_model.lm_head.copy_(sd["lm_head"].to(device))
+            for key in ("encoder", "encoder_v"):              # (nh, D, N)
+                getattr(raw_model, key).data[:, :, :n_old] = sd[key].to(device)
+            dec = raw_model.decoder.data.view(nh, n_new, -1)
+            dec[:, :n_old, :] = sd["decoder"].to(device).view(nh, n_old, -1)
+            for k, v in sd.items():                           # attention internals (freqs handled below)
+                if k.startswith("attn.") and not k.endswith("freqs"):
+                    name = k.split(".", 1)[1]
+                    sub = raw_model.attn.get_submodule(name.rsplit(".", 1)[0]) if "." in name else raw_model.attn
+                    leaf = name.rsplit(".", 1)[-1]
+                    target = sub._parameters.get(leaf) or sub._buffers.get(leaf)
+                    target.copy_(v.to(device))
+            # RoPE freqs are exponent-normalized by n (/n in the exponent): keep
+            # old neurons' frequencies verbatim; new neurons get their own scale.
+            old_f = sd["attn.freqs"].to(device).view(-1)
+            idx = torch.arange(n_old, n_new, dtype=torch.float32, device=device)
+            new_f = 1.0 / (2 ** 16 ** ((idx // 2 * 2) / n_new)) / (2 * math.pi)
+            freqs = torch.cat([old_f, new_f])
+            raw_model.attn.freqs.data[:] = freqs.view(1, 1, 1, n_new)
+        raw_model.embed.weight.requires_grad_(False)
+        raw_model.lm_head.requires_grad_(False)
+        keep = torch.zeros(n_new, device=device)
+        keep[n_old:] = 1.0
+        gate_param_masks = [
+            (raw_model.encoder, keep.view(1, 1, -1)),                 # (nh, D, N)
+            (raw_model.encoder_v, keep.view(1, 1, -1)),
+            (raw_model.decoder, keep.repeat(nh).unsqueeze(1)),        # (nh*N, D)
+        ]
+        print(f"growth: {base_mult} -> {cfg.mlp_internal_dim_multiplier} mult "
+              f"(+{n_new - n_old} neurons/head trainable) | old neurons + embed + lm_head frozen")
+
     if cfg.gate_from:
         gate_imp = None
         for path in filter(None, map(str.strip, cfg.gate_from.split(","))):
