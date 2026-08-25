@@ -96,11 +96,14 @@ def main():
     blocks = _europarl_blocks("data", mb * 1_000_000)
     blocks = {k: v for k, v in blocks.items() if k in langs}
 
-    print(f"ranking neurons by union-max importance over {langs} ...")
     imp = None
-    for lang in langs:
-        i_l = importance(model, blocks[lang]["train"], bs, nb, getattr(C, "k_sparse_ratio", 0.0))
-        imp = i_l if imp is None else torch.maximum(imp, i_l)
+    if not random_prune:
+        print(f"ranking neurons by union-max importance over {langs} ...")
+        for lang in langs:
+            i_l = importance(model, blocks[lang]["train"], bs, nb, getattr(C, "k_sparse_ratio", 0.0))
+            imp = i_l if imp is None else torch.maximum(imp, i_l)
+    else:
+        imp = torch.zeros(nh * N, device=device)
 
     enc_b, encv_b, dec_b = (t.clone() for t in
                             (model.encoder.data, model.encoder_v.data, model.decoder.data))
