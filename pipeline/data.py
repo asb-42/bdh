@@ -154,6 +154,27 @@ class ByteDataset:
         return ByteStream(getattr(self, split), block_size, batch_size)
 
 
+def _prepare_textmix(spec: str, mb: int):
+    """Multi-file byte corpus: spec = comma-separated "name:path" pairs.
+
+    Per domain: train = first `mb` MB, val = following 1 MB, test = next 1 MB.
+    Returns per-domain blocks plus a combined ByteDataset triple.
+    """
+    blocks, trains, vals, tests = {}, [], [], []
+    for item in filter(None, map(str.strip, spec.split(","))):
+        name, path = item.split(":", 1)
+        with open(path, "rb") as f:
+            raw = f.read(mb * 1_000_000)
+        # carve splits inside the per-domain allocation: train | val 1MB | test 1MB
+        t_end = max(0, len(raw) - 2_000_000)
+        v_end = min(len(raw), t_end + 1_000_000)
+        train, val, test = raw[:t_end], raw[t_end:v_end], raw[v_end:]
+        blocks[name] = {"train": train, "val": val, "test": test}
+        trains.append(train); vals.append(val); tests.append(test)
+        print(f"textmix {name}: train {len(train):,} B | val {len(val):,} B | test {len(test):,} B")
+    return blocks, b"".join(trains), b"".join(vals), b"".join(tests)
+
+
 def load_dataset(cfg) -> ByteDataset:
     os.makedirs(cfg.data_dir, exist_ok=True)
     if cfg.dataset == "shakespeare":
@@ -163,6 +184,8 @@ def load_dataset(cfg) -> ByteDataset:
     elif cfg.dataset == "europarl":
         langs = tuple(s.strip() for s in cfg.europarl_langs.split(",") if s.strip())
         train, val, test = _prepare_europarl(cfg.data_dir, cfg.europarl_lang_mb * 1_000_000, langs)
+    elif cfg.dataset == "textmix":
+        _, train, val, test = _prepare_textmix(cfg.text_mix, cfg.text_mix_mb)
     else:
         raise ValueError(f"unknown dataset: {cfg.dataset}")
     if getattr(cfg, "train_slice", ""):
