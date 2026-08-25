@@ -36,13 +36,13 @@ def merge_state_dicts(sd_a: dict, sd_b: dict) -> dict:
         b = sd_b[key]
         if key == _DECODER_KEY:
             na, d = a.shape
-            if b.shape != a.shape or na % nh:
+            nb = b.shape[0]
+            if d != b.shape[1] or na % nh or nb % nh:
                 raise ValueError(f"incompatible decoder shapes: {a.shape} vs {b.shape}")
-            n = na // nh
             cat = torch.cat(
-                [a.view(nh, n, d), b.view(nh, n, d)], dim=1
+                [a.view(nh, na // nh, d), b.view(nh, nb // nh, d)], dim=1
             )  # (nh, n+n', D)
-            merged[key] = cat.reshape(nh * 2 * n, d)
+            merged[key] = cat.reshape(nh * (na // nh + nb // nh), d)
         elif key in _N_DIM_KEYS or key == _FREQS_KEY:
             merged[key] = torch.cat([a, b], dim=-1)
         else:
