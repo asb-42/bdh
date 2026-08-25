@@ -21,7 +21,8 @@ from pipeline.data import _europarl_blocks
 def main():
     ckpt = sys.argv[1]
     lang_mb = int(sys.argv[2]) if len(sys.argv) > 2 else 30
-    blocks = _europarl_blocks("data", lang_mb * 1_000_000)
+    langs = tuple(s for s in sys.argv[3].split(",")) if len(sys.argv) > 3 else ("en", "de", "es")
+    blocks = _europarl_blocks("data", lang_mb * 1_000_000, langs=langs)
     model, cfg = _load_model(ckpt)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = model.to(device).eval()

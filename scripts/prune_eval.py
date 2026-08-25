@@ -81,6 +81,8 @@ def main():
     batch = int(arg("--batch", "4"))
     keeps = [float(k) for k in arg("--keeps", "1.0,0.5,0.25,0.125").split(",")]
     random_prune = "--random" in a
+    block_size_n = int(arg("--block", "0"))  # if >0: prune in contiguous neuron blocks
+    save_at = arg("--save-at", "")           # e.g. "0.333:/path/out.pt" saves pruned ckpt
 
     from pipeline.analyze import _load_model
     model, cfg_d = _load_model(ckpt_path)
@@ -104,17 +106,31 @@ def main():
                             (model.encoder.data, model.encoder_v.data, model.decoder.data))
 
     print(f"=== {'RANDOM' if random_prune else 'IMPORTANCE'} prune sweep | {ckpt_path} "
-          f"| {N * nh} neurons ===")
+          f"| {N * nh} neurons"
+          + (f" | block={block_size_n}" if block_size_n else "") + " ===")
     for q in keeps:
         k = max(1, int(q * N))
         # keep top-k PER HEAD (importance flattened as (nh, N); rank within head)
         imp2 = imp.view(nh, N)
-        ord2 = torch.argsort(imp2, dim=1, descending=True)
-        if random_prune:
-            g2 = torch.Generator().manual_seed(7)
-            ord2 = torch.stack([torch.randperm(N, generator=g2).to(device) for _ in range(nh)])
-        keep2 = torch.zeros(nh, N, dtype=torch.bool, device=device)
-        keep2.scatter_(1, ord2[:, :k], True)
+        if block_size_n > 0:
+            nb_k = N // block_size_n
+            if random_prune:
+                g2 = torch.Generator().manual_seed(7)
+                blk_rank = torch.randperm(nb_k, generator=g2).to(device).unsqueeze(0).expand(nh, nb_k)
+            else:
+                blk_imp = imp2.view(nh, nb_k, block_size_n).mean(dim=2)
+                blk_rank = torch.argsort(blk_imp, dim=1, descending=True)
+            keep_blk = torch.zeros(nh, nb_k, dtype=torch.bool, device=device)
+            keep_blk.scatter_(1, blk_rank[:, : max(1, round(nb_k * q))], True)
+            keep2 = keep_blk.repeat_interleave(block_size_n, dim=1)
+        else:
+            if random_prune:
+                g2 = torch.Generator().manual_seed(7)
+                ord2 = torch.stack([torch.randperm(N, generator=g2).to(device) for _ in range(nh)])
+            else:
+                ord2 = torch.argsort(imp2, dim=1, descending=True)
+            keep2 = torch.zeros(nh, N, dtype=torch.bool, device=device)
+            keep2.scatter_(1, ord2[:, :k], True)
         flat = keep2.reshape(-1)
 
         with torch.no_grad():
@@ -123,6 +139,14 @@ def main():
             model.decoder.data.copy_(dec_b * flat.unsqueeze(1))
         print(f"  keep={q:.3f} ({k}/head)")
         eval_langs(model, blocks, bs, iters, batch)
+
+        if save_at and abs(q - float(save_at.split(":")[0])) < 1e-6:
+            ck = torch.load(ckpt_path, map_location="cpu", weights_only=False)
+            ck["model_state"]["encoder"] = (enc_b.cpu() * flat.cpu().view(nh, 1, N))
+            ck["model_state"]["encoder_v"] = (encv_b.cpu() * flat.cpu().view(nh, 1, N))
+            ck["model_state"]["decoder"] = (dec_b.cpu() * flat.cpu().unsqueeze(1))
+            torch.save(ck, save_at.split(":", 1)[1])
+            print(f"  saved pruned checkpoint -> {save_at.split(':', 1)[1]}")
 
     with torch.no_grad():
         model.encoder.data.copy_(enc_b)

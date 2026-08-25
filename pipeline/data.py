@@ -60,7 +60,7 @@ def _europarl_blocks(data_dir: str, lang_bytes: int, langs=("en", "de", "es")):
 
     edir = os.path.join(data_dir, "europarl")
     os.makedirs(edir, exist_ok=True)
-    sources = {"en": "de-en", "de": "de-en", "es": "es-en"}
+    sources = {"en": "de-en", "de": "de-en", "es": "es-en", "fr": "fr-en", "pt": "pt-en"}
     blocks = {}
     for lang in langs:
         pair = sources[lang]
