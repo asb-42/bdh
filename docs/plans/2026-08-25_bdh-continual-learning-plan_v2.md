@@ -59,7 +59,7 @@ Five experiments, one day, all at 100M on Europarl EN→DE→ES (30 MB/phase):
 | ID | claim | status |
 |---|---|---|
 | H1' | replay/distillation (D) cuts forgetting ≥50% at matched compute vs CL-H1 floor | **new top priority** |
-| H2' | learned phase-router approaches oracle routing (per-phase peaks en 2.26/de 2.13/es 2.13) when labels observable | analytic bound established; build only if label-free routing needed |
+| H2' | learned phase-router approaches oracle routing (per-phase peaks en 2.26/de 2.13/es 2.13) when labels observable | **resolved structurally** (Addendum 7): growth stack + block-prefix masks = exact router, no learning needed; remaining work is a label-free domain detector |
 | H3' | ~~importance protection beats uniform~~ **withdrawn** (L3) | closed |
 | H4 binding | cross-domain binding requires replay (INV-3 probes; zero-shot floors: de 21.8/es 17.6 ppl) | unchanged, now unblocked (gate review satisfied trivially: B/C resolved negatively) |
 | H6' | repeated grow→store→merge cycles stay clean over ≥3 phases; random prune-to-budget each cycle | **revised & promoted**: the operational recipe |

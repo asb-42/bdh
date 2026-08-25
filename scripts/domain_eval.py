@@ -18,11 +18,13 @@ def main():
     ckpt = sys.argv[1]
     spec = sys.argv[2]
     mb = int(sys.argv[3]) if len(sys.argv) > 3 else 30
+    batch = int(sys.argv[sys.argv.index("--batch") + 1]) if "--batch" in sys.argv else 8
+    iters_n = int(sys.argv[sys.argv.index("--iters") + 1]) if "--iters" in sys.argv else 100
     model, cfg = _load_model(ckpt)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = model.to(device).eval()
     bs = cfg["block_size"]
-    batch, iters = 8, 100
+    iters = iters_n
     print(f"ckpt={ckpt} | block={bs} | random-crop cold eval (protocol-congruent)")
     for item in filter(None, map(str.strip, spec.split(","))):
         name, path = item.split(":", 1)
