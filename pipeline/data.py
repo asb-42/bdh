@@ -50,9 +50,10 @@ def _prepare_wikitext2(data_dir: str):
     return load_split("train"), load_split("validation"), load_split("test")
 
 
-def _europarl_blocks(data_dir: str, lang_bytes: int, langs=("en", "de", "es")):
-    """Per-language Europarl v7 blocks: {lang: {train, val, test} bytes}.
+def _europarl_blocks(data_dir: str, lang_bytes, langs=("en", "de", "es")):
+    """Per-language Europarl v7 blocks: {lang: {train, val, test} bytes.
 
+    lang_bytes: int (uniform cap) or per-language sequence of ints.
     The last 2 MB of each language are held out (1 MB val + 1 MB test) before
     the train cap, so evaluation text is never seen in training.
     """
@@ -61,8 +62,12 @@ def _europarl_blocks(data_dir: str, lang_bytes: int, langs=("en", "de", "es")):
     edir = os.path.join(data_dir, "europarl")
     os.makedirs(edir, exist_ok=True)
     sources = {"en": "de-en", "de": "de-en", "es": "es-en", "fr": "fr-en", "pt": "pt-en"}
+    caps = list(lang_bytes) if isinstance(lang_bytes, (list, tuple)) else [lang_bytes] * len(langs)
+    if len(caps) != len(langs):
+        raise ValueError(f"{len(caps)} byte caps for {len(langs)} languages")
     blocks = {}
-    for lang in langs:
+    for li, lang in enumerate(langs):
+        mb = caps[li] * 1_000_000
         pair = sources[lang]
         member = f"europarl-v7.{pair}.{lang}"
         txt = os.path.join(edir, f"{member}.txt")
@@ -78,7 +83,7 @@ def _europarl_blocks(data_dir: str, lang_bytes: int, langs=("en", "de", "es")):
                     while chunk := src.read(1 << 24):
                         f.write(chunk)
         raw = open(txt, "rb").read()
-        need = lang_bytes + 2_000_000
+        need = mb + 2_000_000
         if len(raw) < need:
             raise ValueError(f"europarl {lang}: {len(raw)} bytes < needed {need}")
         blk = raw[-need:]
@@ -92,8 +97,8 @@ def _europarl_blocks(data_dir: str, lang_bytes: int, langs=("en", "de", "es")):
     return blocks
 
 
-def _prepare_europarl(data_dir: str, lang_bytes: int, langs=("en", "de", "es")):
-    """Multilingual Europarl v7 as contiguous per-language blocks (EN, DE, ES)."""
+def _prepare_europarl(data_dir: str, lang_bytes, langs=("en", "de", "es")):
+    """Multilingual Europarl v7 as contiguous per-language blocks."""
     blocks = _europarl_blocks(data_dir, lang_bytes, langs)
     sep = b"\n\n"
     return (sep.join(blocks[l]["train"] for l in langs),
@@ -183,7 +188,10 @@ def load_dataset(cfg) -> ByteDataset:
         train, val, test = _prepare_wikitext2(cfg.data_dir)
     elif cfg.dataset == "europarl":
         langs = tuple(s.strip() for s in cfg.europarl_langs.split(",") if s.strip())
-        train, val, test = _prepare_europarl(cfg.data_dir, cfg.europarl_lang_mb * 1_000_000, langs)
+        caps = [int(m) for m in str(cfg.europarl_lang_mb).split(",")]
+        if len(caps) == 1:
+            caps = caps * len(langs)
+        train, val, test = _prepare_europarl(cfg.data_dir, caps, langs)
     elif cfg.dataset == "textmix":
         _, train, val, test = _prepare_textmix(cfg.text_mix, cfg.text_mix_mb)
     else:

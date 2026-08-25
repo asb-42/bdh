@@ -51,7 +51,7 @@ class Config:
     run_name: str = ""                     # optional tag in checkpoint filenames; isolates concurrent/sequential runs
     train_slice: str = ""                  # "start:end" fractions of the train split to train on ("" = all)
     init_from: str = ""                    # checkpoint path to initialize model weights from (fresh optimizer)
-    europarl_lang_mb: int = 30             # europarl only; per-language train block size in MB
+    europarl_lang_mb: str = "30"           # europarl only; per-language train MB, comma-aligned with --europarl-langs (single value = uniform)
     europarl_langs: str = "en,de,es"       # europarl only; comma-separated language sides to include
     k_sparse_ratio: float = 0.0            # BDH only; 0=ReLU, >0=keep top k% activations (straight-through)
     gate_from: str = ""                    # comma-separated ckpts with "neuron_importance"; write-gating source
