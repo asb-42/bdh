@@ -26,8 +26,10 @@ def main():
     print(f"ckpt={ckpt} | block={bs} | random-crop cold eval (protocol-congruent)")
     for item in filter(None, map(str.strip, spec.split(","))):
         name, path = item.split(":", 1)
+        # must match pipeline.data._prepare_textmix: splits are carved INSIDE the
+        # first `mb` MB as train | val 1MB | test 1MB; eval on the last 2MB.
         with open(path, "rb") as f:
-            raw = f.read((mb + 2) * 1_000_000)[mb * 1_000_000 :]
+            raw = f.read(mb * 1_000_000)[-2_000_000:]
         data = torch.from_numpy(np.frombuffer(raw, dtype=np.uint8).astype(np.int64))
         g = torch.Generator().manual_seed(1234)
         losses = []
