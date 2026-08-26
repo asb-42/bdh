@@ -1,0 +1,55 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
+\newlabel{sec:intro}{{1}{1}{Introduction}{section.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Setup}{2}{section.2}\protected@file@percent }
+\newlabel{sec:setup}{{2}{2}{Setup}{section.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Architecture and growth}{2}{subsection.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Continual protocol}{2}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Definitions}{2}{subsection.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}The phenomenon: four negative results}{2}{section.3}\protected@file@percent }
+\newlabel{sec:phen}{{3}{2}{The phenomenon: four negative results}{section.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Sequential training EN$\to $DE$\to $ES at 100M. Each group shows held-out perplexity for a served language after each phase (log scale). Earlier languages degrade by $4$--$9\times $ while each new language reaches specialist quality.}}{3}{figure.1}\protected@file@percent }
+\newlabel{fig:forgetting}{{1}{3}{Sequential training EN$\to $DE$\to $ES at 100M. Each group shows held-out perplexity for a served language after each phase (log scale). Earlier languages degrade by $4$--$9\times $ while each new language reaches specialist quality}{figure.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Theory: the commutator condition}{3}{section.4}\protected@file@percent }
+\newlabel{sec:theory}{{4}{3}{Theory: the commutator condition}{section.4}{}}
+\newlabel{lem:zf}{{1}{3}{zero-forcing}{lemma.1}{}}
+\newlabel{thm:comm}{{1}{3}{commutator criterion}{theorem.1}{}}
+\newlabel{prop:soft}{{1}{4}{soft gates cannot be exact}{proposition.1}{}}
+\newlabel{prop:bound}{{2}{4}{expansiveness precludes bounding}{proposition.2}{}}
+\newlabel{cor:sel}{{1}{4}{selector vs.\ creator}{corollary.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}The recipe, branch by branch}{4}{section.5}\protected@file@percent }
+\newlabel{sec:recipe}{{5}{4}{The recipe, branch by branch}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Grow to acquire}{4}{subsection.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Select to serve}{4}{subsection.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}The soft-regime budget}{4}{subsection.5.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Leakage of a soft-scaled suffix block into old-language serving (EN inputs, reference = prefix-only state). Left axis: relative logit drift; right axis: top-1 agreement. Superlinear growth reflects expansive depth composition; $j\le 0.15$ is the measured budget.}}{5}{figure.2}\protected@file@percent }
+\newlabel{fig:leakage}{{2}{5}{Leakage of a soft-scaled suffix block into old-language serving (EN inputs, reference = prefix-only state). Left axis: relative logit drift; right axis: top-1 agreement. Superlinear growth reflects expansive depth composition; $j\le 0.15$ is the measured budget}{figure.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Three-phase systems comparison (held-out ppl). The recovered single model equals joint co-training at original width and is deterministic to $\pm 0.01$ ppl over three seeds.}}{5}{table.1}\protected@file@percent }
+\newlabel{tab:pareto}{{1}{5}{Three-phase systems comparison (held-out ppl). The recovered single model equals joint co-training at original width and is deterministic to $\pm 0.01$ ppl over three seeds}{table.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Consolidate: merge, prune randomly, replay briefly}{5}{subsection.5.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Or skip everything: replay during training}{5}{subsection.5.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Systems Pareto (log scale). Merge$\to $prune$\to $replay reaches joint parity at original width; unrouted serving of the merged stack is dominated everywhere.}}{6}{figure.3}\protected@file@percent }
+\newlabel{fig:pareto}{{3}{6}{Systems Pareto (log scale). Merge$\to $prune$\to $replay reaches joint parity at original width; unrouted serving of the merged stack is dominated everywhere}{figure.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6}Decision rule}{6}{subsection.5.6}\protected@file@percent }
+\newlabel{sec:rule}{{5.6}{6}{Decision rule}{subsection.5.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Empirical laws}{6}{section.6}\protected@file@percent }
+\newlabel{sec:laws}{{6}{6}{Empirical laws}{section.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Limitations}{6}{section.7}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Composition governs sparsity at fixed capacity. (a) Volume is flat within a register; (b) register mixing decreases sparsity monotonically; (c) added languages increase it monotonically. Anchors from prior runs shown alongside new grid points.}}{7}{figure.4}\protected@file@percent }
+\newlabel{fig:grid}{{4}{7}{Composition governs sparsity at fixed capacity. (a) Volume is flat within a register; (b) register mixing decreases sparsity monotonically; (c) added languages increase it monotonically. Anchors from prior runs shown alongside new grid points}{figure.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{7}{section.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {A}Proofs}{7}{appendix.A}\protected@file@percent }
+\newlabel{app:proofs}{{A}{7}{Proofs}{appendix.A}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.1}Setting}{7}{subsection.A.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.2}Proof of Lemma~\ref {lem:zf}}{7}{subsection.A.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.3}Proof of Theorem~\ref {thm:comm}}{8}{subsection.A.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.4}Proof sketch of Proposition~\ref {prop:soft}}{8}{subsection.A.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.5}Proof of Proposition~\ref {prop:bound}}{8}{subsection.A.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.6}Remark (LayerNorm)}{8}{subsection.A.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {B}Prior-art triage}{8}{appendix.B}\protected@file@percent }
+\newlabel{app:prior}{{B}{8}{Prior-art triage}{appendix.B}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {C}Reproducibility}{8}{appendix.C}\protected@file@percent }
+\gdef \@abspage@last{9}
