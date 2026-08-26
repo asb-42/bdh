@@ -51,9 +51,9 @@ def _prepare_wikitext2(data_dir: str):
 
 
 def _europarl_blocks(data_dir: str, lang_bytes, langs=("en", "de", "es")):
-    """Per-language Europarl v7 blocks: {lang: {train, val, test} bytes.
+    """Per-language Europarl v7 blocks: {lang: {train, val, test} bytes}.
 
-    lang_bytes: int (uniform cap) or per-language sequence of ints.
+    lang_bytes: cap in BYTES — int (uniform) or per-language sequence.
     The last 2 MB of each language are held out (1 MB val + 1 MB test) before
     the train cap, so evaluation text is never seen in training.
     """
@@ -67,7 +67,7 @@ def _europarl_blocks(data_dir: str, lang_bytes, langs=("en", "de", "es")):
         raise ValueError(f"{len(caps)} byte caps for {len(langs)} languages")
     blocks = {}
     for li, lang in enumerate(langs):
-        mb = caps[li] * 1_000_000
+        need = caps[li] + 2_000_000
         pair = sources[lang]
         member = f"europarl-v7.{pair}.{lang}"
         txt = os.path.join(edir, f"{member}.txt")
@@ -83,7 +83,6 @@ def _europarl_blocks(data_dir: str, lang_bytes, langs=("en", "de", "es")):
                     while chunk := src.read(1 << 24):
                         f.write(chunk)
         raw = open(txt, "rb").read()
-        need = mb + 2_000_000
         if len(raw) < need:
             raise ValueError(f"europarl {lang}: {len(raw)} bytes < needed {need}")
         blk = raw[-need:]
@@ -191,7 +190,8 @@ def load_dataset(cfg) -> ByteDataset:
         caps = [int(m) for m in str(cfg.europarl_lang_mb).split(",")]
         if len(caps) == 1:
             caps = caps * len(langs)
-        train, val, test = _prepare_europarl(cfg.data_dir, caps, langs)
+        train, val, test = _prepare_europarl(
+            cfg.data_dir, [m * 1_000_000 for m in caps], langs)
     elif cfg.dataset == "textmix":
         _, train, val, test = _prepare_textmix(cfg.text_mix, cfg.text_mix_mb)
     else:
