@@ -29,7 +29,7 @@ for D in $SEQ; do
       --run-name ladG-$D \
       2>&1 | tee out/logs/ladG_${D}.log
     INIT="out/bdh_europarl_ladG-${D}_last.pt"
-    .venv/bin/python scripts/lang_eval.py "$INIT" 30 "$D" >> "$A" 2>&1
+    .venv/bin/python scripts/lang_eval.py "$INIT" 30 "$D" 4 >> "$A" 2>&1
     continue
   fi
 
@@ -58,8 +58,8 @@ for D in $SEQ; do
 
   INIT="out/bdh_europarl_ladG-${D}_last.pt"
 
-  # Eval: target language
-  .venv/bin/python scripts/lang_eval.py "$INIT" 30 "$D" >> "$A" 2>&1
+  # Eval: target language (use same batch as training to avoid OOM)
+  .venv/bin/python scripts/lang_eval.py "$INIT" 30 "$D" "$BS" >> "$A" 2>&1
 
   # Milestone: full interference matrix at phases 5/10/15/20
   if [ "$PHASE" -eq 5 ] || [ "$PHASE" -eq 10 ] || [ "$PHASE" -eq 15 ] || [ "$PHASE" -eq 20 ]; then
@@ -70,7 +70,7 @@ for D in $SEQ; do
     done
     SEEN="$SEEN,$D"
     echo "--- milestone phase $PHASE: evaluating on $SEEN ---" >> "$A"
-    .venv/bin/python scripts/lang_eval.py "$INIT" 30 "$SEEN" >> "$A" 2>&1
+    .venv/bin/python scripts/lang_eval.py "$INIT" 30 "$SEEN" "$BS" >> "$A" 2>&1
   fi
 done
 

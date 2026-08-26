@@ -22,12 +22,13 @@ def main():
     ckpt = sys.argv[1]
     lang_mb = int(sys.argv[2]) if len(sys.argv) > 2 else 30
     langs = tuple(s for s in sys.argv[3].split(",")) if len(sys.argv) > 3 else ("en", "de", "es")
+    batch = int(sys.argv[4]) if len(sys.argv) > 4 else 8
     blocks = _europarl_blocks("data", lang_mb * 1_000_000, langs=langs)
     model, cfg = _load_model(ckpt)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = model.to(device).eval()
     bs = cfg["block_size"]
-    batch, iters = 8, 100
+    iters = 100
     print(f"ckpt={ckpt} | block={bs} | random-crop cold eval (protocol-congruent)")
     for lang in sorted(blocks):
         raw = blocks[lang]["val"] + blocks[lang]["test"]
