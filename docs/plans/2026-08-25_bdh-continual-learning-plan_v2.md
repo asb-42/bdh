@@ -37,9 +37,11 @@ Five experiments, one day, all at 100M on Europarl EN→DE→ES (30 MB/phase):
 - **L3. Within-phase knowledge is distributed; between-phase knowledge is modular.**
   Random neuron subsets preserve function; magnitude-selected subsets destroy it.
   Phase-level concat works; within-phase importance ranking doesn't.
-- **L4. Sparsity is a capacity-to-data property** (~94–95% xy across k ∈ {0,…,0.10});
-  top-k tunes weight-graph topology independently (edge_frac −20×) but neither causes
-  nor prevents forgetting.
+- **L4. Sparsity is set by data composition, not volume** (grid-corrected, Addendum 14):
+  flat across 30–90 MB at fixed capacity; cross-language boundaries raise it
+  (~+0.5 pp/language), register mixing lowers it sharply then saturates (−4 pp first
+  register). Capacity-to-data dominates only across scales. Weight-graph topology
+  remains tunable by top-k independently (edge_frac −20×).
 - **L5. Measurement discipline adds corpus difficulty**: never compare losses across
   corpora (Europarl ≈ easier than wikitext-2); alongside INV-1 protocol congruence.
 
