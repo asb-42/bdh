@@ -84,10 +84,11 @@ the plan document travels with the repo.
 
 - [x] Language inventory verified (21 sides)
 - [x] Loader supports all sides (`sources` map extended)
-- [ ] Arm R launched (phase 2 = ES; EN reused)
-- [ ] Milestone reviews at phases 5/10/15/20
-- [ ] Arm G launched after R reaches ~phase 10
-- [ ] Final matrices + routing/detector measurements (both arms)
+- [x] Arm R complete: 19/19 phases, P-Acq PASS (peak 2.21), P-Eros FAIL (+12.7/+20.7 nats)
+- [x] Milestone reviews: full interference matrix at phases 5/10/15/19 (post-hoc from checkpoints)
+- [x] Arm G launched (growth+routed, ×160→×736) — PID 769711, out/logs/ladG_*.log
+- [ ] Arm G milestone reviews at phases 5/10/15/19
+- [ ] Final routing/detector measurements on Arm G (growth arm only)
 - [ ] Report Addendum + manuscript "accumulation" section
 - [ ] Step-4 go/no-go on parameter scaling
 
