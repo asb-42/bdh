@@ -108,7 +108,7 @@ statistical coupling inside LayerNorm. One triple $(E,E_v,D_c)$ serves all $L$ l
 \textbf{Growth.} Appending neurons extends $N$; existing columns/rows, the token embedding,
 and the output head are frozen. Because RoPE frequencies carry the neuron count in their
 exponent, naive growth silently rewrites every surviving neuron's phases; our growth path
-preserves the frequency prefix verbatim, which restores exactness (Proposition~\ref{prop:prefix}).
+preserves the frequency prefix verbatim, which restores exactness of masked-prefix serving (Proposition 3, Appendix \ref{app:proofs}).
 
 \subsection{Continual protocol}
 Phases are ${\sim}30$\,MB byte streams; each phase initializes from the previous endpoint
