@@ -631,13 +631,38 @@ $\|e_{\ell+1}\|\le(1+L_f)\|e_\ell\|+\delta_\ell$; unrolling gives the stated bou
 Contractivity $\rho<1$ on the interference subspace replaces $(1+L_f)$ and yields
 $\|e_L\|\le\delta_{\max}/(1-\rho)$. \hfill$\qed$
 
-\subsection{Remark on the measurement (Remark~\ref{rem:exp})}
-Directional power iteration (6 steps, 8 old-input states, random init) estimates the
-dominant singular direction's gain per composed level map; values are lower-bound-flavored
-proxies, LayerNorm induces contractive directions (minima ${\approx}0.9$), and sampled
-states cover held-out parliamentary English. The conclusion drawn is deliberately modest:
-contraction is unsupported for these models, so contraction-based bounding is unavailable
-\emph{here}; no universal impossibility is claimed.
+\subsection{Remark on the measurement (Remark~\ref{rem:exp})}\label{app:meas}
+Two complementary instruments replace a single operator-norm computation.
+\emph{(i) Whole-map directional gains}: 6-step power iteration on JVPs of one composed
+level map at 8 old-input states; medians $1.05$--$1.89$ per level (lower-bound-flavored;
+LayerNorm induces contractive directions with minima ${\approx}0.9$).
+\emph{(ii) Trajectory-level gate-miscalibration curves} (the interference Jacobian realized
+as finite differences): scaling both suffix blocks to $d$ on EN inputs and tracking state
+deviation $\|h^{(d)}_\ell-h^{(0)}_\ell\|/\|h^{(0)}_\ell\|$ per level yields
+
+\begin{center}\small
+\begin{tabular}{lcccccc}
+\toprule
+$d$ & $L_1$ & $L_2$ & $L_3$ & $L_4$ & $L_5$ & $L_6$ \\
+\midrule
+0.01 & .0006 & .0016 & .0021 & .0023 & .0023 & .0022 \\
+0.05 & .0016 & .0025 & .0033 & .0039 & .0044 & .0050 \\
+0.15 & .0053 & .0100 & .0191 & .0245 & .0298 & .0351 \\
+0.30 & .0214 & .0468 & .0817 & .1006 & .1171 & .1297 \\
+ungated & .4024 & .4816 & .6340 & .7697 & .8580 & .9078 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Hard masking gives exact tensor identity at every level ($\varepsilon_{\mathrm{inv}}
+=\varepsilon_{\mathrm{eq}}=0$ by construction; implementation-faithfulness verified).
+Injections propagate with \emph{mild per-level amplification} (${\sim}1.2$--$1.5\times$,
+consistent with the directional gains) that \emph{saturates} as deviations approach
+$\mathcal{O}(1)$ under LayerNorm renormalization. Conclusion drawn, precisely: contraction
+is unsupported for these models, so contraction-based uniform bounding is unavailable
+\emph{here}; equally, erosion is not runaway-exponential within realistic depths --- it
+approaches full decorrelation (${\approx}0.9$ relative state deviation) and stays there.
+No universal impossibility is claimed.
 
 \section{Prior-art triage}\label{app:prior}
 
