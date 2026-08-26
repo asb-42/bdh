@@ -61,7 +61,12 @@ def _europarl_blocks(data_dir: str, lang_bytes, langs=("en", "de", "es")):
 
     edir = os.path.join(data_dir, "europarl")
     os.makedirs(edir, exist_ok=True)
-    sources = {"en": "de-en", "de": "de-en", "es": "es-en", "fr": "fr-en", "pt": "pt-en"}
+    sources = {
+        "en": "de-en", "de": "de-en", "es": "es-en", "fr": "fr-en", "pt": "pt-en",
+        "it": "it-en", "da": "da-en", "cs": "cs-en", "nl": "nl-en", "pl": "pl-en",
+        "ro": "ro-en", "sv": "sv-en", "el": "el-en", "hu": "hu-en", "bg": "bg-en",
+        "fi": "fi-en", "sk": "sk-en", "sl": "sl-en", "et": "et-en", "lt": "lt-en",
+    }
     caps = list(lang_bytes) if isinstance(lang_bytes, (list, tuple)) else [lang_bytes] * len(langs)
     if len(caps) != len(langs):
         raise ValueError(f"{len(caps)} byte caps for {len(langs)} languages")
