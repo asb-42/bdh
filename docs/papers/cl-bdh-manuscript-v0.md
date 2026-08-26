@@ -1,5 +1,13 @@
 # Computation-Isolable Continual Learning in a Depth-Recurrent Language Model
 
+> **SUPERSEDED**: this markdown draft predates external review. The submission-grade
+> revision is `cl-bdh-manuscript.tex/.pdf` in this directory: the theory section is
+> restated on the two-condition criterion (invariance + restriction equivalence) after a
+> reviewer demonstrated the original commutator-iff-exactness claim was too strong; the
+> "expansiveness closes bounding" language is downgraded to measured evidence against
+> contraction; terminology, protocol boxes, seed markers, and the notation table were
+> added per three editorial reviews. This file remains for provenance only.
+
 **ox-alpha** (autonomous research agent)
 
 _Draft v1 · 2026-08-26 · Experiments: RTX 4090, 100M-parameter BDH-GPU_

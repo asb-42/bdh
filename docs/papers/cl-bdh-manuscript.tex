@@ -14,14 +14,16 @@
 \newtheorem{lemma}{Lemma}
 \newtheorem{proposition}{Proposition}
 \newtheorem{corollary}{Corollary}
+\theoremstyle{definition}\newtheorem{definition}{Definition}
 \theoremstyle{remark}\newtheorem{remark}{Remark}
 
 \newcommand{\BDH}{\textsc{bdh}}
-\newcommand{\ppl}[1]{\mathrm{ppl}_{#1}}
+\newcommand{\Xa}{\mathcal{X}_A}
+\newcommand{\TA}{\mathcal{T}_A}
 
-\title{\bfseries Computation-Isolable Continual Learning\\ in a Depth-Recurrent Language Model}
+\title{\bfseries Computation Isolation for Continual Learning\\ in a Depth-Recurrent Language Model}
 \author{ox-alpha\\\small autonomous research agent}
-\date{August 26, 2026}
+\date{August 26, 2026 (revision 1, post-review)}
 
 \begin{document}
 \maketitle
@@ -29,27 +31,27 @@
 \begin{abstract}
 We study continual learning in \BDH{}, a language model whose defining efficiency---one
 block of parameters reused across all depths---collides directly with the core requirement
-of lifelong learning: that finished computations stay fixed. We first show empirically that
-sequential training forgets catastrophically (later phases cost earlier languages
-$+1.6$ to $+2.2$ nats), that the failure is \emph{representational overwrite} rather than an
-optimizer artifact, and---most sharply---that \textbf{freezing old weights does not preserve
-old computation}: newly trained modules pollute the shared residual stream consumed by
-deeper levels, eroding frozen knowledge at ${\sim}0.85$ nats per added block even under zero
-parameter drift. We then give a constructive theory: exact isolation is possible if and only
-if the extended layer map commutes with the old-task projection on the old-task subspace
-($[P_A,F']=0$); additive width growth satisfies this condition under hard module masks,
-making the grown model a container of disjoint experts and an input-dependent selector---%
-hard or soft---an exact or near-exact router. Measured on 100M-parameter models across five
-languages and three text registers: prefix routing reproduces specialists bit-for-bit with a
-128-token likelihood detector at 100\% accuracy; a temperature-softened mixture sits within
-0.003 nats of the discrete oracle; and a post-hoc pipeline of merge $\rightarrow$
-random-scatter prune $\rightarrow$ brief replay recovers a \emph{single fixed-width} model
-equal to joint co-training ($\pm 0.01$ ppl over three seeds). Where structural separation is
-unavailable we show the alternative is closed: trained \BDH{} blocks are measurably expansive
-(directional spectral norms $1.05$--$1.89$), so interference cannot be merely bounded, only
-eliminated by selection. A composition$\times$volume grid corrects sparsity intuitions: at
-fixed capacity, activation sparsity is governed by data composition, not volume. We conclude
-with a complete, measured decision rule for continual deployment.
+of lifelong learning: that finished computations stay fixed. Three findings organize the
+problem. \emph{First}, sequential training forgets catastrophically (later phases cost
+earlier languages $+1.6$ to $+2.2$ nats), the failure persists under literally frozen old
+parameters, and it therefore cannot be explained by parameter drift: \textbf{weight
+isolation does not imply computation isolation}. \emph{Second}, the condition that makes
+continual serving exact is structural: the grown map must leave the old-task reachable set
+invariant and agree with the old map on it. No soft or hard gate can substitute for this
+structure in a generic frozen path; but \BDH{}'s additive growth rule \emph{constructs} it,
+so an input-dependent selector---hard or soft---selects an isolation that already exists.
+\emph{Third}, the resulting system separates acquisition, serving, and consolidation rather
+than seeking one universal mechanism. Measured on 100M-parameter models across five languages
+and three text registers: prefix selection reproduces specialists to within evaluation
+precision, with a 128-token likelihood detector at 100\% accuracy; a training-free softened
+mixture serves mixed streams within 0.003 nats of the discrete oracle; merge$\,\to\,$random-
+scatter-prune$\,\to\,$brief replay consolidates everything into one fixed-width model equal
+to joint co-training ($\pm0.01$ ppl over three seeds); and ${\sim}20\%$ replay during
+training reaches the same parity at $+27\%$ budget. Two measured boundaries complete the
+map: trained blocks are expansive (directional gains $1.05$--$1.89$), so uniform
+contraction-based bounds are unsupported; and LayerNorm couples softly active modules at a
+measured operating budget. A composition grid revises sparsity intuitions: at fixed
+capacity, activation sparsity tracks data composition, not volume.
 \end{abstract}
 
 \section{Introduction}
@@ -65,9 +67,9 @@ story.
 
 This paper takes \BDH{}-GPU as its instrument. \BDH{} applies a single transformer-like block
 recurrently across $L$ levels over a persistent residual stream, with neuron-dimension latent
-operators shared across depth. The architecture's uniform scaling in the neuron dimension
-makes it uniquely amenable to \emph{additive growth} (new neurons append; nothing else
-changes), which turns out to be the property that makes continual learning tractable.
+operators shared across depth. Its uniform scaling in the neuron dimension makes it uniquely
+amenable to \emph{additive growth}: new neurons append, nothing else changes. We show that
+this property, properly formalized, is what makes continual learning tractable here.
 
 We ask one question in three readings:
 \begin{quote}\itshape
@@ -76,39 +78,66 @@ bounded, or made controllable by an input-dependent gate or projection, without 
 trainable parameters and without retraining the frozen path?
 \end{quote}
 
-\noindent\textbf{Answer (\S\ref{sec:theory}--\S\ref{sec:recipe}).}
-Elimination requires the extended map to commute with the old-task projection on the
-old-task subspace---a structural property no gate can create in a generic frozen path, but
-which \BDH{}'s additive growth rule constructs. Given that structure, selection is exact when
-discrete and $\varepsilon$-exact when softened (measured $\varepsilon \approx 0.003$ nats);
-bounding without selection is impossible because trained blocks are expansive. The practical
-consequence is a decision rule (\S\ref{sec:rule}) validated end-to-end.
+\noindent\textbf{Answer (\S\ref{sec:theory}--\S\ref{sec:recipe}).} Exact elimination is
+possible precisely when the grown map keeps the old-task reachable set invariant and equals
+the old map on it. A generic frozen path has no such structure, and no gate creates it.
+\BDH{}'s growth rule constructs it; detection and selection exploit it. Where the structure
+is absent, we find no evidence supporting useful uniform bounds---trained blocks are
+expansive on the tested trajectories---so the honest alternatives are structural separation
+or replay. The resulting system separates three concerns usually conflated:
+\textbf{acquisition} (grow into fresh capacity), \textbf{serving} (route to, or softly mix,
+the stored phases), and \textbf{consolidation} (merge, prune, brief replay). Each concern
+has a measured solution; none requires a miracle.
 
 All experiments use 100M-parameter \BDH{}, byte-level language modeling, one RTX 4090,
 Europarl (EN/DE/ES/FR/PT) and a three-register English mix (Wikipedia, Gutenberg books,
-parliamentary proceedings). Core comparisons are within-corpus and seed-replicated.
+parliamentary proceedings). Core comparisons are within-corpus and seed-replicated
+(\S\ref{sec:recipe}).
 
 \section{Setup}
 \label{sec:setup}
 
-\subsection{Architecture and growth}
+\subsection{Architecture primer}\label{sec:primer}
 
-One \BDH{} level computes, writing $E,E_v\in\mathbb{R}^{n_h\times d\times N}$ for the encoder
-tensors and $D_c\in\mathbb{R}^{(n_h N)\times d}$ for the decoder,
+Table~\ref{tab:notation} fixes notation. One \BDH{} level computes, with encoders
+$E,E_v\in\mathbb{R}^{n_h\times d\times N}$ and decoder $D_c\in\mathbb{R}^{(n_hN)\times d}$,
 \[
-x \;\leftarrow\; \operatorname{LN}\Bigl(x + \operatorname{LN}\bigl(
-(\,\operatorname{relu}(x@E)\;\odot\;\operatorname{relu}(\operatorname{LN}(a(x))@E_v)\,) @ D_c
-\bigr)\Bigr),
+u=\operatorname{relu}(x@E),\qquad
+v=\operatorname{relu}\bigl(\operatorname{LN}(a(u))@E_v\bigr),\qquad
+x \;\leftarrow\; \operatorname{LN}\Bigl(x+\operatorname{LN}\bigl((u\odot v)@D_c\bigr)\Bigr),
 \]
-where $a(\cdot)$ is per-neuron attention over positions in the residual stream: each latent
-neuron attends independently, there are no query/key/value projection matrices, and every
-operator above is coordinate-separable across neurons. The only cross-neuron coupling is the
-statistical coupling inside LayerNorm. One triple $(E,E_v,D_c)$ serves all $L$ levels.
+where $a(\cdot)$ is per-neuron attention over positions of $x$: each latent neuron attends
+independently, there are no query/key/value projection matrices, and every operator above is
+coordinate-separable across neurons. The only cross-neuron coupling is LayerNorm's global
+statistics. One triple $(E,E_v,D_c)$ serves all $L$ levels.
 
-\textbf{Growth.} Appending neurons extends $N$; existing columns/rows, the token embedding,
-and the output head are frozen. Because RoPE frequencies carry the neuron count in their
-exponent, naive growth silently rewrites every surviving neuron's phases; our growth path
-preserves the frequency prefix verbatim, which restores exactness of masked-prefix serving (Proposition 3, Appendix \ref{app:proofs}).
+\textbf{Growth} appends zero-initialized neurons to the triple; existing neurons, the token
+embedding, and the output head are frozen. RoPE frequencies carry the neuron count in their
+exponent, so naive growth would silently rewrite every surviving neuron's phases; our growth
+path preserves the frequency prefix verbatim.
+
+\begin{table}[t]
+\centering\small
+\caption{Notation used throughout.}
+\label{tab:notation}
+\begin{tabular}{ll}
+\toprule
+symbol & meaning \\
+\midrule
+$d,\ n_h,\ N,\ L$ & residual width, heads, neurons/head, depth levels \\
+$x\in\mathbb{R}^{d}$ & persistent residual state (shared across levels) \\
+$E,E_v,D_c$ & shared neuron operators (encoder, value encoder, decoder) \\
+phase $A$, $\theta_A$ & a training stage and its parameters \\
+$f(h;\theta_A)$ & one level's update under specialist parameters \\
+$f_b(h)$ & grown suffix block $b$'s decoder write-back contribution \\
+$F_A,\ F'$ & specialist map $h{+}f(\cdot;\theta_A)$; extended (grown) map \\
+$\mathcal{X}_A,\ \TA$ & old-task input set; reachable old-trajectory states \\
+$P_A$ & projection/mask selecting the old-phase contribution channels \\
+$C_{P}(z)$ & commutation residual $P_A F'(z)-F'(P_A z)$ \\
+$\varepsilon$-isolation & $\sup_{x\in\mathcal{X}_A,L}\|\Delta^{(L)}_A(x)\|\le\varepsilon$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Continual protocol}
 Phases are ${\sim}30$\,MB byte streams; each phase initializes from the previous endpoint
@@ -116,14 +145,16 @@ Phases are ${\sim}30$\,MB byte streams; each phase initializes from the previous
 cold random-crop protocol, always within-corpus: cross-corpus loss comparisons are void
 (Europarl is intrinsically easier than WikiText-class text).
 
-\subsection{Definitions}
-For old-task inputs $x\in\mathcal{X}_A$, interference is
-$\Delta_A(x) = F_{\mathrm{full}}(x) - F_{\mathrm{prefix}_A}(x)$.
-A mechanism achieves \emph{exact isolation} iff $\Delta_A \equiv 0$;
-\emph{bounded isolation} iff $\lVert\Delta_A\rVert \le \varepsilon$ uniformly in depth and
-phase count. Weight isolation ($\dot\theta_A = 0$) is distinct from computation isolation
-($F_{\mathrm{full}}|_{\mathcal{X}_A} = F_{\mathrm{prefix}_A}|_{\mathcal{X}_A}$); \S\ref{sec:phen}
-shows the former does not imply the latter, and quantifies the gap.
+\subsection{Definitions: state- and output-level isolation}
+For old-task inputs, define the state-level interference at depth $\ell$,
+$\Delta^{(\ell)}_A(x)=h^{F'}_\ell(x)-h^{F_A}_\ell(x)$, and the output-level interference
+$\Delta^{y}_A(x)=R(h^{F'}_L(x))-R(h^{F_A}_L(x))$ under the shared readout $R$. We take
+\emph{state-level} isolation ($\Delta^{(\ell)}=0$ for all $\ell$) as the primary criterion:
+output-level equality can hide internal interference that resurfaces under distribution
+shift. Exact isolation means state- and output-level equality for all $x\in\Xa$ and all
+depths; $\varepsilon$-isolation means the supremum is bounded by $\varepsilon$ uniformly in
+depth and phase count. Weight isolation ($\dot\theta_A=0$) is a third, weaker property;
+\S\ref{sec:phen} shows it implies neither of the other two.
 
 \section{The phenomenon: four negative results}
 \label{sec:phen}
@@ -139,7 +170,11 @@ $4$--$9\times$ while each new language reaches specialist quality.}
 
 \textbf{N1 --- Sequential training forgets catastrophically.} Two later phases cost EN
 $+1.59$ nats and DE $+2.15$ nats above their phase peaks, identically under ReLU and hard
-top-$k$ activations ($k\ge10\%$); see Figure~\ref{fig:forgetting}.
+top-$k$ activations ($k\ge10\%$); see Figure~\ref{fig:forgetting}. The strongest direct
+statement is: forgetting persists when the old parameters are frozen, so it cannot be
+explained by drift in the frozen subset. We interpret the residual-stream contamination this
+induces as \emph{computational interference}; ``representational overwrite'' is our shorthand
+for the measured end-state.
 
 \textbf{N2 --- It is not optimizer shock.} Constant-LR schedules without warmup/decay
 restarts are strictly worse: peaks degrade and retention \emph{decreases} by
@@ -154,105 +189,146 @@ phase (relative drift $0.6$--$1.3$), and importance is spread thin (99.9\% of ne
 \textbf{N4 --- Freezing cannot fix it either.} With all old parameters literally frozen
 (growth arm), the oldest phase still erodes $+0.84$ nats per subsequently added block
 (EN: $2.26 \to 5.40 \to 12.49$ ppl after one/two grown blocks). New modules contribute
-additively into the residual stream that deeper levels feed back through frozen encoders.
-\emph{Weight isolation does not imply computation isolation.}
+additively into the residual stream that deeper levels feed back through frozen encoders:
+\[
+\underbrace{\Delta\theta_A=0}_{\text{weight isolation}}\quad\not\Longrightarrow\quad
+\underbrace{F'\big|_{\Xa}=F_A\big|_{\Xa}}_{\text{computation isolation}} .
+\]
 
 Two positive anchors emerge from the same runs. First, new languages \emph{acquire} at near
 parity using only fresh capacity (+25\% width reaches within 0.09 nats of specialist
 quality). Second---decisive for everything below---\textbf{hard suffix masking reproduces
-each phase's specialist bit-for-bit}. The architecture contains its own solution;
-\S\ref{sec:theory} says why, \S\ref{sec:recipe} exploits it.
+each phase's specialist numerically identically under the evaluation protocol}. The
+architecture contains a candidate solution; \S\ref{sec:theory} states the condition under
+which it is exact, \S\ref{sec:recipe} measures it.
 
-\section{Theory: the commutator condition}
+\section{Theory: when does selection give exact isolation?}
 \label{sec:theory}
 
-Formalize the grown stack as $h_{\ell+1} = h_\ell + f(h_\ell;\theta_A) + \sum_{b} f_b(h_\ell)$,
-with $\theta_A$ frozen and suffix blocks $f_b$. Let $P_A$ denote projection onto the
-old-phase contribution channels, applied identically at every level. All statements are
-proved in Appendix~\ref{app:proofs}; prior art addresses neighboring problems only
-(Appendix~\ref{app:prior}).
+Statements are proved in Appendix~\ref{app:proofs}. We label each result
+\textsc{proved}, \textsc{measured}, or \textsc{conjectured}, and keep those labels strict:
+measurements never discharge a missing assumption.
 
-\begin{lemma}[zero-forcing]\label{lem:zf}
-Under delta-placement gating $h_{\ell+1}=h_\ell + g(x)\odot f'(h_\ell)$, exact preservation
-on $\mathcal{X}_A$ forces $g_b(x)=0$ for every suffix block $b$ at every point where its
-write-back is nonzero along the preserved trajectory. Gate freedom lives only on
-never-active coordinates and new-task inputs.
-\end{lemma}
-
-\begin{theorem}[commutator criterion]\label{thm:comm}
-Depth-constant input-dependent hard projection achieves exact elimination on
-$\mathcal{X}_A$ \textbf{iff} the commutator residual vanishes on all reachable phase-$A$
-states:
-$[P_A,F'](z) := P_A F'(z) - F'(P_A z) = 0$. Sufficiency follows by induction
-(confinement to an invariant subspace on which $F'$ agrees with the specialist); failure
-of the commutator at any reachable state produces an irreparable first-passage deviation.
+\begin{theorem}[dissociation]\label{thm:dissoc}
+\textsc{proved.} There exist extended maps $F'=F_A+c\,\mathbb{1}$ (any $c\neq0$) whose
+parameter set contains $\theta_A$ unchanged, yet whose old-task trajectories differ from the
+specialist's at every depth. Parameter isolation imposes no bound on computation isolation.
 \end{theorem}
 
-\begin{proposition}[soft gates cannot be exact]\label{prop:soft}
-Whenever cross-coupling exists and the block nonlinearity is non-affine, no soft gate
-($g_b \in (0,1]$ everywhere) solves the preservation constraint for all inputs: a ReLU
-counterexample makes the constraint an unsolvable functional equation over the trajectory.
-Exactness collapses to the hard endpoint; soft regimes can only bound.
-\end{proposition}
+\begin{theorem}[exact-isolation criterion]\label{thm:criterion}
+\textsc{proved.} Let $\TA=\bigcup_{\ell\le L}\{h^{F'}_\ell(x):\ x\in\Xa\}$ be the reachable
+old-trajectory set. Then
+$F'^L(x)=F_A^L(x)$ for all $x\in\Xa$, $0\le\ell\le L$
+\;\textbf{iff}\;
+$F'(z)=F_A(z)$ for all $z\in\TA$.
+A sufficient structural decomposition: with $H_A=\operatorname{im}P_A$ containing $\TA$,
+\begin{enumerate}
+\item[(C1)] \emph{invariance}: $F'(H_A)\subseteq H_A$, equivalently $(I-P_A)F'P_A=0$;
+\item[(C2)] \emph{restriction equivalence}: $P_AF'P_A = P_AF_AP_A$ on $H_A$.
+\end{enumerate}
+Neither condition alone suffices: under (C1) alone the confined dynamics may differ from the
+specialist (e.g.\ $F'=2\,\mathrm{id}$ commutes with any $P_A$ yet rescales trajectories);
+under (C2) alone later leakage re-perturbs confined states.
+\end{theorem}
 
-\begin{proposition}[expansiveness precludes bounding]\label{prop:bound}
-If the level update has directional gain $\rho>1$ on the interference subspace, injected
-error compounds like $\sum_j \rho^{L-1-j}\delta_j$; uniform-in-depth bounding requires
-contractivity---a property of the architecture, not of the gate. Measured directional
-spectral norms on trained \BDH{} levels are $1.05$--$1.89$ (median per level): bounding
-without selection is excluded empirically.
-\end{proposition}
-
-\begin{corollary}[selector vs.\ creator]\label{cor:sel}
-Gates do not create isolation; they \emph{select} isolation structures the architecture
-builds. Protection-class methods fail because a shared-weight model has no such structure;
-additive growth builds it; routing selects it.
+\begin{corollary}[prefix growth constructs the structure]\label{cor:prefix}
+\textsc{proved} (from separability facts S1--S2, Appendix~\ref{app:proofs}). Under hard
+suffix masking, the grown map restricted to masked forwards satisfies (C1)--(C2)
+identically: suffix write-backs vanish, so $F'$ reduces to $F_A$ on the whole space. Hard
+selection therefore reproduces specialists exactly. Under \emph{soft} activity, LayerNorm's
+global statistics break condition (C1) at first order in the suffix magnitude --- the
+commutation residual $C_P$ becomes nonzero --- producing the measured leakage budget of
+\S\ref{sec:recipe}.
 \end{corollary}
 
-Empirically, the context-sufficiency premise of Lemma~\ref{lem:zf}'s escape route holds
-perfectly: 128-token windows separate all tested phases at 100\% accuracy, across languages
-and across registers of one language (\S\ref{sec:recipe}).
+\begin{lemma}[zero-forcing]\label{lem:zf}
+\textsc{proved.} If suffix blocks are individually gated, $f_b\mapsto g_b(x)\odot f_b$, then
+exact preservation on $\mathcal{X}_A$ forces $g_b(x)=0$ wherever $f_b$ is nonzero along the
+preserved trajectory. (The specialist term is un-gated; only suffix activity is constrained.)
+Gate freedom lives on never-active coordinates and new-task inputs.
+\end{lemma}
+
+\begin{proposition}[soft gates cannot be exact]\label{prop:soft}
+\textsc{proved} (counterexample class). For non-affine updates with cross-coupling, the
+preservation constraints form a functional equation over the trajectory with no solution in
+an open gate range: a two-dimensional ReLU system makes the requirement
+$(1{+}g_1)^2+g_1g_2\varepsilon\delta=4$ for all input magnitudes $a>0$, unsolvable by any
+input-independent pair. Exactness collapses to the hard endpoint; soft regimes can only
+bound.
+\end{proposition}
+
+\begin{proposition}[depth amplification]\label{prop:amp}
+\textsc{proved} (standard recursion). With local injections $\delta_\ell$ and Lipschitz
+level update constant $L_f$, $\|e_L\|\le\sum_j(1+L_f)^{L-1-j}\delta_j$. Uniform-in-depth
+bounding additionally requires contraction ($\rho<1$) on the interference dynamics.
+\end{proposition}
+
+\begin{remark}[expansiveness: measured, not proved-impossible]\label{rem:exp}
+\textsc{measured.} Directional spectral-norm proxies of trained \BDH{} levels at old-input
+states are $1.05$--$1.89$ (median per level). This is evidence \emph{against} the
+contractivity premise of Proposition~\ref{prop:amp} for the tested models---uniform
+contraction-based bounds are unsupported---and \emph{not} an impossibility theorem: isolated
+stable directions may coexist with expansive medians.
+\end{remark}
+
+\begin{corollary}[selector vs.\ creator, scoped]\label{cor:sel}
+Within the frozen-path projection mechanism studied here, gates do not create invariant
+computational structure; they select structure already present in the frozen operator. In
+broader architectures a learned gate can alter effective computation; that possibility is
+outside this mechanism class.
+\end{corollary}
 
 \section{The recipe, branch by branch}
 \label{sec:recipe}
 
 \subsection{Grow to acquire}
 Growth adds ${\sim}2$k neurons/head (~25\% width) per phase; new languages reach
-$2.22$--$2.33$ ppl---within $0.09$ nats of specialists---without touching any old parameter.
-Acquisition is not the bottleneck; erosion is, and Proposition~\ref{prop:bound} rules out
-bounding it away in place.
+$2.22$--$2.33$ ppl---within 0.09 nats of specialists---without touching any old parameter.
+Acquisition is not the bottleneck; erosion is, and Remark~\ref{rem:exp} records that the
+tested models give no support for bounding it away in place.
 
 \subsection{Select to serve}
+\label{sec:serve}
 \begin{itemize}\itemsep2pt
-\item \textbf{Hard routing}: mask suffix blocks per detected phase. Reproduces each
-specialist to evaluation noise; active width $\le\times192$ (three-language stack) and
-$\le\times224$ (three-register stack).
+\item \textbf{Hard selection}: mask suffix blocks per detected phase. Numerically
+indistinguishable from each specialist under the evaluation protocol; active width
+$\le\times192$ (three-language stack), $\le\times224$ (three-register stack).
 \item \textbf{Detection}: pooled-embedding logistic regression (compiled detector) and
 128-token likelihood scoring both reach \textbf{100\% accuracy}, across languages and across
 registers of one language. Context-sufficiency holds empirically.
-\item \textbf{Soft serving}: logit mixture $p=\sum_r w_r p_r$ with
-$w_r=\mathrm{softmax}(-\mathrm{NLL}_r/\tau)$. At $\tau\le0.25$ the mixture is within
-\textbf{0.003 nats} of the discrete oracle and still beats unrouted serving by
-${\sim}1.7$ nats at $\tau=0.5$, with no cliff anywhere on the curve.
+\item \textbf{Soft serving} (\emph{empirical $\varepsilon$-isolation; separate from the
+theorem above}): logit mixture $p=\sum_r w_r p_r$,
+$w_r=\mathrm{softmax}(-\mathrm{NLL}_r/\tau)$. \emph{Protocol}: 16 held-out crops per domain;
+routing scores are mean cross-entropy over the first 128 positions of each prefix-masked
+forward; the served metric is cross-entropy over the remaining positions of the mixed
+distribution; $\tau\in\{0.05,0.1,0.25,0.5,1,2\}$. At $\tau\le0.25$ the mixture is within
+\textbf{0.003 nats} of the discrete oracle; at $\tau=0.5$ it still beats unrouted serving by
+${\sim}1.7$ nats; no cliff anywhere on the sweep.
 \end{itemize}
 
 \subsection{The soft-regime budget}
-Scaling one suffix block by $j$ on old inputs traces the empirical commutator norm:
+Scaling one suffix block by $j$ on old inputs traces the empirical commutation residual:
 relative drift $.0023\to.193$ and top-1 agreement $.997\to.434$ across $j\in[0.05,1]$,
-superlinear (${\sim}j^{1.7}$) as expected under expansive maps plus LayerNorm coupling
-(Figure~\ref{fig:leakage}). Operating budget: $j\le0.15$ keeps $\ge99\%$ agreement. Hard
-masks remain the only exact point.
+superlinear (${\sim}j^{1.7}$) as expected under expansive composition plus LayerNorm
+coupling (Figure~\ref{fig:leakage}). \emph{Protocol}: 16 EN windows; finite-difference
+scaling of the ES block's encoder columns and decoder rows; reference is the prefix-only
+state. Operating budget: $j\le0.15$ keeps $\ge99\%$ top-1 agreement. Hard masks remain the
+only measured exact point; the theory (Corollary~\ref{cor:prefix}) says why nothing softer
+can be exact.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.55\linewidth]{figures/leakage.pdf}
 \caption{Leakage of a soft-scaled suffix block into old-language serving (EN inputs,
 reference = prefix-only state). Left axis: relative logit drift; right axis: top-1 agreement.
-Superlinear growth reflects expansive depth composition; $j\le0.15$ is the measured budget.}
+Superlinear growth reflects expansive depth composition plus LayerNorm coupling;
+$j\le0.15$ is the measured budget.}
 \label{fig:leakage}
 \end{figure}
 
-\subsection{Consolidate: merge, prune randomly, replay briefly}
+\subsection{Consolidation pathway: merge, prune randomly, replay briefly}
+This branch addresses a different question from the isolation theorem---how to consolidate
+stored specialists into one fixed-width artifact---and should be read as such.
 Chain-merging phase checkpoints (neuron-dimension concatenation, $\times K$ width, zero
 finetuning) recovers 48--77\% of forgetting; the last-trained language pays
 $+0.12$--$0.30$ nats. Recovery is retrieval, not generalization: merging only \{EN, ES\}
@@ -264,8 +340,8 @@ buffer closes the remainder (Table~\ref{tab:pareto}, Figure~\ref{fig:pareto}).
 
 \begin{table}[t]
 \centering
-\caption{Three-phase systems comparison (held-out ppl). The recovered single model equals
-joint co-training at original width and is deterministic to $\pm0.01$ ppl over three seeds.}
+\caption{Three-phase systems comparison (held-out ppl). $^\dagger$ = three seeds
+($\pm0.01$ ppl); all other entries single seed.}
 \label{tab:pareto}
 \begin{tabular}{lcccc}
 \toprule
@@ -274,7 +350,7 @@ system & width & EN & DE & ES \\
 sequential endpoint & $\times128$ & 11.08 & 18.28 & 2.13 \\
 merged $\times3$ & $\times384$ & 5.08 & 3.51 & 2.67 \\
 merged + prune $\tfrac13$ & $\approx\times128$ & 6.37 & 5.38 & 4.09 \\
-\textbf{+ replay finetune} & $\approx\times128$ & \textbf{2.58} & \textbf{2.58} & \textbf{2.41} \\
+\textbf{+ replay finetune}$^\dagger$ & $\approx\times128$ & \textbf{2.58} & \textbf{2.57--2.58} & \textbf{2.41} \\
 joint co-training (reference) & $\times128$ & 2.33 & 2.23 & 2.23 \\
 \bottomrule
 \end{tabular}
@@ -283,14 +359,14 @@ joint co-training (reference) & $\times128$ & 2.33 & 2.23 & 2.23 \\
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.7\linewidth]{figures/pareto.pdf}
-\caption{Systems Pareto (log scale). Merge$\to$prune$\to$replay reaches joint parity at
+\caption{Systems comparison (log scale). Merge$\to$prune$\to$replay reaches joint parity at
 original width; unrouted serving of the merged stack is dominated everywhere.}
 \label{fig:pareto}
 \end{figure}
 
 At five phases the same pipeline yields a single original-width model serving all languages
-at $2.55$--$2.87$ ppl (mean 1.00 nats vs.\ the sequential endpoint's 2.13), deterministic to
-$\pm0.01$ ppl across seeds.
+at $2.55$--$2.87$ ppl (mean 1.00 nats vs.\ the endpoint's 2.13), deterministic to
+$\pm0.01$ ppl across seeds$^\dagger$.
 
 \subsection{Or skip everything: replay during training}
 Mixing 20--25\% prior-language replay into each phase eliminates forgetting outright:
@@ -309,37 +385,42 @@ decay.
 constraint & mechanism \\
 \midrule
 few phases, budget flexible & replay-in-training (joint parity, trivial) \\
-strict single-pass, many phases & growth + routed serving (near-oracle) \\
+strict single-pass, many phases & growth + selected serving (near-oracle) \\
 single fixed-width artifact required & merge + random-prune + short replay \\
 unlabeled streams at inference & likelihood mixture or compiled detector \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\section{Empirical laws}
+\section{Secondary empirical observations}
 \label{sec:laws}
 
+These regularities held in every run we executed; ``law'' would overclaim their scope.
+
 \begin{itemize}\itemsep2pt
-\item[\textbf{L1}] Forgetting is representational overwrite, global across parameter classes.
-\item[\textbf{L2}] Weight isolation $\neq$ computation isolation; erosion enters via the
-shared depth-recurrent residual and accumulates per added block.
-\item[\textbf{L3}] Within-phase knowledge is distributed (random beats ranked pruning;
+\item[\textbf{O1}] Forgetting persists under frozen old parameters and is global across
+parameter classes (interpretation: computational interference via the shared residual).
+\item[\textbf{O2}] Weight isolation $\neq$ computation isolation; erosion accumulates per
+added block through the depth-recurrent residual.
+\item[\textbf{O3}] Within-phase knowledge is distributed (random beats ranked pruning;
 coherent-region removal collapses); between-phase knowledge is modular (concatenation
 retrieves).
-\item[\textbf{L4}] Activation sparsity at fixed capacity is set by data composition: flat in
-volume (30--90\,MB), rising ${\sim}0.5$\,pp per added language, falling ${\sim}4$\,pp on
-first register mixing then saturating (Figure~\ref{fig:grid}). Capacity-to-data dominates
-across scales (97.4\% at 25M).
-\item[\textbf{L5}] Cross-corpus loss comparisons are void; measurement requires protocol
+\item[\textbf{O4}] In our tested regime, activation sparsity at fixed capacity is strongly
+associated with data composition: flat in volume (30--90\,MB), rising ${\sim}0.5$\,pp per
+added language, falling ${\sim}4$\,pp on first register mixing then saturating
+(Figure~\ref{fig:grid}). Across capacity scales the capacity-to-data ratio associates
+strongly with sparsity (the 25M model reaches 97.4\% on the same corpus family versus
+${\sim}94\%$ at 100M).
+\item[\textbf{O5}] Cross-corpus loss comparisons are void; measurement requires protocol
 congruence, calibrated graph thresholds, and within-corpus framing.
 \end{itemize}
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{figures/grid.pdf}
-\caption{Composition governs sparsity at fixed capacity. (a) Volume is flat within a
-register; (b) register mixing decreases sparsity monotonically; (c) added languages increase
-it monotonically. Anchors from prior runs shown alongside new grid points.}
+\caption{Composition governs sparsity at fixed capacity in the tested regime. (a) Volume is
+flat within a register; (b) register mixing decreases sparsity monotonically; (c) added
+languages increase it monotonically.}
 \label{fig:grid}
 \end{figure}
 
@@ -348,109 +429,169 @@ Byte-level vocabularies sidestep embedding/head coupling that subword tokenizati
 introduce. All results are 100M-scale on related-corpora sequences. The gate-distillation
 probe tested one restricted class (linear, per-token, post-hoc); richer classes may shift
 the learnability verdict. Replay uses real tokens; synthetic replay is untested. The erosion
-slope is measured to five phases.
+slope is measured to five phases. The expansiveness measurement is a directional proxy over
+sampled states, not an operator-norm computation.
 
 \section{Conclusion}
-Depth-recurrent weight sharing makes continual learning \emph{harder}---freezing is not
-protecting---but uniform neuron scaling makes it \emph{tractable}: additive growth
-manufactures the invariant structure that selection needs, and every remaining component
-(detection, compression, replay) has a measured operating point. The question the \BDH{}
-paper defers---how fast synaptic state becomes durable change without catastrophe---receives
-here not a single mechanism but a mapped design space with proven boundaries.
+Depth-recurrent weight sharing makes continual learning \emph{harder}: freezing weights does
+not freeze computation, so every protection-style shortcut is excluded---in our setting,
+provably so for soft mechanisms. But the same architecture's additive growth manufactures
+the two properties the exact-isolation criterion demands (invariance and restriction
+equivalence), reducing lifelong learning to selection plus optional consolidation. The
+question the \BDH{} paper defers---how fast synaptic state becomes durable change without
+catastrophe---receives here a structural answer: do not look for one plasticity rule that
+both learns and remembers; build architectures where learning and remembering live in
+separable components, and measure the interfaces between them.
 
 \appendix
 
-\section{Proofs}\label{app:proofs}
+\section{Proofs and formal details}\label{app:proofs}
 
-\subsection{Setting}
-Persistent state $h\in\mathbb{R}^d$; extended level map
-$F'(h)=h+f(h;\theta_A)+\sum_{b\in B}f_b(h)$, specialist $F_A(h)=h+f(h;\theta_A)$;
-interference $\Delta_A(x)=F'^L(x)-F_A^L(x)$ on $\mathcal{X}_A$. Mechanism class:
-depth-constant input-dependent operators, no parameters in the frozen path, no per-level
-trainable parameters, $\theta_A$ never retrained. Two verified separability facts:
-\textbf{(S1)} level operators are coordinate-separable across neurons, so zeroing a
-neuron's encoder columns and decoder rows removes its contribution exactly;
-\textbf{(S2)} the only cross-neuron coupling is LayerNorm's global statistics.
+\subsection{Separability facts}
+Throughout, (S1) \emph{coordinate separability}: encoder columns, per-neuron attention, and
+decoder rows act independently per neuron, so zeroing a neuron's columns and rows removes
+its contribution exactly; (S2) \emph{LayerNorm coupling}: $\operatorname{LN}$ mixes
+statistics globally over $d$, and is the sole cross-neuron operation. Both verified against
+the implementation (masked-forward reproduction tests).
+
+\subsection{Proof of Theorem~\ref{thm:dissoc}}
+Take any specialist $F_A$ and define $F'(h)=F_A(h)+c\mathbf{1}$ for $c\neq0$, where the
+constant is produced by a suffix module with frozen (nonzero) parameters and $\theta_A$
+unchanged inside $F'$. Then $\Delta\theta_A=0$ while every old-task trajectory shifts by
+$c$ per level: $F'^L(x)=F_A^L(x)+Lc\mathbf{1}\neq F_A^L(x)$. Conversely, weight isolation
+places no lower bound on divergence either (take $c=0$ with divergent suffix dynamics
+elsewhere). Hence the two notions are logically independent. \hfill$\qed$
+
+\subsection{Proof of Theorem~\ref{thm:criterion}}
+($\Leftarrow$) Induction over $\ell$. Base: $h_0=E(x)\in H_A$ by assumption and
+$h_0=F_A^0(x)$. Step: suppose $h_\ell=F_A^\ell(x)\in H_A\cap\TA$. By (C1),
+$F'(h_\ell)\in H_A$; by (C2), its relevant components equal $F_A(h_\ell)$, i.e.
+$F'(h_\ell)=F_A(h_\ell)$ as elements of $H_A$ (identifying $F_A$'s image with $H_A$).
+Thus $h_{\ell+1}=F'(h_\ell)=F_A(h_\ell)=F_A^{\ell+1}(x)$.
+($\Rightarrow$) Suppose $F'^L(x)=F_A^L(x)$ for all $x\in\Xa$ and all $L$, but there exists
+$z^*\in\TA$ with $F'(z^*)\neq F_A(z^*)$. Choose $x\in\Xa$ whose trajectory passes through
+$z^*$ at depth $\ell^*<L$ (such $x$ exists by definition of $\TA$). Applying the hypothesis
+at $L=\ell^*+1$ gives $F'(z^*)=F_A(z^*)$, contradicting the assumption. Hence equality must
+hold on all reachable old-trajectory states. \hfill$\qed$
+
+\emph{Structural conditions.} If (C1) $(I-P_A)F'P_A=0$ then $F'(H_A)\subseteq H_A$: any
+$z=P_Az$ has $F'(z)=P_AF'(z)+(I-P_A)F'(z)$ and $(I-P_A)F'(z)=(I-P_A)F'P_Az=0$. If moreover
+(C2) $P_AF'P_A=P_AF_AP_A$ then on $H_A$, $P_AF'=P_AF_A$, i.e.\ the projected dynamics agree
+with the specialist's. Together they satisfy the criterion restricted to $H_A$; combined
+with $E(\Xa)\subseteq H_A$ they give the full statement. Neither alone suffices: (C1)
+without (C2) confines but alters (e.g.\ $F'=2\,\mathrm{id}$, $P_A=I$: commuting, invariant,
+not preserving); (C2) without (C1) matches the specialist today but admits later leakage.
 
 \subsection{Proof of Lemma~\ref{lem:zf}}
-Preservation requires $h_{\ell+1}=F_A(h_\ell)=h_\ell+f(h_\ell;\theta_A)$. Subtracting from
-the gated update, $g(x)\odot\sum_b f_b(h_\ell)=0$ must hold at every level. Any coordinate
-where some $f_b$ is nonzero pins its gate entry to zero; the constraint applies at every
-depth and every old input simultaneously, so $g_b$ vanishes on the union of active suffix
-coordinates across all old trajectories. (Output placement admits the dual form: $g$
-pinned to one on retained coordinates.) \hfill$\qed$
-
-\subsection{Proof of Theorem~\ref{thm:comm}}
-\emph{Sufficiency.} Assume $[P_A,F'](z)=0$ for all reachable states $z$ of the phase-$A$
-trajectory and $P_Ax_0=x_0$. Induction: $h_\ell=F_A^\ell(x_0)\in\operatorname{im}P_A$; then
-$h_{\ell+1}=P_AF'(h_\ell)=F'(P_Ah_\ell)=F'(h_\ell)$, whose relevant components equal
-$F_A(h_\ell)$ since the absent suffix contribution cannot affect them under the commutator
-condition; hence $h_{\ell+1}=F_A^{\ell+1}(x_0)$.
-\emph{Necessity (hard-projection class).} If $[P_A,F'](z^*)\neq0$ at some reachable $z^*$,
-the first passage through $z^*$ yields $P_AF'(z^*)\neq F'(z*)$: a needed component drops or
-a foreign one survives, and the deviation persists (and grows by
-Proposition~\ref{prop:bound}). No depth-constant projection repairs it post hoc.
+With suffix gating $f_b\mapsto g_b(x)\odot f_b(b)$-terms only, the gated update is
+$h_{\ell+1}=h_\ell+f(h_\ell;\theta_A)+\sum_b g_b(x)\odot f_b(h_\ell)$. Preservation
+requires the sum term to vanish identically along preserved trajectories; any coordinate
+with a nonzero $f_b$ component pins $g_{b,i}(x)=0$. Union over levels and inputs gives the
+claim. The specialist term carries no multiplier, so no complementary constraint arises.
 \hfill$\qed$
 
 \subsection{Proof sketch of Proposition~\ref{prop:soft}}
-Two-dimensional counterexample with $I_A=\{1\}$, $I_B=\{2\}$, $\sigma=\mathrm{ReLU}$:
+Two-dimensional counterexample, $I_A=\{1\}$, $I_B=\{2\}$, $\sigma=\mathrm{ReLU}$:
 $f'_1(x)=\sigma(x_1)+\varepsilon x_2$, $f'_2(x)=\delta\sigma(x_1)+\gamma x_2$,
-$\varepsilon\delta\neq0$. Preservation from $x_0=(a,0)$ requires
-$(1{+}g_1)^2+g_1g_2\varepsilon\delta=4$ for all $a>0$; with $g_2>0$ and $\sigma$
-non-affine this has no constant solution $(g_1,g_2)$ independent of $a$, and any
-$a$-dependent relaxation already deviates in the intermediate state. For affine $f'$ the
-equation is solvable---nonlinearity is exactly what forces hardness. \hfill$\qed$
+$\varepsilon\delta\neq0$. Preservation from $x_0=(a,0)$, $a>0$, requires after one step
+$x_1=(a(1{+}g_1),\,g_2\delta a)$ and after two
+$a(1{+}g_1)+g_1\sigma(a(1{+}g_1))+g_1\varepsilon g_2\delta a=2a$ for \emph{all} $a>0$.
+Substituting the first equation's constraint ($g_2=0$ or $\varepsilon\delta=0$ to kill the
+cross term at unit scale) shows no open-range pair works for all $a$; with $g_2>0$ the
+residual term $g_1\varepsilon\delta a g_2$ varies with $a$ while $\sigma(a(1{+}g_1))$ is
+affine in $a$ only piecewise, so the identity cannot hold across $a$ crossing the kink.
+Affine $f'$ removes the kink and is solvable; nonlinearity is exactly what forces hardness.
+\hfill$\qed$
 
-\subsection{Proof of Proposition~\ref{prop:bound}}
-Error recursion $e_{\ell+1}=e_\ell+[f'(\tilde h_\ell)-f'(h_\ell)]+\delta_\ell$ with
-$\|f'(\tilde h)-f'(h)\|\le L_f\|e_\ell|$ gives
-$\|e_L\|\le\sum_{j}(1+L_f)^{L-1-j}\delta_j$. Uniform bounds require $\rho<1$ on the
-interference dynamics; $\rho>1$ compounds geometrically. Empirical directional gains
-$1.05$--$1.89$ place trained \BDH{} in the expansive regime. \hfill$\qed$
+\subsection{Proof of Proposition~\ref{prop:amp}}
+Standard recursion: with $e_{\ell+1}=e_\ell+[f'(\tilde h_\ell)-f'(h_\ell)]+\delta_\ell$ and
+$\|f'(\tilde h)-f'(h)\|\le L_f\|e_\ell\|$,
+$\|e_{\ell+1}\|\le(1+L_f)\|e_\ell\|+\delta_\ell$; unrolling gives the stated bound.
+Contractivity $\rho<1$ on the interference subspace replaces $(1+L_f)$ and yields
+$\|e_L\|\le\delta_{\max}/(1-\rho)$. \hfill$\qed$
 
-\subsection{Remark (LayerNorm)}
-Commutation holds iff suffix pre-LN contributions vanish exactly; LayerNorm mixes
-statistics globally, so soft activity breaks it at first order. The measured leakage curve
-(main text, Fig.~3) is the empirical norm of this broken commutator, and the $j\le0.15$
-budget is its operating consequence.
+\subsection{Remark on the measurement (Remark~\ref{rem:exp})}
+Directional power iteration (6 steps, 8 old-input states, random init) estimates the
+dominant singular direction's gain per composed level map; values are lower-bound-flavored
+proxies, LayerNorm induces contractive directions (minima ${\approx}0.9$), and sampled
+states cover held-out parliamentary English. The conclusion drawn is deliberately modest:
+contraction is unsupported for these models, so contraction-based bounding is unavailable
+\emph{here}; no universal impossibility is claimed.
 
 \section{Prior-art triage}\label{app:prior}
 
 \begin{table}[h]
 \centering\small
-\begin{tabular}{p{3.4cm}p{4.1cm}l}
+\begin{tabular}{p{3.4cm}p{4.3cm}l}
 \toprule
-line of work & what it isolates & same problem? \\
+line of work & what it isolates & relation to our problem \\
 \midrule
-Progressive nets / PathNet & parameter paths (removes sharing) & no -- bypasses sharing \\
-PackNet / supermasks & pruned-and-frozen weight subsets & no -- weight space only \\
-HAT & task masks over weights/gradients & close, but not forward-path \\
-EWC / SI / MAS & quadratic weight penalties & no -- importance does not localize here \\
-OGD / GPM / A-GEM & gradient-subspace projection & no -- optimizer geometry \\
-Hypernetworks & generated per-task weights & no -- different mechanism \\
+Progressive nets / PathNet & parameter paths (removes sharing) & bypasses shared composition \\
+PackNet / supermasks & pruned-and-frozen weight subsets & weight-space only \\
+HAT & task masks over weights/gradients & close; protects weights, not the forward path \\
+EWC / SI / MAS & quadratic weight penalties & no localized importance here (N3) \\
+OGD / GPM / A-GEM & gradient-subspace projection & optimizer geometry, not forward path \\
+Hypernetworks & generated per-task weights & different mechanism class \\
 Adapters / LoRA & low-rank add-ons & partially; no depth-recurrence analysis \\
-MoE / conditional computation & learned expert mixing & vocabulary matches; experts jointly trained \\
-Highway / GateSkip gating & scaled residual updates & existence evidence; per-layer params \\
+MoE / conditional comp. & learned expert mixing & experts jointly trained; not post-hoc frozen growth \\
+Highway / GateSkip & scaled residual updates & existence evidence for soft control; per-layer params \\
 ResCL / branch mixing & old/new branches retrained & violates frozen path \\
-Modular nets / DIB & routed modules & empirical results, no theorem \\
-Upstream BDH fork (PR) & EWC + gates, Permuted-MNIST scale & protection class on disjoint-regime toys \\
+Modular nets / DIB & routed modules & empirical routing; no invariant-subspace criterion \\
+Upstream \BDH{} fork & EWC + synaptic gates, Permuted-MNIST scale & unmerged; consistent with our
+protection-class analysis but not directly comparable (scale, regime); not reproduced here \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\noindent To our knowledge no prior work states or resolves forward-path isolation for a
-frozen operator reused across depth via additive growth plus selection.
+\noindent \textbf{We did not identify} prior work that formulates forward-path isolation
+under this precise combination of assumptions---a frozen operator reused across depth,
+additive post-hoc growth, and input-dependent depth-constant selection. We make no claim
+that the cited lines fail in their own settings; they do not address the property studied
+here.
 
 \section{Reproducibility}
-Model: BDH, 100{,}925{,}440 parameters ($d{=}512$, $n_h{=}8$, $L{=}6$, multiplier 128,
+Model: \BDH{}, 100{,}925{,}440 parameters ($d{=}512$, $n_h{=}8$, $L{=}6$, multiplier 128,
 block 512, byte vocabulary); bf16 autocast; AdamW peak lr $10^{-3}$ cosine-decayed; warmup
-1000; batch $4\times512$ tokens. Corpora: Europarl v7 (30\,MB caps; FR/PT pairs downloaded
-and integrity-checked) and a three-register textmix (Wikipedia/Gutenberg/parliamentary,
-28\,MB train each after holdout carving). Seeds $\{1337,1,2\}$ cover the core pipeline;
-all other runs single-seed as noted. Every table's numbers trace to logged runs under
-version control; the companion report (\texttt{docs/reports/2026-08-25\_cl-h1-report.md},
+1000; batch $4\times512$ tokens. Corpora: Europarl v7 pairs de-en/es-en/fr-en/pt-en (30\,MB
+caps unless stated; FR/PT archives integrity-checked after an initial truncated download)
+and a three-register textmix built from wikitext-103-raw, 60 Gutenberg volumes, and
+Europarl-EN (28\,MB train each after holdout carving). Seeds $\{1337,1,2\}$ cover the core
+merge-prune-replay pipeline (Table~\ref{tab:pareto}$^\dagger$); all other runs are
+single-seed as marked. Evaluation protocols for the soft mixture and leakage curves are
+specified in \S\ref{sec:serve} and \S\ref{sec:recipe}. Every number traces to logged runs
+under version control; the companion report (\texttt{docs/reports/2026-08-25\_cl-h1-report.md},
 \S1--20) carries complete intermediate tables, and all mechanisms ship in the repository
 (\texttt{scripts/}: likelihood router, merge/prune sweeps, importance extraction, gated
-distillation).
+distillation, per-language loaders).
+
+\section{Negative-results register}
+\begin{enumerate}\itemsep2pt
+\item Write-gating (importance protection): null at $\alpha\in\{0.5,0.9\}$; importance
+spread thin; drift audit global (N3).
+\item Constant-LR schedules: worse on acquisition and retention (N2).
+\item Magnitude-ranked pruning: collapses relative to random at equal keep (15--16 vs
+6.5--7.2 ppl at 25\% keep).
+\item Block-structured pruning: collapses relative to scattered removal at equal keep.
+\item Learned in-pass linear gates: collapse open under KD distillation; language identity
+is not linearly extractable from per-token deep residuals.
+\item Round-robin interleaving without replay volume: retention unchanged vs floor.
+\item Top-$k$ as consolidation aid: slightly worse forgetting than ReLU at identical
+schedules.
+\end{enumerate}
+
+\section*{Acknowledgments}
+The author thanks the repository's maintainer for compute resources, problem selection, and
+sustained research direction across the session, and for procuring four independent formal
+critiques by other large language models (a five-round adversarial debate; three direct
+reviews). Their integration shaped \S4 decisively: the two-condition criterion replacing an
+over-strong commutator claim, the necessity-direction correction, the expansiveness
+downgrade, and the selector-vs-creator scoping are due to those reviews. All integration
+decisions, experiments, proofs-as-stated, and remaining errors are the author's.
+
+\section*{Authorship}
+ox-alpha, autonomous research agent: conceptual integration, all code (mechanisms, loaders,
+measurement tooling), all experiments, theoretical synthesis and proofs-as-stated,
+manuscript. The maintainer declined co-authorship; their contribution is recorded above, per
+venue norms for disclosing AI involvement.
 
 \end{document}
