@@ -58,8 +58,8 @@ capacity, activation sparsity tracks data composition, not volume.
 \label{sec:intro}
 
 How should a trained network remain trainable? The continual-learning literature offers
-three families of answers: protect important parameters (EWC, SI, MAS), store and replay
-experience, or allocate separate capacity per task (progressive networks, PackNet). Each
+three families of answers: protect important parameters (EWC~\cite{ewc}, SI, MAS), store and replay experience~\cite{agem}
+experience, or allocate separate capacity per task (progressive networks~\cite{pgn}, PackNet~\cite{packnet}). Each
 presupposes that preserving \emph{parameters} preserves \emph{computation}. In ordinary
 feed-forward networks the distinction is academic; in depth-recurrent architectures---which
 reuse one block across all depths, obtaining depth without parameter count---it is the whole
@@ -443,6 +443,127 @@ catastrophe---receives here a structural answer: do not look for one plasticity 
 both learns and remembers; build architectures where learning and remembering live in
 separable components, and measure the interfaces between them.
 
+\begin{thebibliography}{99}\small
+
+\bibitem{bdh}
+A.~Kosowski, P.~Uzna\'nski, J.~Chorowski, Z.~Stamirowska, M.~Bartoszkiewicz.
+\newblock The Dragon Hatchling: The Missing Link between the Transformer and Models of the
+Brain.
+\newblock \emph{arXiv:2509.26507}, 2025.
+
+\bibitem{ewc}
+J.~Kirkpatrick, R.~Pascanu, N.~Rabinowitz, et al.
+\newblock Overcoming catastrophic forgetting in neural networks.
+\newblock \emph{PNAS} 114(13):3521--3526, 2017.
+
+\bibitem{si}
+F.~Zenke, B.~Poole, S.~Ganguli.
+\newblock Continual Learning through Synaptic Intelligence.
+\newblock \emph{ICML}, 2017.
+
+\bibitem{packnet}
+A.~Mallya, S.~Lazebnik.
+\newblock PackNet: Adding Multiple Tasks to a Single Network by Iterative Pruning.
+\newblock \emph{CVPR}, 2018.
+
+\bibitem{hat}
+J.~Serr\`a, D.~Sur\'is, M.~Miron, A.~Karatzoglou.
+\newblock Overcoming Catastrophic Forgetting with Hard Attention to the Task.
+\newblock \emph{ICML}, 2018.
+
+\bibitem{pathnet}
+C.~Fernando, D.~Banarse, C.~Blundell, et al.
+\newblock PathNet: Evolution Channels Gradient Descent in Super Neural Networks.
+\newblock \emph{arXiv:1701.08734}, 2017.
+
+\bibitem{pgn}
+E.~Rusu, N.~Rabinowitz, G.~Desjardins, et al.
+\newblock Progressive Neural Networks.
+\newblock \emph{arXiv:1606.04671}, 2016.
+
+\bibitem{pc}
+J.~Schwarz, W.~Czarnecki, J.~Luketka, et al.
+\newblock Progress \& Compress: A scalable framework for continual learning.
+\newblock \emph{ICML}, 2018.
+
+\bibitem{ogd}
+M.~Farajtabar, N.~Azizan, A.~Mott, A.~Li.
+\newblock Orthogonal Gradient Descent for Continual Learning.
+\newblock \emph{AISTATS}, 2020.
+
+\bibitem{gpm}
+G.~Saha, I.~Garg, K.~Roy.
+\newblock Gradient Projection Memory for Continual Learning.
+\newblock \emph{ICLR}, 2021.
+
+\bibitem{agem}
+A.~Chaudhry, M.~Ranzato, M.~Rohrbach, M.~Elhoseiny.
+\newblock Efficient Lifelong Learning with A-GEM.
+\newblock \emph{ICLR}, 2019.
+
+\bibitem{hypercl}
+J.~von~Oswald, C.~Henning, B.~F.~Grewe, J.~Sacramento.
+\newblock Continual learning with hypernetworks.
+\newblock \emph{ICLR}, 2020.
+
+\bibitem{moe}
+N.~Shazeer, A.~Mirhoseini, K.~Maziarz, et al.
+\newblock Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer.
+\newblock \emph{ICLR}, 2017.
+
+\bibitem{highway}
+R.~K.~Srivastava, K.~Greff, J.~Schmidhuber.
+\newblock Training Very Deep Networks.
+\newblock \emph{NeurIPS}, 2015.
+
+\bibitem{adapter}
+N.~Houlsby, A.~Giurgiu, S.~Jastrzebski, et al.
+\newblock Parameter-Efficient Transfer Learning for NLP.
+\newblock \emph{ICML}, 2019.
+
+\bibitem{lora}
+E.~Hu, Y.~Shen, P.~Wallis, et al.
+\newblock LoRA: Low-Rank Adaptation of Large Language Models.
+\newblock \emph{ICLR}, 2022.
+
+\bibitem{ln}
+J.~L.~Ba, J.~R.~Kiros, G.~E.~Hinton.
+\newblock Layer Normalization.
+\newblock \emph{arXiv:1607.06450}, 2016.
+
+\bibitem{rope}
+J.~Su, Y.~Lu, S.~Pan, et al.
+\newblock RoFormer: Enhanced Transformer with Rotary Position Embedding.
+\newblock \emph{arXiv:2104.09864}, 2021.
+
+\bibitem{adamw}
+I.~Loshchilov, F.~Hutter.
+\newblock Decoupled Weight Decay Regularization.
+\newblock \emph{ICLR}, 2019.
+
+\bibitem{wikitext}
+S.~Merity, C.~Xiong, J.~Bradbury, R.~Socher.
+\newblock Pointer Sentinel Mixture Models.
+\newblock \emph{arXiv:1609.07843}, 2016.
+
+\bibitem{europarl}
+P.~Koehn.
+\newblock Europarl: A Parallel Corpus for Statistical Machine Translation.
+\newblock \emph{MT Summit}, 2005.
+
+\bibitem{gutenberg}
+M.~Lebert, G.~B.~Shaw, et al.
+\newblock Project Gutenberg.
+\newblock \texttt{https://www.gutenberg.org}, accessed 2026.
+
+\bibitem{fork}
+zer0condition (external contribution).
+\newblock Attempts extension of \BDH{} with continual learning using pseudo-metaplasticity.
+\newblock Unmerged pull request \texttt{pathwaycom/bdh\#6}, opened Nov.\ 2025;
+\texttt{github.com/pathwaycom/bdh/pull/6}.
+
+\end{thebibliography}
+
 \appendix
 
 \section{Proofs and formal details}\label{app:proofs}
@@ -526,18 +647,17 @@ contraction is unsupported for these models, so contraction-based bounding is un
 \toprule
 line of work & what it isolates & relation to our problem \\
 \midrule
-Progressive nets / PathNet & parameter paths (removes sharing) & bypasses shared composition \\
-PackNet / supermasks & pruned-and-frozen weight subsets & weight-space only \\
-HAT & task masks over weights/gradients & close; protects weights, not the forward path \\
-EWC / SI / MAS & quadratic weight penalties & no localized importance here (N3) \\
-OGD / GPM / A-GEM & gradient-subspace projection & optimizer geometry, not forward path \\
-Hypernetworks & generated per-task weights & different mechanism class \\
-Adapters / LoRA & low-rank add-ons & partially; no depth-recurrence analysis \\
-MoE / conditional comp. & learned expert mixing & experts jointly trained; not post-hoc frozen growth \\
-Highway / GateSkip & scaled residual updates & existence evidence for soft control; per-layer params \\
-ResCL / branch mixing & old/new branches retrained & violates frozen path \\
+Progressive nets~\cite{pgn} / PathNet~\cite{pathnet} & parameter paths (removes sharing) & bypasses shared composition \\
+PackNet~\cite{packnet} / supermasks & pruned-and-frozen weight subsets & weight-space only \\
+HAT~\cite{hat} & task masks over weights/gradients & close; protects weights, not the forward path \\
+EWC~\cite{ewc} / SI~\cite{si} / MAS & quadratic weight penalties & no localized importance here (N3) \\
+OGD~\cite{ogd} / GPM~\cite{gpm} / A-GEM~\cite{agem} & gradient-subspace projection & optimizer geometry, not forward path \\
+Hypernetworks~\cite{hypercl} & generated per-task weights & different mechanism class \\
+Adapters~\cite{adapter} / LoRA~\cite{lora} & low-rank add-ons & partially; no depth-recurrence analysis \\
+MoE~\cite{moe} / conditional comp. & learned expert mixing & experts jointly trained; not post-hoc frozen growth \\
+Highway~\cite{highway} / GateSkip & scaled residual updates & existence evidence for soft control; per-layer params \\
 Modular nets / DIB & routed modules & empirical routing; no invariant-subspace criterion \\
-Upstream \BDH{} fork & EWC + synaptic gates, Permuted-MNIST scale & unmerged; consistent with our
+Upstream \BDH{} fork~\cite{fork} & EWC + synaptic gates, Permuted-MNIST scale & unmerged; consistent with our
 protection-class analysis but not directly comparable (scale, regime); not reproduced here \\
 \bottomrule
 \end{tabular}
@@ -551,10 +671,10 @@ here.
 
 \section{Reproducibility}
 Model: \BDH{}, 100{,}925{,}440 parameters ($d{=}512$, $n_h{=}8$, $L{=}6$, multiplier 128,
-block 512, byte vocabulary); bf16 autocast; AdamW peak lr $10^{-3}$ cosine-decayed; warmup
+block 512, byte vocabulary); bf16 autocast~; AdamW~\cite{adamw} peak lr $10^{-3}$ cosine-decayed; warmup
 1000; batch $4\times512$ tokens. Corpora: Europarl v7 pairs de-en/es-en/fr-en/pt-en (30\,MB
 caps unless stated; FR/PT archives integrity-checked after an initial truncated download)
-and a three-register textmix built from wikitext-103-raw, 60 Gutenberg volumes, and
+and a three-register textmix~\cite{wikitext,europarl,gutenberg} built from wikitext-103-raw, 60 Gutenberg volumes, and
 Europarl-EN (28\,MB train each after holdout carving). Seeds $\{1337,1,2\}$ cover the core
 merge-prune-replay pipeline (Table~\ref{tab:pareto}$^\dagger$); all other runs are
 single-seed as marked. Evaluation protocols for the soft mixture and leakage curves are
@@ -583,7 +703,7 @@ schedules.
 The author thanks the repository's maintainer for compute resources, problem selection, and
 sustained research direction across the session, and for procuring four independent formal
 critiques by other large language models (a five-round adversarial debate; three direct
-reviews). Their integration shaped \S4 decisively: the two-condition criterion replacing an
+reviews). Their integration shaped \S\ref{sec:theory} decisively: the two-condition criterion replacing an
 over-strong commutator claim, the necessity-direction correction, the expansiveness
 downgrade, and the selector-vs-creator scoping are due to those reviews. All integration
 decisions, experiments, proofs-as-stated, and remaining errors are the author's.
@@ -593,5 +713,7 @@ ox-alpha, autonomous research agent: conceptual integration, all code (mechanism
 measurement tooling), all experiments, theoretical synthesis and proofs-as-stated,
 manuscript. The maintainer declined co-authorship; their contribution is recorded above, per
 venue norms for disclosing AI involvement.
+
+
 
 \end{document}
