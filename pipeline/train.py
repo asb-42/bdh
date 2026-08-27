@@ -145,6 +145,8 @@ def train(cfg: Config) -> None:
             raw_model.attn.freqs.data[:] = freqs.view(1, 1, 1, n_new)
         raw_model.embed.weight.requires_grad_(False)
         raw_model.lm_head.requires_grad_(False)
+        for p in raw_model.attn.parameters():
+            p.requires_grad_(False)
         keep = torch.zeros(n_new, device=device)
         keep[n_old:] = 1.0
         gate_param_masks = [
@@ -153,7 +155,7 @@ def train(cfg: Config) -> None:
             (raw_model.decoder, keep.repeat(nh).unsqueeze(1)),        # (nh*N, D)
         ]
         print(f"growth: {base_mult} -> {cfg.mlp_internal_dim_multiplier} mult "
-              f"(+{n_new - n_old} neurons/head trainable) | old neurons + embed + lm_head frozen")
+              f"(+{n_new - n_old} neurons/head trainable) | old neurons + embed + lm_head + attn frozen")
 
     if cfg.gate_from:
         gate_imp = None
