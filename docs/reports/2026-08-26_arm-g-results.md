@@ -70,7 +70,7 @@ The model adds capacity each phase (mult 128→708, ~100M→~700M params), but t
 
 This confirms the theory: **routing/selection is essential for true isolation**. Growth alone is just a bigger container for the same interference.
 
-## Comparison: Arm R vs Arm R
+## Comparison: Arm R vs Arm G
 
 | Metric | Arm R (fixed 100M) | Arm G (growth to 700M) |
 |--------|-------------------|----------------------|
@@ -88,9 +88,8 @@ Interesting: Arm G's erosion is actually WORSE than Arm R for some languages (en
 ## Next Steps
 
 1. **Routing measurements on final grown stack**: Does the ~700M model HAVE routable structure? (eval_router.py, detection accuracy)
-2. **Compare with Arm R**: Direct comparison of erosion curves
-3. **Update manuscript**: Add accumulation results
-4. **Step-4 go/no-go**: Parameter scaling (150M/250M) — probably not worth it given these results
+2. **Update manuscript**: Add accumulation results
+3. **Step-4 go/no-go**: Parameter scaling (150M/250M) — probably not worth it given these results
 
 ## Files
 - Analysis: `out/logs/ladder_armG_analysis.txt`
