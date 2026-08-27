@@ -70,7 +70,7 @@ def main():
     names = [n for n, _ in doms]
     R = len(routes)
     conf = torch.zeros(len(doms), R, dtype=torch.int64)
-    routed_ppl, oracle_ppl = {}, {}
+    routed_ppl = {}
     joint_losses = []
 
     for ti, (tname, blocks) in enumerate(doms):
@@ -91,11 +91,9 @@ def main():
         scores = rl[:, :, : args.window].mean(dim=2)
         choice = scores.argmin(dim=0)
         served = rl[choice, torch.arange(args.crops), args.window:].mean(dim=1)
-        oracle = rl[ti, :, args.window:].mean(dim=1)
 
         conf[ti] += torch.bincount(choice, minlength=R)
         routed_ppl[tname] = math.exp(served.mean().item())
-        oracle_ppl[tname] = math.exp(oracle.mean().item())
 
         set_prefix(N_full)
         amp = torch.autocast("cuda", dtype=torch.bfloat16, enabled=device.type == "cuda")
@@ -113,12 +111,9 @@ def main():
     print("          " + "".join(f"{n:>9}" for n in names))
     for i, n in enumerate(names):
         print(f"{n:>9} " + "".join(f"{conf[i, j].item():>9}" for j in range(R)))
-    print(f"\n{'domain':>9} {'acc':>6} {'routed':>8} {'oracle':>8}")
+    print(f"\n{'domain':>9} {'routed':>8}")
     for n in names:
-        hits = int(conf[names.index(n), names.index(n)])
-        tot = int(conf[names.index(n)].sum())
-        print(f"{n:>9} {hits / max(1, tot):>6.0%} "
-              f"{routed_ppl[n]:>8.2f} {oracle_ppl[n]:>8.2f}")
+        print(f"{n:>9} {routed_ppl[n]:>8.2f}")
     print(f"\njoint full-width reference: ppl {math.exp(sum(joint_losses)/len(joint_losses)):.2f}"
           f"  (served positions only)")
 
