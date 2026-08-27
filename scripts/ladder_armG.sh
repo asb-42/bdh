@@ -34,15 +34,13 @@ for D in $SEQ; do
   fi
 
   # Phases 2+: growth from previous checkpoint
-  # Batch policy: batch 4 for mult≤192, batch 2 beyond
-  # Phase 2 mult = 128+32 = 160 (batch 4)
-  # Phase 3 mult = 160+32 = 192 (batch 4)
-  # Phase 4 mult = 192+32 = 224 (batch 2)
+  # Batch policy: batch 4 for mult≤192 (phases 2-3), batch 1 beyond
+  # At mult>192 the model is ~200M+ and batch 2 OOMs during backward
   PREV_MULT=$((128 + (PHASE - 2) * 32))
   if [ "$PREV_MULT" -le 192 ]; then
     BS=4
   else
-    BS=2
+    BS=1
   fi
 
   echo "== phase $PHASE: $D (grow from mult $PREV_MULT, batch=$BS) ==" >> "$A"
