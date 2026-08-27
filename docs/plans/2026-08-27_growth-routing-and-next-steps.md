@@ -13,7 +13,12 @@ routable structure, and whether growth + routing prevents forgetting.
 |---|---|---|
 | Arm R (fixed 100M) | Pure interference accumulation | P-Acq PASS, P-Eros FAIL (+12.7/+20.7 nats) |
 | Arm G (growth to 700M) | Growth WITHOUT routing | P-Acq FAIL (peak 3.49), P-Eros FAIL (en 41.2, bg 1436) |
-| Routing on Arm G stack | Does grown model have routable structure? | Partial: 88.8% accuracy with 5 routes, 7/19 domains >5× |
+| Routing on Arm G stack | Does grown model have routable structure? | Anecdotal: 88.8% with 5 routes, 7/19 domains >5× (pre-fix `eval_router.py`) |
+
+**Note:** The routing preliminary was measured before the `eval_router.py` fix (d10d389:
+oracle bug, confusion matrix output). Phase 1 re-measures with the fixed script; only
+that result decides the gate. See E6 precedent: self-corrected measurement replaces
+broken one.
 
 **Key insight:** Arm G was growth WITHOUT routing. Arm R was routing WITHOUT growth.
 The combination experiment (growth + routing) is the missing cell in the matrix.
@@ -67,8 +72,11 @@ The combination experiment (growth + routing) is the missing cell in the matrix.
 **Design:**
 - Same 20-phase Europarl ladder as Arm R/G
 - Width growth: +32 neurons/head per phase (×128 → ×708)
-- **Addition:** trained routing head (or compiled detector) at each phase
-- **Addition:** during training, route to the current phase's prefix; during eval, use the router
+- **Routing mechanism:** compiled detector or likelihood router (both validated, label-free)
+  - NOT a trained routing head: falsified (Addendum 12, bcbf022); prefix routing on growth
+    stack verified (7752743); likelihood routing with 100% label-free detection (d62ba57)
+- **During training:** route to the current phase's prefix via the growth rule
+- **During eval:** use the router (compiled detector or likelihood mixture) to serve
 
 **Measurement:**
 - P-Acq: does acquisition stay ≤2.6 ppl?
