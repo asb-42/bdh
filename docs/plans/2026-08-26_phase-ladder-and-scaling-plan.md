@@ -86,11 +86,12 @@ the plan document travels with the repo.
 - [x] Loader supports all sides (`sources` map extended)
 - [x] Arm R complete: 19/19 phases, P-Acq PASS (peak 2.21), P-Eros FAIL (+12.7/+20.7 nats)
 - [x] Milestone reviews: full interference matrix at phases 5/10/15/19 (post-hoc from checkpoints)
-- [x] Arm G launched (growth+routed, ×160→×736) — PID 769711, out/logs/ladG_*.log
-- [ ] Arm G milestone reviews at phases 5/10/15/19
-- [ ] Final routing/detector measurements on Arm G (growth arm only)
-- [ ] Report Addendum + manuscript "accumulation" section
-- [ ] Step-4 go/no-go on parameter scaling
+- [x] Arm G complete: 19/19 phases, P-Acq FAIL (peak 3.49), P-Eros FAIL (en 41.2, bg 1436)
+- [x] Routing measurements on Arm G stack: 5 routes, 88.8% accuracy, 7/19 domains >5×
+- [x] Manuscript revision 2: accumulation section, math fixes (commit `013b559`)
+- [ ] Routing diagnosis: 20-way detection (P-Det), per-domain retention (P-Route) → `2026-08-27_growth-routing-and-next-steps.md`
+- [ ] Growth + Routing combination experiment (~100M) → `2026-08-27_growth-routing-and-next-steps.md`
+- [ ] Step-4: CANCELLED — Arm G is already a scaling experiment (100M→700M)
 
 ## 6. Provenance
 

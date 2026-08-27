@@ -87,9 +87,9 @@ Interesting: Arm G's erosion is actually WORSE than Arm R for some languages (en
 
 ## Next Steps
 
-1. **Routing measurements on final grown stack**: Does the ~700M model HAVE routable structure? (eval_router.py, detection accuracy)
-2. **Update manuscript**: Add accumulation results
-3. **Step-4 go/no-go**: Parameter scaling (150M/250M) — probably not worth it given these results
+1. **Routing diagnosis on Arm-G stack**: 20-way detection (P-Det), per-domain retention (P-Route) — see `docs/plans/2026-08-27_growth-routing-and-next-steps.md`
+2. **Growth + Routing combination experiment** (~100M) — the missing cell in the matrix
+3. **Step-4: CANCELLED** — Arm G is already a scaling experiment (100M→700M)
 
 ## Files
 - Analysis: `out/logs/ladder_armG_analysis.txt`
