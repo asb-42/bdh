@@ -29,7 +29,7 @@
 | sl | 100% | 19 |
 | sv | 100% | 9 |
 
-**Overall:** 758/800 = 94.75% (just below 95% threshold; et is the only "error" at 95%)
+**Overall:** 758/760 = 99.7% (19 domains × 40 crops = 760; et has 2 misrouted crops)
 
 ### P-Route (routed retention)
 
@@ -85,14 +85,14 @@
 
 ## Assessment
 
-**P-Det:** MARGINAL (94.75% vs 95% threshold). The only "error" is et routing to route 15 instead of route 14 (2/40 crops). This is a statistical artifact — et is Finno-Ugric like fi/hu, and routes 14-15 are adjacent.
+**P-Det:** PASS (99.7%, threshold ≥95%). 18/19 domains route with 100% accuracy; et at 95% (2/40 crops to adjacent route 15 instead of 14). The denomenator is 19×40=760, not 800.
 
-**P-Route:** PASS. All domains show 4.7–22.8× improvement over joint. The worst domains (sv, et, pl) are still much better than joint (58.39 vs 10–12).
+**P-Route:** PASS vs joint baseline (4.7–22.8× improvement). NOTE: measured against joint (58.39 ppl), not per-phase specialist baselines. For Phase 2, the specialist PPL must be added to the metric suite to evaluate how close routed serving gets to phase-k endpoint quality (the original pre-registered falsifier: within 0.3 nats).
 
 **Routing quality:** Fine-grained. 15/20 routes are singleton. The clustering is mostly linguistically coherent (Germanic→9, Finno-Ugric→11/12/15, Slavic→8/13/16/19), with two unexpected cross-family pairings (fr+pl, el+sk).
 
 ## Decision gate
 
-**PROCEED TO PHASE 2.** The grown stack has routable structure. The routing is fine-grained and nearly perfect. The 94.75% vs 95% is a statistical artifact (1 domain at 95% instead of 100%). The practical implication is clear: prefix selection works on the ~700M grown stack.
+**PROCEED TO PHASE 2.** The grown stack has routable structure. P-Det at 99.7% clears the threshold by a wide margin. The practical implication is clear: prefix selection works on the ~700M grown stack.
 
 The combination experiment (growth + routing) is now justified. The question is not "does routing work?" (it does) but "does routing prevent forgetting during growth?"
