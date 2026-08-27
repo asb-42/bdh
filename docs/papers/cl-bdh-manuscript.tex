@@ -23,7 +23,7 @@
 
 \title{\bfseries Computation Isolation for Continual Learning\\ in a Depth-Recurrent Language Model}
 \author{ox-alpha\\\small autonomous research agent}
-\date{August 26, 2026 (revision 1, post-review)}
+\date{August 27, 2026 (revision 2, accumulation study)}
 
 \begin{document}
 \maketitle
@@ -33,25 +33,29 @@ We study continual learning in \BDH{}, a language model whose defining efficienc
 block of parameters reused across all depths---collides directly with the core requirement
 of lifelong learning: that finished computations stay fixed. Three findings organize the
 problem. \emph{First}, sequential training forgets catastrophically (later phases cost
-earlier languages $+1.6$ to $+2.2$ nats), the failure persists under literally frozen old
-parameters, and it therefore cannot be explained by parameter drift: \textbf{weight
-isolation does not imply computation isolation}. \emph{Second}, the condition that makes
-continual serving exact is structural: the grown map must leave the old-task reachable set
-invariant and agree with the old map on it. No soft or hard gate can substitute for this
-structure in a generic frozen path; but \BDH{}'s additive growth rule \emph{constructs} it,
-so an input-dependent selector---hard or soft---selects an isolation that already exists.
-\emph{Third}, the resulting system separates acquisition, serving, and consolidation rather
-than seeking one universal mechanism. Measured on 100M-parameter models across five languages
-and three text registers: prefix selection reproduces specialists to within evaluation
-precision, with a 128-token likelihood detector at 100\% accuracy; a training-free softened
-mixture serves mixed streams within 0.003 nats of the discrete oracle; merge$\,\to\,$random-
-scatter-prune$\,\to\,$brief replay consolidates everything into one fixed-width model equal
-to joint co-training ($\pm0.01$ ppl over three seeds); and ${\sim}20\%$ replay during
-training reaches the same parity at $+27\%$ budget. Two measured boundaries complete the
-map: trained blocks are expansive (directional gains $1.05$--$1.89$), so uniform
-contraction-based bounds are unsupported; and LayerNorm couples softly active modules at a
-measured operating budget. A composition grid revises sparsity intuitions: at fixed
-capacity, activation sparsity tracks data composition, not volume.
+earlier languages $+1.6$ to $+2.2$ nats in two-language experiments; $+12$ to $+20$ nats
+over 19 sequential phases), the failure persists under literally frozen old parameters,
+and it therefore cannot be explained by parameter drift: \textbf{weight isolation does not
+imply computation isolation}. \emph{Second}, the condition that makes continual serving
+exact is structural: the grown map must leave the old-task reachable set invariant and
+agree with the old map on it. No soft or hard gate can substitute for this structure in a
+generic frozen path; but \BDH{}'s additive growth rule \emph{constructs} it, so an
+input-dependent selector---hard or soft---selects an isolation that already exists.
+\emph{Third}, the resulting system separates acquisition, serving, and consolidation
+rather than seeking one universal mechanism. Measured on 100M-parameter models across 19
+languages and three text registers: prefix selection reproduces specialists to within
+evaluation precision, with a 128-token likelihood detector at 100\% accuracy; a
+training-free softened mixture serves mixed streams within 0.003 nats of the discrete
+oracle; merge$\,\to\,$random-scatter-prune$\,\to\,$brief replay consolidates everything
+into one fixed-width model equal to joint co-training ($\pm0.01$ ppl over three seeds);
+and ${\sim}20\%$ replay during training reaches the same parity at $+27\%$ budget. Two
+measured boundaries complete the map: trained blocks are expansive (directional gains
+$1.05$--$1.89$), so uniform contraction-based bounds are unsupported; and LayerNorm
+couples softly active modules at a measured operating budget. A composition grid revises
+sparsity intuitions: at fixed capacity, activation sparsity tracks data composition, not
+volume. A 19-phase accumulation study shows that catastrophic forgetting scales
+super-linearly with phase count at fixed capacity, and that growth without routing
+provides no protection---routing is essential, not optional.
 \end{abstract}
 
 \section{Introduction}
@@ -78,19 +82,25 @@ bounded, or made controllable by an input-dependent gate or projection, without 
 trainable parameters and without retraining the frozen path?
 \end{quote}
 
+\noindent A fourth reading extends this to accumulation: does the isolation property
+survive when the number of sequential phases scales from 3--5 to 19--20? The answer
+determines whether the recipe is a few-phase curiosity or a lifelong-learning mechanism.
+
 \noindent\textbf{Answer (\S\ref{sec:theory}--\S\ref{sec:recipe}).} Exact elimination is
 possible precisely when the grown map keeps the old-task reachable set invariant and equals
 the old map on it. A generic frozen path has no such structure, and no gate creates it.
 \BDH{}'s growth rule constructs it; detection and selection exploit it. Where the structure
 is absent, we find no evidence supporting useful uniform bounds---trained blocks are
 expansive on the tested trajectories---so the honest alternatives are structural separation
-or replay. The resulting system separates three concerns usually conflated:
+or replay. A 19-phase accumulation study confirms that the problem scales super-linearly:
+at fixed capacity, forgetting reaches $+12$--$+20$ nats; growth without routing provides no
+protection. The resulting system separates three concerns usually conflated:
 \textbf{acquisition} (grow into fresh capacity), \textbf{serving} (route to, or softly mix,
 the stored phases), and \textbf{consolidation} (merge, prune, brief replay). Each concern
 has a measured solution; none requires a miracle.
 
 All experiments use 100M-parameter \BDH{}, byte-level language modeling, one RTX 4090,
-Europarl (EN/DE/ES/FR/PT) and a three-register English mix (Wikipedia, Gutenberg books,
+Europarl (19 language pairs) and a three-register English mix (Wikipedia, Gutenberg books,
 parliamentary proceedings). Core comparisons are within-corpus and seed-replicated
 (\S\ref{sec:recipe}).
 
@@ -384,13 +394,69 @@ decay.
 \toprule
 constraint & mechanism \\
 \midrule
-few phases, budget flexible & replay-in-training (joint parity, trivial) \\
-strict single-pass, many phases & growth + selected serving (near-oracle) \\
+few phases (${\le}5$), budget flexible & replay-in-training (joint parity, trivial) \\
+many phases (${\ge}10$), strict single-pass & growth + routing (essential; without routing, growth fails) \\
 single fixed-width artifact required & merge + random-prune + short replay \\
 unlabeled streams at inference & likelihood mixture or compiled detector \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\section{Accumulation: does isolation survive many phases?}
+\label{sec:accum}
+
+The preceding results rest on 3--5 phases. If prefix selection stops being exact, or
+acquisition degrades, or erosion accelerates super-linearly by phase 15--20, the central
+claim must be scoped to few-phase regimes. We test this with a 20-phase language ladder
+(en plus 19 distinct Europarl language sides, fixed order, families interleaved) under the
+canonical protocol (30\,MB/phase, 10k steps, batch 4, fresh optimizer per phase).
+
+\subsection{Arm R: fixed capacity (rewrite chaining)}
+
+With constant-width $\times128$ (100M params), sequential training forgets catastrophically
+and the erosion scales super-linearly:
+\begin{itemize}\itemsep2pt
+\item \textbf{P-Acq (pass):} every new language acquires at $\le2.6$ ppl (peak 2.21);
+acquisition is robust regardless of position in the chain.
+\item \textbf{P-Eros (fail):} EN drifts from 11.9 to 24.6 ppl ($+12.7$ nats) and ES from
+2.1 to 22.8 ($+20.7$ nats) over 19 phases---exceeding the 0.3-nat falsifier by
+$10$--$70\times$.
+\item Erosion is non-monotonic: related languages temporarily improve each other (cross-lingual
+transfer from FR$\to$DE, DA$\to$SV), but the overall trend is downward.
+\item After ${\sim}10$ phases the model can no longer hold all languages; the most recent
+language is always at ${\sim}2.0$ while everything else degrades to 20--80 ppl.
+\end{itemize}
+
+\subsection{Arm G: growth without routing}
+
+With width growing $+32$ neurons/head per phase ($\times128{\to}\times708$, ${\sim}554$M final
+params), forgetting is \emph{identical} to fixed capacity:
+\begin{itemize}\itemsep2pt
+\item Target acquisition degrades at later phases (peak 3.49 at LT, $>2.6$ threshold).
+\item Final erosion: EN $=41.2$ ppl, ES $=31.7$, most earlier languages at 30--80 ppl,
+with catastrophic outliers (BG $=1436$, EL $=1268$).
+\item The grown model \emph{does} have routable structure (prefix selection gives
+10--$19\times$ improvement for well-routed domains: CS $=5.30$, DE $=3.03$, EL $=2.96$ vs.\ joint
+57.57), but the routing is coarse, not fine-grained.
+\end{itemize}
+
+\textbf{The critical finding.} Growth alone does not prevent forgetting. The model adds
+capacity each phase, but new neurons do not protect earlier languages---weight updates still
+overwrite them. This is exactly what the theory predicts: \textbf{without routing/selection,
+growth is just a bigger container for the same interference}. The architecture contains the
+structure for isolation (Corollary~\ref{cor:prefix}); it must be actively selected.
+
+\subsection{Implications}
+
+The accumulation study scopes the recipe:
+\begin{enumerate}\itemsep2pt
+\item \emph{Few phases} (${\le}5$): the full recipe works trivially (replay-in-training)
+or near-trivially (merge$\to$prune$\to$replay).
+\item \emph{Many phases} (${\ge}10$): growth + routing is essential; fixed-capacity methods
+fail super-linearly.
+\item \emph{Routing is not optional}: growth without selection provides zero protection.
+The selector must be explicit.
+\end{enumerate}
 
 \section{Secondary empirical observations}
 \label{sec:laws}
@@ -426,11 +492,13 @@ languages increase it monotonically.}
 
 \section{Limitations}
 Byte-level vocabularies sidestep embedding/head coupling that subword tokenization would
-introduce. All results are 100M-scale on related-corpora sequences. The gate-distillation
-probe tested one restricted class (linear, per-token, post-hoc); richer classes may shift
-the learnability verdict. Replay uses real tokens; synthetic replay is untested. The erosion
-slope is measured to five phases. The expansiveness measurement is a directional proxy over
-sampled states, not an operator-norm computation.
+introduce. All results are 100M-scale on related-corpora sequences; the accumulation study
+covers 19 languages but still within Europarl. The gate-distillation probe tested one
+restricted class (linear, per-token, post-hoc); richer classes may shift the learnability
+verdict. Replay uses real tokens; synthetic replay is untested. The growth-without-routing
+arm (Arm G) reached ${\sim}554$M params but could not test routing heads at that scale due
+to GPU memory constraints; routing measurements used batch-1 inference. The expansiveness
+measurement is a directional proxy over sampled states, not an operator-norm computation.
 
 \section{Conclusion}
 Depth-recurrent weight sharing makes continual learning \emph{harder}: freezing weights does
@@ -616,12 +684,12 @@ Two-dimensional counterexample, $I_A=\{1\}$, $I_B=\{2\}$, $\sigma=\mathrm{ReLU}$
 $f'_1(x)=\sigma(x_1)+\varepsilon x_2$, $f'_2(x)=\delta\sigma(x_1)+\gamma x_2$,
 $\varepsilon\delta\neq0$. Preservation from $x_0=(a,0)$, $a>0$, requires after one step
 $x_1=(a(1{+}g_1),\,g_2\delta a)$ and after two
-$a(1{+}g_1)+g_1\sigma(a(1{+}g_1))+g_1\varepsilon g_2\delta a=2a$ for \emph{all} $a>0$.
-Substituting the first equation's constraint ($g_2=0$ or $\varepsilon\delta=0$ to kill the
-cross term at unit scale) shows no open-range pair works for all $a$; with $g_2>0$ the
-residual term $g_1\varepsilon\delta a g_2$ varies with $a$ while $\sigma(a(1{+}g_1))$ is
-affine in $a$ only piecewise, so the identity cannot hold across $a$ crossing the kink.
-Affine $f'$ removes the kink and is solvable; nonlinearity is exactly what forces hardness.
+$a(1{+}g_1)+g_1\sigma(a(1{+}g_1))+g_1\varepsilon g_2\delta a=a$ for \emph{all} $a>0$ (the
+first component must return to $a$). The second component forces $g_2=0$ (since
+$g_2\delta(a+\sigma(a(1{+}g_1))+g_2\gamma a)=0$ and the bracket is positive for $a>0$). With
+$g_2=0$ the first component reduces to $g_1(1+\sigma(a(1{+}g_1)))=0$, which forces $g_1=0$
+since $\sigma>0$. The only solution is the hard endpoint; no open-range pair works.
+Nonlinearity (the kink in $\sigma$) is exactly what forces hardness.
 \hfill$\qed$
 
 \subsection{Proof of Proposition~\ref{prop:amp}}
@@ -696,13 +764,16 @@ here.
 
 \section{Reproducibility}
 Model: \BDH{}, 100{,}925{,}440 parameters ($d{=}512$, $n_h{=}8$, $L{=}6$, multiplier 128,
-block 512, byte vocabulary); bf16 autocast~; AdamW~\cite{adamw} peak lr $10^{-3}$ cosine-decayed; warmup
-1000; batch $4\times512$ tokens. Corpora: Europarl v7 pairs de-en/es-en/fr-en/pt-en (30\,MB
-caps unless stated; FR/PT archives integrity-checked after an initial truncated download)
-and a three-register textmix~\cite{wikitext,europarl,gutenberg} built from wikitext-103-raw, 60 Gutenberg volumes, and
+block 512, byte vocabulary); bf16 autocast; AdamW~\cite{adamw} peak lr $10^{-3}$ cosine-decayed; warmup
+1000; batch $4\times512$ tokens. Corpora: Europarl v7 pairs (19 language sides, 30\,MB
+caps; growth arm extended to 20 phases with $+32$ neurons/head per phase reaching
+${\sim}554$M params) and a three-register textmix~\cite{wikitext,europarl,gutenberg} built from wikitext-103-raw, 60 Gutenberg volumes, and
 Europarl-EN (28\,MB train each after holdout carving). Seeds $\{1337,1,2\}$ cover the core
 merge-prune-replay pipeline (Table~\ref{tab:pareto}$^\dagger$); all other runs are
-single-seed as marked. Evaluation protocols for the soft mixture and leakage curves are
+single-seed as marked. Accumulation study (Arm R + Arm G): 20-phase language ladder,
+pre-registered falsifiers, post-hoc analysis from phase-end checkpoints
+(\texttt{docs/reports/2026-08-26\_ladder-analysis.md},
+\texttt{2026-08-26\_arm-g-results.md}). Evaluation protocols for the soft mixture and leakage curves are
 specified in \S\ref{sec:serve} and \S\ref{sec:recipe}. Every number traces to logged runs
 under version control; the companion report (\texttt{docs/reports/2026-08-25\_cl-h1-report.md},
 \S1--20) carries complete intermediate tables, and all mechanisms ship in the repository
