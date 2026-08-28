@@ -194,13 +194,16 @@ class BDH(nn.Module):
         elif isinstance(module, nn.Embedding):
             nn.init.normal_(module.weight, mean=0.0, std=0.02)
 
-    def forward(self, idx, targets=None, state=None):
+    def forward(self, idx, targets=None, state=None, neuron_mask=None):
         """State-space forward pass.
 
         state: None, or {"pos": int, "layers": [per-layer attention state]} as
         returned by a previous call. Carrying state across calls continues both
         the absolute RoPE positions and the attention memory (the paper's
         recurrent state rho), enabling state carry-over / truncated BPTT.
+        neuron_mask: optional (N,) float tensor; zeros out old neurons so only
+        newly grown neurons contribute to the forward.  Used by route-aware
+        training.
         Returns (logits, loss, new_state).
         """
         C = self.config
@@ -240,6 +243,9 @@ class BDH(nn.Module):
 
             x_sparse = _k_sparse_relu(x_latent, C.k_sparse_ratio) if C.k_sparse_ratio > 0 else F.relu(x_latent)  # B, nh, T, N
 
+            if neuron_mask is not None:
+                x_sparse = x_sparse * neuron_mask.view(1, 1, 1, -1)
+
             yKV, layer_new_state = self.attn(
                 x_sparse,
                 x,
@@ -251,6 +257,10 @@ class BDH(nn.Module):
 
             y_latent = yKV @ self.encoder_v
             y_sparse = _k_sparse_relu(y_latent, C.k_sparse_ratio) if C.k_sparse_ratio > 0 else F.relu(y_latent)
+
+            if neuron_mask is not None:
+                y_sparse = y_sparse * neuron_mask.view(1, 1, 1, -1)
+
             xy_sparse = x_sparse * y_sparse  # B, nh, T, N
 
             xy_sparse = self.drop(xy_sparse)

@@ -98,6 +98,7 @@ def train(cfg: Config) -> None:
     # BDH shares one (encoder, encoder_v, decoder) triple across depth levels, so
     # three masks cover everything neuron-indexed (decoder rows are h*N + n ordered).
     gate_param_masks = []
+    route_neuron_mask = None
 
     # Mechanism B/grow: with init_from + grow_mult, widen the latent by fresh
     # zero-init neurons; old neurons, embed and lm_head are frozen so new-phase
@@ -154,6 +155,9 @@ def train(cfg: Config) -> None:
             (raw_model.encoder_v, keep.view(1, 1, -1)),
             (raw_model.decoder, keep.repeat(nh).unsqueeze(1)),        # (nh*N, D)
         ]
+        route_neuron_mask = keep.clone() if cfg.route_aware else None
+        if cfg.route_aware:
+            print(f"route-aware: prefix mask {n_old}..{n_new} (alpha={cfg.route_alpha})")
         print(f"growth: {base_mult} -> {cfg.mlp_internal_dim_multiplier} mult "
               f"(+{n_new - n_old} neurons/head trainable) | old neurons + embed + lm_head + attn frozen")
 
@@ -233,7 +237,13 @@ def train(cfg: Config) -> None:
             x, y = data.get_batch("train", cfg.block_size, cfg.batch_size, device)
 
         with ctx:
-            _, loss, new_state = model(x, y, state)
+            if route_neuron_mask is not None:
+                # Route-aware training: prefix-masked forward + full forward, mix losses
+                _, prefix_loss, new_state = model(x, y, state, neuron_mask=route_neuron_mask)
+                _, full_loss, _ = model(x, y, state)
+                loss = (1 - cfg.route_alpha) * prefix_loss + cfg.route_alpha * full_loss
+            else:
+                _, loss, new_state = model(x, y, state)
 
         if cfg.carry_state and horizon > 1:
             # Truncated BPTT: accumulate the loss over `horizon` minibatches (the

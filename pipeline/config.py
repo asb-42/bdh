@@ -59,6 +59,8 @@ class Config:
     grow_mult: int = 0                     # with init_from: add this many mlp multiplier units as trainable fresh neurons; old neurons + embed/lm_head frozen
     text_mix: str = ""                     # textmix only; comma-separated "name:path" byte-corpus pairs
     text_mix_mb: int = 30                  # textmix only; per-domain train MB (val/test 1MB each follow)
+    route_aware: bool = False              # route-aware training: zero out old neurons in forward, compute loss on prefix-only logits
+    route_alpha: float = 0.1               # mix ratio: loss = (1-alpha)*prefix_loss + alpha*full_loss
 
 
 def estimate_bdh_params(cfg: Config) -> int:
