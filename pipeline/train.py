@@ -146,8 +146,9 @@ def train(cfg: Config) -> None:
             raw_model.attn.freqs.data[:] = freqs.view(1, 1, 1, n_new)
         raw_model.embed.weight.requires_grad_(False)
         raw_model.lm_head.requires_grad_(False)
-        for p in raw_model.attn.parameters():
-            p.requires_grad_(False)
+        if cfg.freeze_attn:
+            for p in raw_model.attn.parameters():
+                p.requires_grad_(False)
         keep = torch.zeros(n_new, device=device)
         keep[n_old:] = 1.0
         gate_param_masks = [
@@ -157,9 +158,11 @@ def train(cfg: Config) -> None:
         ]
         route_neuron_mask = keep.clone() if cfg.route_aware else None
         if cfg.route_aware:
-            print(f"route-aware: prefix mask {n_old}..{n_new} (alpha={cfg.route_alpha})")
+            print(f"route-aware: prefix mask {n_old}..{n_new} | "
+                  f"loss = {cfg.route_alpha}*prefix + {1 - cfg.route_alpha}*full")
         print(f"growth: {base_mult} -> {cfg.mlp_internal_dim_multiplier} mult "
-              f"(+{n_new - n_old} neurons/head trainable) | old neurons + embed + lm_head + attn frozen")
+              f"(+{n_new - n_old} neurons/head trainable) | old neurons + embed + lm_head frozen"
+              f" | attn {'frozen' if cfg.freeze_attn else 'UNFROZEN'}")
 
     if cfg.gate_from:
         gate_imp = None
@@ -238,10 +241,11 @@ def train(cfg: Config) -> None:
 
         with ctx:
             if route_neuron_mask is not None:
-                # Route-aware training: prefix-masked forward + full forward, mix losses
+                # Route-aware training: prefix-masked forward + full forward, mix losses.
+                # route_alpha = prefix fraction (higher = stronger route-aware signal).
                 _, prefix_loss, new_state = model(x, y, state, neuron_mask=route_neuron_mask)
                 _, full_loss, _ = model(x, y, state)
-                loss = (1 - cfg.route_alpha) * prefix_loss + cfg.route_alpha * full_loss
+                loss = cfg.route_alpha * prefix_loss + (1 - cfg.route_alpha) * full_loss
             else:
                 _, loss, new_state = model(x, y, state)
 
