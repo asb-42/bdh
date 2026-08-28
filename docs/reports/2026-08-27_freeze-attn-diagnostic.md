@@ -36,7 +36,7 @@
 | sl | 100% | 19 |
 | sv | 100% | 16 |
 
-**Overall:** 740/760 = 97.4% (lt accounts for 38/20 misroutes)
+**Overall:** 703/760 = 92.5% (lt accounts for 38 of 40 misroutes)
 
 ### P-Route (routed retention)
 
@@ -71,7 +71,7 @@
 |---|---|---|
 | lt PPL | 55.10 | 55.30 |
 | lt routing accuracy | 32% | 5% |
-| Overall P-Det | 95.3% | 97.4% |
+| Overall P-Det | 95.3% | 92.5% |
 | Older languages | 100% | 100% |
 
 **Both models show lt at joint quality (~56 ppl).** The unfrozen model is actually *worse* at routing lt (5% vs 32%).
