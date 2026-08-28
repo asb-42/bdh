@@ -3,74 +3,52 @@
 **Date:** 2026-08-28
 **Reviewer:** Quinn (review seat, Saga AI Labs)
 **Reviewed:** `docs/reports/2026-08-27_routing-diagnosis-gr.md` (commit `b3e10b5`)
-**Context:** First intermediate result of Phase 2 (growth + routing combination).
+**Context:** First intermediate result from Phase 2 (growth + routing combination).
 
 ## Verdict
 
-**Strong finding, but the report's numbers need correction and the interpretation needs
-one diagnostic step before the next arm is built.**
+**Kernbefund tragfähig — aber Arithmetik korrigieren, bevor der Bericht zitiert wird. Wichtigster Schritt: freeze_attn-Konfounder per Diagnose-Experiment ausschließen, bevor ein neuer Arm gebaut wird.**
 
-## 1. The core result is real and important
+## 1. Der Befund ist real und wichtig
 
-The current phase (lt) has no routable structure: 32% detection, scattered across 7
-routes, routed ppl 55.10 = joint (54.96). Older languages retain routable structure.
-This is the **current-phase problem**: the growth rule preserves old prefixes but does
-not construct one for the language being trained now.
+Die zuletzt trainierte Sprache (lt) hat keine routbare Struktur: 32 % Detektion, auf 7 Routen verstreut, Routed-PPL 55,10 = Joint (54,96). Alle älteren Sprachen routen gut (95–100 %).
 
-This is exactly the theory's prediction framed differently: **isolation is constructed,
-not emergent.** The old languages are routable because their structure was constructed
-when they were trained with (presumably) full attention. The last language could not
-construct its prefix under the current training setup.
+Das ist das **aktuelle-Phasen-Problem**: Die Wachstumsregel erhält alte Präfixe, konstruiert aber keines für die aktuell trainierte Sprache. Die Formulierung des Berichts („the prefix is an emergent property of training, not an explicit allocation") ist exakt die richtige Diagnose.
 
-## 2. CRITICAL — arithmetic inconsistencies (before this enters the manuscript)
+## 2. Arithmetik: dieselbe Fehlerklasse wie im letzten Routing-Report
 
-- Report: "Overall: 2/760 = 0.3% on diagonal". 2/760 is 0.26%, but more importantly
-  the count is wrong. The table lists 16 fully-correct domains (100%) — not 18.
-- es is 95% and et is 82%, so "18 older languages route perfectly (100%)" is false.
-  Independently: 16×40 + es 38 + et ~33 + lt ~13 = ~724/760 ≈ 95.3%, not 99.7% or 100%.
-- Report: "Excluding lt: 744/720 = 100%" — 744/720 is mathematically >1 and internally
-  inconsistent (744 ≠ 720, and es/et are not perfect either).
+- „Overall: 2/760 = 0.3 % on diagonal" — rechnerisch falsch (2/760 = 0,26 %, und 2 ist ohnehin nicht die korrekte Anzahl).
+- „Excluding lt: 744/720 = 100 %" — mathematisch unmöglich (Zähler > Nenner); außerdem sind es/et laut eigener Tabelle nicht 100 %.
+- Unabhängige Zählung aus der Tabelle: 16 Sprachen à 40 = 640 + es 38 + et ~33 + lt ~13 = **~724/760 = 95,3 %**, nicht 99,7 % und nicht „alles 100 %".
 
-**Action:** recompute the P-Det table carefully (per-domain counts, diagonal, overall).
-The qualitative conclusion survives, but the manuscript must not carry broken arithmetic
-again (see the routing-diagnosis review from 2026-08-27 on the same class of error).
+**Aktion:** Im Report korrigieren (724/760 = 95,3 %, lt als einziger Ausreißer). Das Manuskript darf keine fehlerhafte Prozentarithmetik tragen — die Review-Anmerkung vom 2026-08-27 betraf genau dieselbe Klasse.
 
-## 3. Interpretation: freeze_attn is a likely confounder — test before building Arm C
+## 3. Wichtiger als die Zahlen: freeze_attn ist ein plausibler Konfounder
 
-Arm G (without freeze_attn) gave lt a clean route: 3.74 ppl at Route 20. Arm G+R froze
-attention for the final phase. Two competing explanations for lt's missing structure:
+Der Unterschied zwischen Arm G und Arm G+R ist der freeze_attn-Mechanismus (Commit `8fef089`: „freeze attn weights during growth"). Prüfe den Vergleich:
 
-1. **Current-phase problem (the report's reading):** the current phase fundamentally
-   cannot be isolated; the recipe needs explicit prefix allocation during training.
-2. **Freeze-attention artifact:** attention was trained before lt and has no capacity
-   allocated for it; with attention frozen, lt cannot form a consistent neuron-level
-   projection. The missing routable structure is then a property of the experiment
-   design (freezing the last phase's only trainable pathway), not of the architecture.
+| Arm | lt-Detektion | lt-Routed-PPL | Attention bei lt-Training |
+|---|---|---|---|
+| Arm G (ohne R) | saubere Route (Route 20) | 3,74 | trainierbar |
+| Arm G+R | 32 %, verstreut | 55,10 (= Joint) | **eingefroren** |
 
-Arm G's lt result (3.74 ppl routed) is direct evidence that explanation 2 is
-plausible: without the freeze, lt WAS routable.
+Plausible Erklärung: Lt wurde mit eingefrorener Attention trainiert — die Attention war bereits auf ältere Sprachen optimiert und hatte für die neue Sprache keinen freien Gestaltungsraum. Ohne trainierbare Attention kann lt kein konsistentes neuronales Projektionsmuster formen; es verteilt sich über die vorhandenen Strukturen. Das aktuelle-Phasen-Problem wäre dann ein Artefakt der Freeze-Regel, nicht ein fundamentales Architektur-Limit.
 
-**Recommended cheap diagnostic (before option 2 as a full arm):**
-Train the final phase with unfrozen attention (or a dedicated lt specialist with its own
-attention), then re-run the 20-way routing diagnosis. If lt becomes routable, the
-freeze is the cause and routing-aware training is the correct next step. If not, the
-current-phase problem is real and option 2 is justified.
+**Empfohlenes Diagnose-Experiment (kostet einen Run, keine neue Arm-Architektur):**
+Letzte Phase (oder eine Wiederholung von lt) mit **aufgetauter Attention** trainieren, dann Routing-Diagnose erneut messen.
+- Wird lt routbar (≈ 3,7 ppl, saubere Route) → freeze_attn ist der Grund. Dann ist der nächste Schritt: Attention für die aktuelle Phase trainierbar lassen und die Routing-Awareness ins Training einbauen (Option 2 aus dem Bericht, aber jetzt mit präzisem Mechanismus).
+- Bleibt lt unroutbar → das aktuelle-Phasen-Problem ist fundamental; dann lohnt sich der Aufwand für Option 2.
 
-**Against option 1 (explicit prefix reservation):** reserving neurons in advance is a
-learned-gate-style mechanism; learned in-pass gates were already falsified (Addendum 12,
-bcbf022: feature poverty, compiled detector = oracle). Routing-aware training (option 2)
-is theoretically consistent with the manuscript's construction thesis.
+## 4. Gegen Option 1 (explizite Präfix-Reservierung) — kurze Anmerkung
 
-## 4. What is good
+Neuronen vorab zu reservieren ähnelt einem learned-gate-Mechanismus; learned in-pass gates wurden bereits falsifiziert (Addendum 12, bcbf022 — Feature Poverty, compiled detector = oracle). Wenn die Diagnose freeze_attn bestätigt, ist route-aware training (Option 2) die theoretisch konsistentere Antwort.
 
-- Comparing Arm G vs Arm G+R is the right frame and gives a clean message: routing
-  preserves old languages perfectly once their structure exists.
-- The report names the exact gap ("the prefix is an emergent property of training, not
-  an explicit allocation"). That sentence is the thesis of the next experiment.
-- Compute efficiency: 30 min inference, no new training. Good discipline.
+## 5. Gut gemacht
+
+- Der Vergleich Arm G vs Arm G+R ist der richtige Rahmen und gibt eine klare Botschaft: Routing erhält alte Sprachen perfekt, sobald deren Struktur existiert.
+- Die Interpretation benennt die Baustelle präzise (emergent vs. allokiert).
+- Günstige Methode: reine Inference, keine neuen Trainingsläufe in dieser Diagnose.
 
 ## Bottom line
 
-The current-phase problem is a real, isolatable finding — but before building a new
-arm, run the freeze-attention diagnostic on lt. It costs one training run and resolves
-the two competing explanations. Fix the arithmetic in the report regardless.
+Kernbefund (lt unroutbar, ältere routbar) steht. Arithmetik korrigieren. Vor dem nächsten Arm: freeze_attn-Konfounder mit einem gezielten Run ausschließen. Das ist billiger und präziser als direkt ein neues großes Experiment.
