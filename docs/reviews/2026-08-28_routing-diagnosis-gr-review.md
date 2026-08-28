@@ -7,48 +7,76 @@
 
 ## Verdict
 
-**Kernbefund tragfähig — aber Arithmetik korrigieren, bevor der Bericht zitiert wird. Wichtigster Schritt: freeze_attn-Konfounder per Diagnose-Experiment ausschließen, bevor ein neuer Arm gebaut wird.**
+**Core finding is sound — but fix the arithmetic before the report is cited. Most
+important next step: rule out the freeze_attn confounder with a targeted diagnostic
+run before building a new arm.**
 
-## 1. Der Befund ist real und wichtig
+## 1. The finding is real and important
 
-Die zuletzt trainierte Sprache (lt) hat keine routbare Struktur: 32 % Detektion, auf 7 Routen verstreut, Routed-PPL 55,10 = Joint (54,96). Alle älteren Sprachen routen gut (95–100 %).
+The last-trained language (lt) has no routable structure: 32% detection, scattered
+across 7 routes, routed PPL 55.10 = joint (54.96). All older languages route well
+(95–100%).
 
-Das ist das **aktuelle-Phasen-Problem**: Die Wachstumsregel erhält alte Präfixe, konstruiert aber keines für die aktuell trainierte Sprache. Die Formulierung des Berichts („the prefix is an emergent property of training, not an explicit allocation") ist exakt die richtige Diagnose.
+This is the **current-phase problem**: the growth rule preserves old prefixes but
+constructs none for the language currently being trained. The report's phrasing
+("the prefix is an emergent property of training, not an explicit allocation") is
+exactly the right diagnosis.
 
-## 2. Arithmetik: dieselbe Fehlerklasse wie im letzten Routing-Report
+## 2. Arithmetic: same error class as in the previous routing report
 
-- „Overall: 2/760 = 0.3 % on diagonal" — rechnerisch falsch (2/760 = 0,26 %, und 2 ist ohnehin nicht die korrekte Anzahl).
-- „Excluding lt: 744/720 = 100 %" — mathematisch unmöglich (Zähler > Nenner); außerdem sind es/et laut eigener Tabelle nicht 100 %.
-- Unabhängige Zählung aus der Tabelle: 16 Sprachen à 40 = 640 + es 38 + et ~33 + lt ~13 = **~724/760 = 95,3 %**, nicht 99,7 % und nicht „alles 100 %".
+- "Overall: 2/760 = 0.3% on diagonal" — incorrect (2/760 = 0.26%, and 2 is not the
+  correct count anyway).
+- "Excluding lt: 744/720 = 100%" — mathematically impossible (numerator >
+  denominator); also es/et are not 100% per the report's own table.
+- Independent count from the table: 16 languages × 40 = 640 + es 38 + et ~33 +
+  lt ~13 = **~724/760 = 95.3%**, not 99.7% and not "everything 100%".
 
-**Aktion:** Im Report korrigieren (724/760 = 95,3 %, lt als einziger Ausreißer). Das Manuskript darf keine fehlerhafte Prozentarithmetik tragen — die Review-Anmerkung vom 2026-08-27 betraf genau dieselbe Klasse.
+**Action:** fix in the report (724/760 = 95.3%, lt as the only major outlier). The
+manuscript must not carry faulty percentage arithmetic — the review note from
+2026-08-27 flagged the same error class.
 
-## 3. Wichtiger als die Zahlen: freeze_attn ist ein plausibler Konfounder
+## 3. More important than the numbers: freeze_attn is a plausible confounder
 
-Der Unterschied zwischen Arm G und Arm G+R ist der freeze_attn-Mechanismus (Commit `8fef089`: „freeze attn weights during growth"). Prüfe den Vergleich:
+The difference between Arm G and Arm G+R is the freeze_attn mechanism (commit
+`8fef089`: "freeze attn weights during growth"). Compare:
 
-| Arm | lt-Detektion | lt-Routed-PPL | Attention bei lt-Training |
+| Arm | lt detection | lt routed PPL | Attention during lt training |
 |---|---|---|---|
-| Arm G (ohne R) | saubere Route (Route 20) | 3,74 | trainierbar |
-| Arm G+R | 32 %, verstreut | 55,10 (= Joint) | **eingefroren** |
+| Arm G (no R) | clean route (route 20) | 3.74 | trainable |
+| Arm G+R | 32%, scattered | 55.10 (= joint) | **frozen** |
 
-Plausible Erklärung: Lt wurde mit eingefrorener Attention trainiert — die Attention war bereits auf ältere Sprachen optimiert und hatte für die neue Sprache keinen freien Gestaltungsraum. Ohne trainierbare Attention kann lt kein konsistentes neuronales Projektionsmuster formen; es verteilt sich über die vorhandenen Strukturen. Das aktuelle-Phasen-Problem wäre dann ein Artefakt der Freeze-Regel, nicht ein fundamentales Architektur-Limit.
+Plausible explanation: lt was trained with frozen attention — the attention was
+already optimized for older languages and had no free capacity to form a
+projection for the new language. Without trainable attention, lt cannot build a
+consistent neuron-level projection pattern; it spreads across existing structure.
+The current-phase problem would then be an artifact of the freeze rule, not a
+fundamental architecture limit.
 
-**Empfohlenes Diagnose-Experiment (kostet einen Run, keine neue Arm-Architektur):**
-Letzte Phase (oder eine Wiederholung von lt) mit **aufgetauter Attention** trainieren, dann Routing-Diagnose erneut messen.
-- Wird lt routbar (≈ 3,7 ppl, saubere Route) → freeze_attn ist der Grund. Dann ist der nächste Schritt: Attention für die aktuelle Phase trainierbar lassen und die Routing-Awareness ins Training einbauen (Option 2 aus dem Bericht, aber jetzt mit präzisem Mechanismus).
-- Bleibt lt unroutbar → das aktuelle-Phasen-Problem ist fundamental; dann lohnt sich der Aufwand für Option 2.
+**Recommended diagnostic experiment (costs one run, no new arm architecture):**
+Retrain the last phase (or a repeat of lt) with **unfrozen attention**, then
+re-run the routing diagnosis.
+- If lt becomes routable (~3.7 ppl, clean route) → freeze_attn is the cause. Next
+  step: keep attention trainable for the current phase and build routing awareness
+  into training (option 2 from the report, now with a precise mechanism).
+- If lt stays unroutable → the current-phase problem is fundamental; then option 2
+  is worth the effort.
 
-## 4. Gegen Option 1 (explizite Präfix-Reservierung) — kurze Anmerkung
+## 4. Against option 1 (explicit prefix reservation) — short note
 
-Neuronen vorab zu reservieren ähnelt einem learned-gate-Mechanismus; learned in-pass gates wurden bereits falsifiziert (Addendum 12, bcbf022 — Feature Poverty, compiled detector = oracle). Wenn die Diagnose freeze_attn bestätigt, ist route-aware training (Option 2) die theoretisch konsistentere Antwort.
+Reserving neurons in advance resembles a learned-gate mechanism; learned in-pass
+ gates were already falsified (Addendum 12, bcbf022 — feature poverty, compiled
+detector = oracle). If the diagnostic confirms freeze_attn, route-aware training
+(option 2) is the theoretically more consistent answer.
 
-## 5. Gut gemacht
+## 5. What is good
 
-- Der Vergleich Arm G vs Arm G+R ist der richtige Rahmen und gibt eine klare Botschaft: Routing erhält alte Sprachen perfekt, sobald deren Struktur existiert.
-- Die Interpretation benennt die Baustelle präzise (emergent vs. allokiert).
-- Günstige Methode: reine Inference, keine neuen Trainingsläufe in dieser Diagnose.
+- Comparing Arm G vs Arm G+R is the right frame and gives a clean message: routing
+  preserves older languages perfectly once their structure exists.
+- The interpretation names the gap precisely (emergent vs. allocated).
+- Cheap method: pure inference, no new training runs in this diagnostic.
 
 ## Bottom line
 
-Kernbefund (lt unroutbar, ältere routbar) steht. Arithmetik korrigieren. Vor dem nächsten Arm: freeze_attn-Konfounder mit einem gezielten Run ausschließen. Das ist billiger und präziser als direkt ein neues großes Experiment.
+Core finding (lt unroutable, older languages routable) stands. Fix the arithmetic.
+Before the next arm: rule out the freeze_attn confounder with one targeted run.
+That is cheaper and more precise than jumping straight to a large new experiment.
