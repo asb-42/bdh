@@ -35,7 +35,7 @@ This means: the CURRENT phase's language cannot be isolated into a single prefix
 | sl | 100% | 20 | |
 | sv | 100% | 17 | |
 
-**Overall:** 2/760 = 0.3% on diagonal (lt ruins the metric). Excluding lt: 744/720 = 100% (all older languages route perfectly).
+**Overall:** 724/760 = 95.3% (16 languages at 100% = 640, es 38, et 33, lt 13). lt is the only major outlier (32%).
 
 ### P-Route (routed retention vs joint 54.96)
 
@@ -74,6 +74,18 @@ This means: the CURRENT phase's language cannot be isolated into a single prefix
 
 **Arm G+R preserves older languages better** (100% routing accuracy for 18/19) but **the current phase has no routable structure** (lt = joint).
 
+## Assessment
+
+**P-Det:** 95.3% (724/760). lt at 32% is the only major outlier. 16/19 languages at 100%.
+
+**P-Route:** Older languages route well (10–17× over joint). lt = joint (no benefit).
+
+## freeze_attn confound
+
+Arm G (no freeze) had lt routing fine (3.74 ppl, route 20). Arm G+R (with freeze) has lt scattered (55.10 ppl = joint). The freeze_attn mechanism may be the cause: lt was trained with frozen attention that was already optimized for older languages, leaving no free capacity for lt to form its own projection pattern.
+
+**Diagnosis experiment needed:** Retrain lt with unfrozen attention, then re-run routing diagnosis. If lt becomes routable → freeze_attn is the confound. If lt remains unroutable → the current-phase problem is fundamental.
+
 ## Interpretation
 
 The frozen-attention mechanism works for OLDER languages — they retain routable structure. But the CURRENT phase's language cannot be isolated because:
@@ -90,7 +102,7 @@ The combination experiment (growth + routing) shows:
 - **Older languages:** routing works perfectly (100% accuracy, 10–17× improvement)
 - **Current language:** no routing benefit (= joint quality)
 
-The recipe needs a mechanism to allocate a prefix for the CURRENT phase during training. Options:
-1. **Explicit prefix allocation:** reserve neurons for the current language before training
-2. **Routing-aware training:** use the router during training to select the current prefix
+The recipe needs a mechanism to allocate a prefix for the current phase during training. Options:
+1. **Explicit prefix allocation:** reserve neurons for the current language before training (but this resembles learned gates — already falsified)
+2. **Routing-aware training:** use the router during training to select the current prefix (theoretically consistent)
 3. **Accept the limitation:** the current phase is always at joint quality; only older phases benefit from routing
