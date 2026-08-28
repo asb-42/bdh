@@ -6,14 +6,18 @@
 
 ## 1. What v1 got wrong and what v2 fixes
 
-| Issue (per review `c37d263`) | v1 | v2 |
+| Issue (per review `c37d263` + erratum `2b2381e`) | v1 | v2 |
 |---|---|---|
 | Attention during growth | FROZEN (protocol violation: plan §3.1 requires unfrozen) | **UNFROZEN** (`--no-freeze-attn`, new `freeze_attn` config flag, default True) |
-| route_alpha semantics | Unclear/misreported | **Prefix fraction**: `loss = α·prefix + (1−α)·full`, printed explicitly in log |
-| Alpha calibration | Single point | **Sweep α ∈ {0.5, 0.9, 1.0}** (monotonicity check) |
+| route_alpha semantics | Full-mix fraction (`(1−α)·prefix + α·full`); v1 α=0.1 = 90% prefix, as registered (erratum confirms code was right, report misread it) | **Prefix fraction**: `loss = α·prefix + (1−α)·full`, printed explicitly in log |
+| Alpha calibration | Single point | **Sweep** new-α ∈ {0.5, 0.9, 1.0} |
 | Eval route grid | 2252..45040, calibrated for the 554M stack — routes > N_full=5632 all clamp to the full model, so 17 of 19 routes were identical | **256-step grid 256..5632** (22 distinct prefixes within the trained range) + phase-boundary grid 1536/3584/5632 |
 | LR schedule | warmup 30 / decay 300 (defaults) | **warmup 1000 / cosine over 10k** (plan §3.1) |
 | P1 base | warmup-30 EN base | retrained with protocol LR schedule |
+
+**Alpha semantics mapping** (new α = prefix fraction vs old α = full-mix fraction):
+new α = 1 − old α. The registered setting ("10% full-forward mix") is new α=0.9
+(old α=0.1). The sweep new-α {0.5, 0.9, 1.0} covers full-mix {0.5, 0.1, 0.0}.
 
 ## 2. Setup
 
