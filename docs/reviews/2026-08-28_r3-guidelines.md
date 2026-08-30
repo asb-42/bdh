@@ -39,3 +39,26 @@ convention in Table pareto; make it explicit in the protocol description.
 
 These four points are the only operational imports from the external evaluation;
 they apply to writing and validating R3, not to the BDH research scope.
+
+---
+
+## 5. Checkpoint-verified facts for Arm G/G+R (2026-08-30)
+
+Measured from the saved checkpoints (read-only inspection; see
+`docs/reports/2026-08-30_pi-checkpoint-measurement.md`), superseding all
+circulating derived numbers:
+
+- Schedule: **20 phases, ×128 → ×736** (the report's ×708 and its 19-row table
+  are wrong — the `sv` row was dropped; MiMo's ×738 is off-grid).
+- Growth rate: **+32 multiplier units/phase = +2,048 neurons/head** (one unit =
+  64 per-head latent neurons). The manuscript's "+32 neurons/head" understates
+  by 64×.
+- Final size: **579,123,200 ≈ 579M parameters**. The manuscript's "~554M" is
+  `sl`, the penultimate phase (553,955,328) — R3 currently describes Arm G one
+  phase short; the report's "~700M" is wrong in the other direction.
+- Both script headers corrected in the same commit; the report table should be
+  re-derived from artifacts, not formulas (any computed cell must be labeled).
+
+Process rule inherited from this finding: **consistency between two derived
+numbers is not verification** — only a value read from an artifact breaks the
+chain. Recorded as failure class F5 in the team A/B protocol.

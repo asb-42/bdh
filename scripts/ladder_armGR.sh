@@ -1,5 +1,6 @@
 #!/bin/bash
-# Arm G+R: growth + frozen-attention ladder (20 phases, ×128→×708)
+# Arm G+R: growth + frozen-attention ladder (20 phases, ×128→×736)
+# (schedule checkpoint-verified 2026-08-30: en=128, sk=576, sv=608, ro=640, nl=672, sl=704, lt=736; final 579,123,200 params)
 # Same language order as Arm R/G for direct comparison.
 # Protocol: 30MB/phase, 10k steps, fresh optimizer via --init-from.
 # Batch: 4 for mult≤192 (phases 1-3), 1 for mult>192.

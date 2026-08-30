@@ -1,5 +1,8 @@
 #!/bin/bash
-# Arm G: growth+routed ladder (20 phases, ×160→×736)
+# Arm G: growth+routed ladder (20 phases, ×128→×736)
+# (schedule checkpoint-verified 2026-08-30 via the GR checkpoints: en=128, sk=576,
+#  sv=608, ro=640, nl=672, sl=704, lt=736; Phase-1 line below trains at mult 128.
+#  The previous header value ×160 was wrong — never matched Phase 1.)
 # Same language order as Arm R for direct comparison.
 # Protocol: 30MB/phase, 10k steps, fresh optimizer via --init-from.
 # Batch: 4 for mult≤192 (phases 1-2), 2 for mult>192 (phases 3+).

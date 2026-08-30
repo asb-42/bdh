@@ -42,10 +42,7 @@ The notes contain a layer of findings **beyond** the referee report, itemized be
 
 ## Findings in the notes beyond the report
 
-- **C-7 — growth rate wrong by ~61x.** ×128→×708 over 19 phases = 30.5 multiplier units/phase =
-  512 neurons each = ~1,950 neurons/head per phase, not "+32". Width and parameter figures are mutually
-  consistent (554M/100.9M ≈ 708/128), so the error is isolated to the rate — exactly the number someone
-  would code from. Reproducibility hazard, fix is one sentence.
+- **C-7 — growth rate wrong.** [ERRATUM 2026-08-30, superseded by Pi's checkpoint measurement — see docs/reports/2026-08-30_pi-checkpoint-measurement.md.] The text below was infected by the report's ×708/19-phase premises; I recorded the mutual consistency of two derived numbers as verification, which is exactly the failure mode it describes: "×128→×708 over 19 phases = 30.5 multiplier units/phase = ~1,950 neurons/head per phase, not '+32'. Width and parameter figures are mutually consistent (554M/100.9M ≈ 708/128)." Measured truth: 20 phases, ×128→×736 → rate is +32 mult units/phase = **+2,048 neurons/head** (manuscript understates by 64×). And ~554M is not a wrong number at all — it is sl's exact count (553,955,328); the manuscript simply describes Arm G one phase short (final lt = 579,123,200).
 - **A-5 — the dissoc witness is degenerate in-architecture.** LayerNorm is shift-invariant
   (`LN(z + c·1) = LN(z)`), so the witness `F' = F_A + c·1` vanishes before the first LN and the closed
   form `F'^L = F_A^L + Lc·1` does not hold. Conclusion survives trivially at depth 1; cite N4's measured

@@ -1,5 +1,13 @@
 # Arm G Results: Growth Without Routing
 
+> **CORRECTION (2026-08-30).** The schedule in this report is wrong: the true
+> ladder is **20 phases, ×128 → ×736** (checkpoint-verified — see
+> `docs/reports/2026-08-30_pi-checkpoint-measurement.md`). This report's table
+> dropped the `sv` row and its final cells (676, 708) match neither the
+> checkpoints nor the table's own formula. "~700M params" is also wrong (final
+> is ≈579M). The narrative conclusions are unaffected; the numeric column was
+> computed, not measured. Kept as historical record; numbers below are stale.
+
 ## Setup
 - 19 sequential Europarl X→en phases with width growth
 - Base: cl-a-en (mult=128, 100M params)
