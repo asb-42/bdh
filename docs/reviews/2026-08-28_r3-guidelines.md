@@ -71,3 +71,27 @@ step, loss, ppl) must state its source: the artifact it was read from
 Formulas may not silently substitute for measurements, and row counts are not
 phase counts — count the sequence in the generating script. Reviewers should
 reject any run-property column without provenance.
+
+## 7. Verification claims (binding, 2026-08-30)
+
+From the ?02 verification round (Pi, pi-33):
+
+- **State the strength of the exactness claim.** Where the width changes,
+  claim ULP-bounded, not bit-equality: bit-equality across a changed N
+  depends on BLAS reduction order, is stronger than the theorems need, and
+  can fail spuriously. Bit-equality is only meaningful at identical shapes
+  (the zero-init route).
+- **Attribute exactness to its operative mechanism:** append-only growth +
+  exact-zero initialization of new neurons + verbatim preservation of old
+  RoPE frequencies — not to the mask. With k_sparse_ratio > 0, top-k runs
+  before the mask (`_k_sparse_relu` at bdh.py:244 precedes the mask at
+  :246), so a mask alone cannot preserve computation; zero-init keeps new
+  neurons out of top-k. Full derivation: Pi's ?02 artifact (docs/notes/,
+  this date).
+- **Frequency lattice note (methods):** `2 ** 16 ** (q/n)` is
+  right-associative and differs from `(2 ** 16) ** (q/n)`; new neurons
+  therefore enter on a different frequency lattice than a from-scratch
+  model of the same width.
+- **Independent execution:** the author of a verification artifact may not
+  attest its own run. ?02 attestation must come from a non-author (Pi on
+  the GX10, or the execution seat).
