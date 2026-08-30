@@ -95,3 +95,15 @@ From the ?02 verification round (Pi, pi-33):
 - **Independent execution:** the author of a verification artifact may not
   attest its own run. ?02 attestation must come from a non-author (Pi on
   the GX10, or the execution seat).
+- **Amendment (pi-33, 2026-08-30; derivation sections 3-4 of the cited ?02
+  artifact).** Two refinements to the bullets above, both from reading `bdh.py`.
+  1. "Not the mask" is too strong: in the ReLU regime the mask is applied after
+     `relu` (`bdh.py:246-247`) and is sufficient by itself, which is exactly what S1
+     measures as passing. The accurate rule is *not the mask alone, once a
+     selection operator precedes it*.
+  2. Under ratio-based top-k, neither the mask nor zero-init preserves
+     exactness, because `k = int(ratio * width)` (`bdh.py:13`) grows with the
+     width and so enlarges the retained set of *old* neurons at the growth step.
+     Sparse growth needs an absolute `k`, or the mask applied before selection.
+     Consequence: the negative result at `cl-bdh-manuscript.tex:794` (top-k
+     forgets worse than ReLU) is predicted structurally, not empirically.
