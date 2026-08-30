@@ -8,6 +8,12 @@ import torch.nn.functional as F
 from torch import nn
 
 
+# NOTE (2026-08-30 exactness verification, docs/reports/2026-08-30_s1s2-exactness-verification.md):
+# ratio-based k is NOT width-invariant. Under growth (N -> N') k grows with the
+# axis and the retained set of OLD activations changes; neither the neuron mask
+# (applied after selection) nor zero-init of new neurons restores forward
+# exactness while k_sparse_ratio > 0. Sparse growth requires an absolute k or
+# the mask applied BEFORE selection.
 def _k_sparse_relu(x, ratio):
     x_pos = F.relu(x)
     k = max(1, int(ratio * x_pos.shape[-1]))
