@@ -64,6 +64,11 @@ realistically less because LayerNorm renormalizes, but not negligible. Implicati
 3. Never run QAT experiments while the FP32 CL protocol is still the active measurement
    baseline for the manuscript.
 4. Per-level quantization scales are mandatory; global-only quantization is rejected.
+5. Any selection operator entering via quantization (top-k / sparse positive
+   activation, §7 Q1) must be width-invariant under growth: absolute k frozen at the
+   pre-growth value, or the neuron mask applied before selection. Ratio-based k
+   silently breaks forward exactness at every growth step
+   (docs/reports/2026-08-30_s1s2-exactness-verification.md).
 
 ## 7. Open design questions (for the Q1 revision)
 
