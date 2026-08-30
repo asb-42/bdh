@@ -1,0 +1,48 @@
+router ckpt=out/bdh_europarl_ladG-lt_last.pt | routes=[9000, 18000, 27000, 36000, 45000] n/head | window=128 tok | 40 crops/domain
+
+confusion (rows=true domain, cols=routed expert):
+                 bg       cs       da       de       de       el       es       et       fi       fr       hu       it       lt       nl       pl       pt       ro       sk       sl       sv
+       bg         0        0       18       22        0
+       cs         0       40        0        0        0
+       da         0       37        3        0        0
+       de         0       40        0        0        0
+       de        40        0        0        0        0
+       el         0        0        0       40        0
+       es        40        0        0        0        0
+       et         0        2        0       38        0
+       fi         0        0       39        1        0
+       fr        13       27        0        0        0
+       hu         0        0       40        0        0
+       it        35        4        0        1        0
+       lt         0        0        0        0       40
+       nl        12       28        0        0        0
+       pl         0       40        0        0        0
+       pt        40        0        0        0        0
+       ro         0       29        0        6        5
+       sk         0        0        0       40        0
+       sl         0       20        0       19        1
+       sv         1       35        1        3        0
+
+   domain   routed
+       bg   415.91
+       cs     5.30
+       da    23.86
+       de     3.03
+       de     3.03
+       el     2.96
+       es     7.01
+       et    27.89
+       fi    28.73
+       fr    13.07
+       hu     3.45
+       it    15.53
+       lt     3.78
+       nl    20.38
+       pl    27.26
+       pt    16.72
+       ro    39.57
+       sk     4.42
+       sl    20.76
+       sv    29.95
+
+joint full-width reference: ppl 57.57  (served positions only)

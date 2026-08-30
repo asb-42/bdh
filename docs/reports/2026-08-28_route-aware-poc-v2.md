@@ -39,6 +39,12 @@ new α = 1 − old α. The registered setting ("10% full-forward mix") is new α
 
 Specialists: de 2.19, es 2.18. Thresholds: pass ≤2.6, partial 2.6–3.5, fail >3.5.
 
+Note: P-Acq (5.52) and P-Route (5.64) for α=1.0 ES differ because they measure
+different things — P-Acq reports the best validation PPL during training (best
+checkpoint), while P-Route reports routed serving PPL on the boundary grid (the
+model is forced to route through the ES prefix). Both are valid; the 0.12 nat
+gap reflects serving-vs-training evaluation conditions.
+
 ## 4. Routing evaluation protocol
 
 **Exact commands** (one per branch, batch 1 to avoid OOM):

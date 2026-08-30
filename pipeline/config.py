@@ -61,7 +61,7 @@ class Config:
     text_mix: str = ""                     # textmix only; comma-separated "name:path" byte-corpus pairs
     text_mix_mb: int = 30                  # textmix only; per-domain train MB (val/test 1MB each follow)
     route_aware: bool = False              # route-aware training: zero out old neurons in forward, compute loss on prefix-only logits
-    route_alpha: float = 0.1               # prefix fraction: loss = alpha*prefix_loss + (1-alpha)*full_loss (higher = stronger route-aware signal)
+    route_alpha: float = 0.9               # prefix fraction: loss = alpha*prefix_loss + (1-alpha)*full_loss (higher = stronger route-aware signal; 0.9 = 10% full mix, the registered setting)
 
 
 def estimate_bdh_params(cfg: Config) -> int:

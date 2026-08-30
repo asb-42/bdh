@@ -1,0 +1,93 @@
+########## a05 3-route (phase boundaries) ##########
+       lt        12       10       18
+       nl         7       32        1
+       pl        17        9       14
+       pt         0        0       40
+       ro        15        1       24
+       sk        18        4       18
+       sl         9       12       19
+
+   domain   routed
+       bg 1757128.32
+       cs   192.21
+       da    37.91
+       de     2.50
+       el 1492587.18
+       en     2.42
+       es     2.41
+       et    65.77
+       fi    72.44
+       fr    23.42
+       hu    89.83
+       it    22.39
+       lt   167.46
+       nl    30.95
+       pl   197.13
+       pt    12.79
+       ro    78.86
+       sk   135.70
+       sl    95.23
+
+joint full-width reference: ppl 157.80  (served positions only)
+########## a09 3-route (phase boundaries) ##########
+       lt         3        6       31
+       nl        10       29        1
+       pl         7        9       24
+       pt         0        0       40
+       ro         7        1       32
+       sk         8       12       20
+       sl         7       13       20
+
+   domain   routed
+       bg 1783835.93
+       cs   204.17
+       da    35.79
+       de     2.68
+       el 491885.33
+       en     2.42
+       es     2.67
+       et    61.07
+       fi    63.27
+       fr    23.69
+       hu    92.61
+       it    19.69
+       lt   152.68
+       nl    29.95
+       pl   192.79
+       pt    12.37
+       ro    70.83
+       sk   145.46
+       sl    94.27
+
+joint full-width reference: ppl 142.58  (served positions only)
+########## a10 3-route (phase boundaries) ##########
+       lt         0        0       40
+       nl         0       14       26
+       pl         0        0       40
+       pt         0        0       40
+       ro         6        0       34
+       sk         1        1       38
+       sl         1        1       38
+
+   domain   routed
+       bg 1786115.29
+       cs   135.29
+       da    35.09
+       de     2.72
+       el 1075531.69
+       en     2.42
+       es     5.64
+       et    40.08
+       fi    47.21
+       fr    20.63
+       hu    54.09
+       it    16.80
+       lt   104.54
+       nl    30.76
+       pl   133.35
+       pt    13.22
+       ro    69.29
+       sk   100.64
+       sl    64.72
+
+joint full-width reference: ppl 118.58  (served positions only)
