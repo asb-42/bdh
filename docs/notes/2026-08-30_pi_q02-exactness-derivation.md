@@ -4,12 +4,14 @@
 full derivation cited by `docs/reviews/2026-08-28_r3-guidelines.md` section 7.
 
 **Provenance:** written by seat **pi-33**. Backend for this derivation is the
-cloud `qwen3.8-flash` endpoint (`PI_PROVIDER=bai`), *not* the local 4090 GGUF
-that authored the referee report — the distinction matters for the blind-run
-record, so it is stated up front. Method: hand derivation against `bdh.py` and
-Pathway's reference listing (`paper.tex:2065`-`:2118`). **No model was run**
-while writing this: this box has no torch, and the 4090 is occupied by R3.
-Every claim that needs a run is marked as such, with its falsifier attached.
+cloud `qwen3.8-flash` endpoint (`PI_PROVIDER=bai`, `PI_MODEL=qwen3.8-flash`),
+*not* the local 4090 GGUF that authored the referee report — the distinction
+matters for the blind-run record, so it is stated up front. Method: hand
+derivation against `bdh.py` and Pathway's reference listing
+(`paper.tex:2065`-`:2118`), followed on 2026-08-30 by an executed run of
+`scripts/verify_masked_forward.py` on the GX10 (section 7). The derivation was
+written before any run; the run then confirmed section 4 and refuted nothing in
+section 3.
 
 ---
 
@@ -98,14 +100,33 @@ entries *after* selection and cannot un-select the extra old entries. So under a
 fixed ratio, additive growth changes the active set of old neurons by
 construction, whatever the initialization.
 
-**Falsifiable prediction, not yet tested.** In `verify_masked_forward.py`, the
-`k_sparse` trials must report `masked+zero-init FAIL` whenever more than
-`floor(rho*N_old)` old neurons are positive. With the script's own defaults
-(`rho = 0.25`, `N_old = 384`, `N_new = 768`, so `k` goes 96 to 192) and random
-weights, roughly half of the old entries are positive, the truncation binds, and
-the prediction is FAIL. If the run reports PASS instead, then either my reading of
-`_k_sparse_relu` is wrong or the toy config is non-binding, and this section
-should be struck from the record.
+**Falsifiable prediction, and the result of testing it.** The prediction was
+that in `verify_masked_forward.py`, the `k_sparse` trials must report
+`masked+zero-init FAIL` whenever more than `floor(rho*N_old)` old neurons are
+positive, and must stop failing once `k` stops binding. It was tested on the
+GX10 (`gx10-50ef`, torch 2.13.0+cpu, toy config `2L d=32 nh=2`, `mult 24->48`, so
+`N_old = 384`, `N_new = 768`; logits of scale ~0.4, float32 epsilon 1.19e-07).
+Coverage of that test, stated where the claim is made: one seed, one input batch,
+five top-k ratios of a single toy width pair, all on the repaired script of
+section 7. Gap is the largest absolute logit difference between base and grown:
+
+| top-k ratio | k, base to grown | masked+zero-init gap | verdict |
+|---|---|---|---|
+| 0 (dense ReLU) | not used | 1.04e-07 | exact (one epsilon) |
+| 0.10 | 38 to 76 | 2.88e-01 | breaks, worst case |
+| 0.25 | 96 to 192 | 1.62e-01 | breaks |
+| 0.50 | 192 to 384 | 7.93e-03 | breaks, marginally |
+| 0.90 | 345 to 691 | 1.04e-07 | exact again |
+
+The dose-response is the mechanism: the error is largest where the truncation
+binds hardest and vanishes once `k` exceeds the number of positive old neurons,
+which is exactly what a width-dependent `k` predicts and not what a
+"zero-init restores exactness" story predicts. The section stands as written.
+
+**What the run does not establish:** it is not a statistical result (one seed, no
+repeats) and not a production-width measurement, and must not be quoted as one.
+The dense verdict, and the two `masked+zero-init` verdicts quoted in section 7,
+were additionally reproduced over five trials by the script itself.
 
 **Why this is worth more than a bug note.** It supplies a structural explanation
 for a result already sitting in the manuscript's negative register: "Top-$k$ as
@@ -130,18 +151,62 @@ model of the same width would use, so "grown to width `N'`" and "trained at widt
 
 ## 6. What this does not settle
 
-- **Nothing here was executed.** Section 4's prediction is untested. Under the
-  guidelines' own independence rule (section 7: the author of a verification
-  artifact may not attest its own run), the right attester of
-  `verify_masked_forward.py` is a non-author, and for that script I am one. Plan:
-  run it on the GX10, or on the 4090 when R3 pauses, and record the `k_sparse`
-  lines verbatim, including the `masked+zero` verdict.
 - **The induction is for the listing-faithful block.** If `bdh.py` departs from it
   in any of the four places the argument touches — `decoder_x` row copy, `V`
   construction, `encoder` row copy, LayerNorm placement — the proof needs
-  re-checking against `bdh.py`. I verified the mask/relu ordering, the top-k
-  width dependence and the zero-init growth path; I did not audit all four.
+  re-checking against `bdh.py`. What I checked, and no more than this: five named
+  sites read directly in `bdh.py` — the top-k-before-mask ordering (`:244-247`), the
+  width dependence of `k` (`:13`), the parameter shapes and their axis order
+  (`:173-181`), the RoPE pairing convention (`:94-97`, adjacent pairs, so appending
+  preserves old pairings), and the absence of any learnable `Attention` internal
+  besides `freqs`. That is not an audit of `bdh.py` as a whole. The four-place check
+  was then completed by the executed run in section 7, which found the model
+  faithful and the harness not.
 - **The theorem-level half of ?02 is a text fix, not a math fix.** The
   manuscript's exactness statements should name frequency preservation as a
   hypothesis, and either exclude the ratio-top-k regime or add an absolute-`k`
   hypothesis to it.
+- **The run is a toy config.** Two layers, `d=32`, two heads, `mult 24 to 48`. It
+  establishes the mechanism, not the production numbers; see section 7 item 4.
+
+## 7. The verification artifact could not run, and had to be repaired first
+
+Executed 2026-08-30 by pi-33 over ssh on the GX10, as the non-author that
+`docs/reviews/2026-08-28_r3-guidelines.md` section 7 requires for attesting
+`scripts/verify_masked_forward.py`. Four findings, all reproducible:
+
+1. **The script never ran.** `grow()` called `m.embed.copy_(base.embed)`; `nn.Module`
+   has no `copy_`, so it raised `AttributeError` on every platform and every
+   PyTorch version, at the first trial. Whatever the docstring asserts about S1 and
+   S2, this file cannot have produced it. Fixed to `m.embed.weight.copy_`.
+2. **`grow()` did not mirror `train.py`, which is its stated contract.** `decoder`
+   is `(nh*N, D)` and the call site flattens the neuron axis head-major
+   (`transpose(1,2).reshape(...)`, so row `h*N + n`; `train.py:99` says so in
+   words). `train.py:131-132` therefore copies per head:
+   `dec.view(nh, n_new, -1)[:, :n_old, :] = ...`. The script instead did a
+   contiguous `m.decoder[:nh*N_old] = base.decoder`, which mis-places every head
+   after the first. With `nh = 2` that is not a corner case, it is half the model.
+3. **`zero_new()` had the same layout error**, zeroing `m.decoder[nh*N_old:]` — a
+   contiguous tail that, at the grown width, is head 1's *old* rows. So S2 did not
+   test zero-initialisation of new neurons; it destroyed old ones. This is what
+   produced the apparent `max_ulp` of ~2e9.
+4. **The pass criterion was unachievable.** Both S1 and S2 were judged by
+   `torch.equal`, bit-equality. Any width change alters the matmul reduction
+   order, so bit-equality cannot hold even when the computation is mathematically
+   exact — the script's own numerics note anticipated this, but the verdict and
+   the exit code did not use it.
+
+**After 1 to 3, the model is faithful and exactness holds.** Dense S1 (mask, random
+new weights) and S2 (zero-init, no mask) both come out at `maxabs = 1.04e-07`
+against logits of scale 0.40 — one float32 epsilon, i.e. no computation change.
+S3 (old frequencies verbatim) and S4 (the sensitivity control does differ) pass.
+The script now reports an 8-epsilon criterion alongside the old bit-equality one
+and exits 0 on dense configs; the `k_sparse` block is judged the same way, which
+is how the table in section 4 was obtained.
+
+Two things this does **not** do. It does not test production width (`d=512`, real
+depth, `mult 128 to 736`) — the mechanism is established, the production number is
+not, and section 6 of the ladder checklist should say so explicitly. And the
+repairs are mine: the verdicts above are from a pi-repaired copy of a
+Quinn-authored artifact, so Quinn should read the diff before anyone cites the
+script again. The three defects are marked in place with the reason for each.

@@ -107,3 +107,10 @@ From the ?02 verification round (Pi, pi-33):
      Sparse growth needs an absolute `k`, or the mask applied before selection.
      Consequence: the negative result at `cl-bdh-manuscript.tex:794` (top-k
      forgets worse than ReLU) is predicted structurally, not empirically.
+     **Both halves now measured** (2026-08-30, GX10): dense growth is exact to one
+     float32 epsilon, and the sparse gap tracks how binding `k` is. Note for the
+     record: `scripts/verify_masked_forward.py` as committed at `d1bc095` could not
+     run at all, and its `grow`/`zero_new` did not mirror `train.py`'s head-major
+     decoder layout; three repairs were needed before any verdict existed, so no
+     S1/S2 result from that file should be cited without reading the diff. See the
+     derivation's section 7.
