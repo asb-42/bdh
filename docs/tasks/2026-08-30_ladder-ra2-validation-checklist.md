@@ -66,7 +66,12 @@ verification.
 - [ ] Exactness claims stated as ULP-bounded (not bit-equality) wherever
       the width changed.
 - [ ] Exactness attribution names the operative mechanism (zero-init + RoPE
-      frequency preservation), never the mask.
+      frequency preservation, plus the mask in the ReLU regime), never the
+      mask alone under a preceding selection operator.
+- [ ] Citable S1/S2 evidence comes only from `verify_masked_forward.py` at
+      4c8e51e or later (GX10-attested by pi-33). The original d1bc095
+      version never produced a verdict — recorded as failure class F6 in
+      the team A/B protocol.
 
 ## 7. Independence
 
