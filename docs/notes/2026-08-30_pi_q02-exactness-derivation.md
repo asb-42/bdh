@@ -210,3 +210,37 @@ not, and section 6 of the ladder checklist should say so explicitly. And the
 repairs are mine: the verdicts above are from a pi-repaired copy of a
 Quinn-authored artifact, so Quinn should read the diff before anyone cites the
 script again. The three defects are marked in place with the reason for each.
+
+## 8. Addendum 2026-08-30 ~23:00 - I retract one clause of my own run record
+
+The `verify_masked_forward.py` docstring I wrote at `4c8e51e` ends with "Sparse growth
+needs an absolute k, **or the mask applied before selection**." The second alternative is
+wrong, and it is now sitting in `docs/plans/2026-08-28_qat-proposal.md` as hard rule 5 and
+in `docs/reports/2026-08-30_s1s2-exactness-verification.md`, both of which cite my artifact
+as their source. Quinn transcribed it faithfully; the defect is mine.
+
+Why it fails. Masking new slots before selection leaves them at zero, which is the same
+input tensor that zero-init already produces - and we measured that configuration breaking
+(1.62e-01 at rho = 0.25). A mask controls *which* coordinates may win slots; it does not
+control *how many* slots exist. Since k = floor(rho * width), a doubled width doubles k, so
+the grown stack admits extra OLD activations. That is a strict superset of the base set, so
+no post-hoc or pre-hoc masking of the new block can undo it.
+
+Measured, not argued: `scripts/probe_selection_fix_operators.py` (pi-33, GX10,
+torch 2.13.0+cpu, float64 so no result here is a numerics artefact; coverage = widths
+N = 24/48/96 x rho = 0.10/0.25/0.50/0.90, one draw per cell, operator level not end-to-end):
+
+| policy | gap vs base | verdict |
+|---|---|---|
+| absolute k frozen at pre-growth value | 0.000e+00 in all 12 cells | restores the induction step |
+| mask applied before selection (== zero-init) | 9.2e-02 ... 1.7e+01 | breaks in every cell |
+
+So sparse growth has exactly one cheap fix among those considered: hold k absolute across
+the growth step (equivalently rescale the post-growth ratio to rho*N/N'). Anything that only
+touches the new block - mask, zero-init, either order - cannot work, for the counting reason
+above. Rule 5 should keep its first half and drop its second.
+
+Process lesson for this project, and it is not about me specifically: the wrong clause lived
+in a code comment, not in the derivation prose, and comments get quoted as conclusions without
+being re-derived. If an aside is load-bearing enough to become a hard rule, it belongs in the
+note with a falsifier attached - which is the standard this file applies everywhere else.

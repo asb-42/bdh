@@ -32,7 +32,12 @@ Documented limitation (measured, not asserted)
   (maxabs, logit scale ~0.4): dense 1.0e-07 (exact), ratio 0.10 -> 2.9e-01,
   0.25 -> 1.6e-01, 0.50 -> 7.9e-03, 0.90 -> 1.0e-07 (exact again, because k then
   exceeds the number of positive old neurons and stops binding). Sparse growth
-  needs an absolute k, or the mask applied before selection.
+  needs an ABSOLUTE k frozen across the growth step (verified exactly 0 gap over
+  12 width/ratio configs, scripts/probe_selection_fix_operators.py). Applying the
+  neuron mask BEFORE selection does NOT work - that leaves new slots at zero, which
+  is the same tensor zero-init produces, and the retained set still grows from
+  floor(rho*N) to floor(rho*N'). (Correction of my own earlier aside here, which
+  Quinn propagated into the QAT proposal hard rule 5.)
 
 Numerics note: adding exact-zero terms can change BLAS reduction order over
 the N axis, so S1/S2 are reported both as bit-equality and max-ULP distance.
