@@ -62,3 +62,12 @@ circulating derived numbers:
 Process rule inherited from this finding: **consistency between two derived
 numbers is not verification** — only a value read from an artifact breaks the
 chain. Recorded as failure class F5 in the team A/B protocol.
+
+## 6. Reporting rule (binding, 2026-08-30)
+
+Every table column that claims a run property (multiplier, parameter count,
+step, loss, ppl) must state its source: the artifact it was read from
+(checkpoint path, log line) or an explicit `computed` tag with the formula.
+Formulas may not silently substitute for measurements, and row counts are not
+phase counts — count the sequence in the generating script. Reviewers should
+reject any run-property column without provenance.
