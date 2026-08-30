@@ -104,7 +104,12 @@ From the ?02 verification round (Pi, pi-33):
   2. Under ratio-based top-k, neither the mask nor zero-init preserves
      exactness, because `k = int(ratio * width)` (`bdh.py:13`) grows with the
      width and so enlarges the retained set of *old* neurons at the growth step.
-     Sparse growth needs an absolute `k`, or the mask applied before selection.
+     Sparse growth needs an absolute `k`, frozen across the growth step (or a
+     post-growth ratio of `rho*N/N'`). Retracted alternative: the mask applied
+     before selection does NOT work — it is tensor-equal to zero-init and cannot
+     shrink `k = floor(rho*width)` (pi-33 retraction, commit 6754e83, derivation
+     §8 with the float64 operator probe: absolute k exact in all 12 cells, mask
+     before selection breaks in every cell).
      Consequence: the negative result at `cl-bdh-manuscript.tex:794` (top-k
      forgets worse than ReLU) is predicted structurally, not empirically.
      **Both halves now measured** (2026-08-30, GX10): dense growth is exact to one

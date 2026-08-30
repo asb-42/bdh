@@ -16,10 +16,12 @@ which conditions? (Open question ?02.)
 ## Answer
 
 **Yes in the ReLU regime** (`k_sparse_ratio = 0.0`, the regime of all Arm G/R
-and RA2 runs), under three jointly necessary conditions: append-only growth on
+and RA2 runs), under three jointly sufficient conditions: append-only growth on
 the neuron axis, exact-zero initialization of new neurons, and verbatim
-preservation of old RoPE frequencies. **No under ratio-based top-k** — and not
-repairable there by mask or zero-init (see Structural finding).
+preservation of old RoPE frequencies. (Necessity of zero-init is not
+established: with the neuron mask present, exactness survives without it —
+the mask alone is sufficient in this regime.) **No under ratio-based top-k** —
+and not repairable there by mask or zero-init (see Structural finding).
 
 ## Measured (dense, five trials, toy config 2L d=32 nh=2, mult 24→48)
 
@@ -60,7 +62,7 @@ zero-init, max logit gap):
 | 0.10 | 38→76 | 2.88e-01 | breaks (worst) |
 | 0.25 | 96→192 | 1.62e-01 | breaks |
 | 0.50 | 192→384 | 7.93e-03 | breaks, marginally |
-| 0.90 | 345→691 | 1.04e-07 | exact again (k stops binding) |
+| 0.90 | 345→691 | 1.04e-07 | exact here: #positive old ≤ k_b held in the real model (ReLU zeroes most coordinates); the synthetic operator probe (all coordinates positive) still shows a 9.2e-02 gap — non-binding, not immune (6754e83) |
 
 The non-monotonicity is the mechanism's signature. Consequence: the
 manuscript's negative result at `cl-bdh-manuscript.tex:794` (top-k forgets
@@ -69,9 +71,15 @@ itself, independent of training dynamics — this strengthens the thesis that
 exactness is a property of ReLU BDH.
 
 **Fix if sparse growth is ever wanted (not yet implemented; `bdh.py:13`
-unchanged):** hold `k` absolute across the growth step (freeze pre-growth k, or
-set post-growth ratio to `rho·N/N′`), or apply the neuron mask **before**
-selection. Either restores induction step 1.
+unchanged):** hold `k` absolute across the growth step — freeze pre-growth k,
+or set post-growth ratio to `rho·N/N′`. This is the only cheap fix among those
+considered: masking the new block (before or after selection) does NOT restore
+exactness — it is tensor-equal to zero-init and cannot prevent `k_g = floor(ρ·N′)`
+from admitting extra OLD activations. Counting argument plus float64 operator
+probe (absolute k: 0 gap in all 12 cells; mask-before: breaks in every cell):
+derivation §8, commit 6754e83. The retracted ‚mask before selection' clause
+originated in Pi's harness docstring and was propagated by Quinn into this
+report and QAT rule 5.
 
 ## Coverage limits
 

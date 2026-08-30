@@ -65,10 +65,13 @@ realistically less because LayerNorm renormalizes, but not negligible. Implicati
    baseline for the manuscript.
 4. Per-level quantization scales are mandatory; global-only quantization is rejected.
 5. Any selection operator entering via quantization (top-k / sparse positive
-   activation, §7 Q1) must be width-invariant under growth: absolute k frozen at the
-   pre-growth value, or the neuron mask applied before selection. Ratio-based k
-   silently breaks forward exactness at every growth step
-   (docs/reports/2026-08-30_s1s2-exactness-verification.md).
+   activation, §7 Q1) must be width-invariant under growth: hold k absolute across
+   the growth step (freeze the pre-growth k, or equivalently rescale the post-growth
+   ratio to rho*N/N'). Masking the new block — before or after selection — does NOT
+   restore exactness: it is tensor-equal to zero-init, and k = floor(rho*width)
+   still admits extra OLD activations. Ratio-based k silently breaks forward
+   exactness at every growth step (docs/reports/2026-08-30_s1s2-exactness-verification.md;
+   counting argument and float64 operator probe: derivation §8, commit 6754e83).
 
 ## 7. Open design questions (for the Q1 revision)
 
