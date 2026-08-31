@@ -125,3 +125,37 @@ Transfer inventory on gx10: `out/` 65 GB (24 ladRA2 checkpoints, md5-verified),
 `out/logs` complete, `data/` complete except F-T6. Historical arm checkpoints
 (~545 GB: armG/armGR/m5/diag/cl/seed) intentionally left on ai — resume does
 not need them; copy on demand.
+
+---
+
+## Addendum 2: driver identified — F-T2/F-T6 resolved (2026-08-31, Quinn)
+
+**F-T6 closed.** `wiki.train.raw` made readable (operator chmod a+r) and
+transferred; md5 identical on both hosts
+(`8a2d5ab8735b1246d49cf767b70d4dd0`). `data/` is now complete on gx10.
+
+**F-T2 resolved** via MiMo statement (operator-relayed screenshot):
+
+- The executed driver was **no script**: MiMo ran the phases ad-hoc — one
+  `pipeline.run train` command per phase inside the conversation session,
+  continuing from a summary of phases 1-8.
+- MiMo's reconstruction (growth headers in the logs) matches the F-T1
+  birth-time order exactly: en es pl fr de nl it sv da pt cz ro complete
+  (12 phases), el attempt OOM. **Two independent evidence classes agree** —
+  the executed order is provenance-hard.
+- Divergence from the script SEQ starts at phase 6 (nl instead of cs).
+- No `routdiag_pN.txt`/`boundary_pN.txt` exist because the script never ran
+  as a batch. The surviving `ro_boundary_p10.txt` is MiMo's **manual**
+  milestone-10 eval on the RO checkpoint; `pt_boundary_p10.txt` is an
+  `eval_router.py` traceback (F-T4 unchanged: routing metrics must be
+  re-evaluated from checkpoints).
+
+**Resume definition (8 phases, 13-20):** remaining languages in script-order
+positions are fi(9) hu(10) bg(11) et(13) el(14) sk(15) sl(19) lt(20), so the
+resume SEQ is `fi hu bg et el sk sl lt`, growth 480→512 up to 704→736.
+Correction to MiMo's count ("7 unused"): **el must be included** — the
+attempt OOM'd and left no checkpoint, so el is retried at its script
+position (phase 17). Interference analysis must use the **executed** order
+for phases 1-12 and script order for 13-20; the seam must be flagged in
+every table. Resume-order choice (script order recommended, matching
+MiMo's suggestion) is pending operator/MiMo confirmation.
