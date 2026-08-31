@@ -196,3 +196,37 @@ MiMo's suggestion) is pending operator/MiMo confirmation.
 
 Note: git pull on gx10 is DEFERRED while the ladder runs -- bash reads
 scripts incrementally; updating a running script in place is hazardous.
+
+## Addendum 4 (2026-08-31): en domain-file gap (F-T8) + routdiag backfill spec (F-T4 remedy)
+
+### F-T8: en domain file never existed as a standalone artifact
+
+- pipeline/data.py maps "en" to the de-en pair (sources dict, data.py:65);
+  the EN-side text materializes as europarl-v7.de-en.en.txt. The DOMAINS
+  strings in the ladder scripts hardcode europarl-v7.en-en.en.txt -- a
+  path no preparation step ever creates.
+- gx10: file was ABSENT (verified 05:1x, ~6h before phase-13 routdiag
+  would have needed it at 2049 ms/step). Fixed by copying de-en.en.txt
+  -> en-en.en.txt (md5-identical 56a330fd9a6291c2540ee733e40e9dd2,
+  287,250,069 bytes). The running resume opens the file lazily at eval
+  time, so the fix lands before first use.
+- ai: en-en.en.txt not readable for a0-quinn (absent or 660 asb:asb);
+  de-en.en.txt IS readable with the same md5. Backfill resolves "en"
+  via a verified home-directory copy; /media/data untouched per
+  operator instruction.
+
+### F-T4 remedy: routdiag backfill for phases 1-12 on ai
+
+- Background: phases 1-12 ran ad-hoc without the script's routing
+  diagnosis (F-T4). Checkpoints are frozen; eval_router is stateless,
+  so diagnosis on the phase-final _last.pt is exactly the at-phase-end
+  diagnosis (no further training touched these weights).
+- Runs on ai (idle): read-only checkpoints, outputs to
+  /home/a0-quinn/routdiag_backfill/routdiag_p{1..12}.txt + progress.log.
+- Grid: boundary-aligned routes 8192+2048*k up to mult*64 (p routes at
+  phase p) over the full 20-domain grid -- identical to what
+  ladder_ra2.sh @HEAD would have produced; comparable to p13+ grids
+  from the live gx10 resume. Batch 4 with automatic batch-1 retry
+  (ULP-class; confusion/ppl expectations are batch-independent).
+- Success criterion per phase: "joint full-width reference" line
+  present in the output file.
