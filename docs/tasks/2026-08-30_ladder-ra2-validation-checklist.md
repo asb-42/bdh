@@ -230,3 +230,13 @@ scripts incrementally; updating a running script in place is hazardous.
   (ULP-class; confusion/ppl expectations are batch-independent).
 - Success criterion per phase: "joint full-width reference" line
   present in the output file.
+
+### Backfill launch note (F6, Quinn): first launch failed instantly
+
+- First launch (05:17): all 12 phases FAIL within one second -- shell
+  escaping defect in the launch harness (\$PY written literally inside a
+  quoted heredoc -> "command not found" per invocation). No eval ran;
+  outputs were garbage and were discarded.
+- Relaunched after rewrite (absolute venv python path, bash -n gate).
+  Launch-verification rule applied: progress.log + GPU utilization +
+  first real output lines checked before declaring the job running.
