@@ -28,9 +28,12 @@ set -euo pipefail
 # GB10 lacks python3-dev: torch inductor JIT (cuda_utils.c) fails with
 # "fatal error: Python.h: No such file or directory" at first step.
 # Dynamo/inductor is a speed optimization, not a semantics requirement;
-# disabling it runs plain eager bf16 (same numerics class as the ai runs
-# if those also ran eager). To re-enable later: sudo apt install python3-dev
-# on gx10, then remove this export.
+# disabling it runs plain eager bf16. Parity note (checklist addendum 3):
+# ai phases 1-12 ran COMPILED (compile=True default, headers present);
+# gx10 phases 13-20 run EAGER. Kernel-selection/reduction-order delta,
+# ULP class, same dtype/protocol; all cross-arm comparisons are ppl-based.
+# To re-enable later: sudo apt install python3-dev on gx10, then remove
+# this export.
 export TORCHDYNAMO_DISABLE=1
 cd "$(dirname "$0")/.."
 

@@ -159,3 +159,40 @@ position (phase 17). Interference analysis must use the **executed** order
 for phases 1-12 and script order for 13-20; the seam must be flagged in
 every table. Resume-order choice (script order recommended, matching
 MiMo's suggestion) is pending operator/MiMo confirmation.
+
+## Addendum 3 (2026-08-31): gx10 launch forensics + backend deviation record
+
+### F-T7 launch forensics (resume phases 13-20 on gx10)
+
+- Attempt 1 (04:03): CUDA-op JIT compile crash -- torch inductor builds
+  cuda_utils.c, fatal error: Python.h (python3-dev missing on GB10).
+  Trigger: pipeline/config.py:36 sets compile=True by default. Log kept:
+  out/logs/ladRA2_fi.attempt1-inductor-crash.log.
+- Attempt 2 (04:07): identical crash -- deployed script lacked the fix
+  (82f99d7) because the earlier git pull completed only halfway
+  (fetch ok, merge not applied; gx10 HEAD was still e7517fd). Log kept:
+  out/logs/ladRA2_fi.attempt2-inductor-crash.log.
+- F6 record (Quinn): attempt 2 was relaunched WITHOUT verifying deployed
+  bytes. Rule applied from attempt 3 on: grep-gate on the deployed script
+  (TORCHDYNAMO_DISABLE present) before every start.
+- Attempt 3 (04:12): verified launch -- deploy repaired via
+  git fetch + reset --hard origin/main, grep-gate passed,
+  0 inductor lines, process alive >289 s (past the ~111 s crash mark),
+  GPU 96 %. fi.log buffers via tee (python block buffering); step lines
+  appear on first flush -- buffering, not failure (known from ai logs).
+
+### Backend deviation record: compiled (ai) vs eager (gx10)
+
+- ai phases 1-12: torch.compile active (compile=True default; ai has
+  python3-dev, no crash, inductor kernels in use).
+- gx10 phases 13-20: eager (TORCHDYNAMO_DISABLE=1; no python3-dev).
+- Same dtype (bf16), same protocol (30MB/10k steps/alpha=0.9/unfrozen
+  attn), same eval scripts. Deviation is kernel-selection and
+  reduction-order class only -> ULP-bounded, accepted under Guidelines
+  section 7 (bit-equality is not claimed across arms; every cross-arm
+  comparison is ppl-based).
+- Fix path if ever needed for parity: sudo apt install python3-dev on
+  gx10, remove the export, re-run.
+
+Note: git pull on gx10 is DEFERRED while the ladder runs -- bash reads
+scripts incrementally; updating a running script in place is hazardous.
