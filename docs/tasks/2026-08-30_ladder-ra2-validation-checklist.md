@@ -240,3 +240,32 @@ scripts incrementally; updating a running script in place is hazardous.
 - Relaunched after rewrite (absolute venv python path, bash -n gate).
   Launch-verification rule applied: progress.log + GPU utilization +
   first real output lines checked before declaring the job running.
+
+## Addendum 5 (2026-08-31): weight-decay leak on "frozen" neurons (F-T10) — found via weight-atlas implementation review
+
+- Origin: the weight-atlas BDH support doc (section 7.3) reports a weight-decay
+  leak on grad-masked "frozen" neurons. Quinn verified it directly against
+  checkpoints: the leak is real and affects every arm that grows or gates via
+  pipeline/train.py:225 (grad.mul_(mask) leaves materialized zero grads) with
+  AdamW wd=0.1 over raw_model.parameters(): POC ra/ra2, ladRA2 primary,
+  ladRA2s42, gate_from runs.
+- Measurements (uniform, min approx max; own-N decoder geometry):
+  POC ra2-a09 p3_last/p2_last on p1-units = 0.5865 (encoder, encoder_v,
+  decoder identical); ladder es_last/en_last on en-units = 0.5828 encoder
+  (n=1024) / 0.5820 decoder. Compounding: en-units at ro_last = 2.70e-3 of
+  en_last amplitude, uniform (2.683-2.714e-3).
+- Mechanism closed quantitatively, no free parameters: sum(lr)=5.451 over the
+  10k schedule (lr 1e-3, warmup 1000, cosine to min_lr 1e-4) -> full-schedule
+  decay exp(-0.1*5.451)=0.5798; each phase initializes from the predecessor's
+  _best (p2 best@step 8950), so last-to-last ratio = 0.5798 / exp(-wd*tail)
+  = 0.5866 vs measured 0.5865. Within-phase best-vs-last tail measured
+  independently: uniform 1.0116. embed/lm_head (requires_grad=False) are
+  bit-identical across phases — the contrast isolates the zero-grad mechanism.
+- Consequences: "frozen by construction" is structural (mask, cos >= 0.9999,
+  RoPE old part verbatim) but NOT amplitude-preserving (~0.58x/phase,
+  ~2.7e-3 after 11 phases). RA2 arms are internally consistent (identical
+  leak everywhere), so cross-arm ppl comparisons are unaffected; manuscript
+  absolute "frozen" language needs rewording; neuron_importance consumers
+  (prune/merge/gate) see decayed amplitudes. Fix decision belongs to the BDH
+  side; until fixed, the decay factor is deterministic and divisible out.
+- Full analysis: docs/reviews/2026-08-31_weight-atlas-bdh-implementation-review.md (F-2).
