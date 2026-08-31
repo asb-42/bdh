@@ -81,7 +81,8 @@ def grow(base: BDH, total_mult: int) -> BDH:
         m.decoder.view(nh, N_new, -1)[:, :N_old, :] = \
             base.decoder.view(nh, N_old, -1)
         old_f = base.attn.freqs.data.view(-1)
-        idx = torch.arange(N_old, N_new, dtype=torch.float32)
+        idx = torch.arange(N_old, N_new, dtype=torch.float32,
+                           device=old_f.device)
         new_f = 1.0 / (2 ** 16 ** ((idx // 2 * 2) / N_new)) / (2 * math.pi)
         m.attn.freqs.copy_(torch.cat([old_f, new_f]).view(1, 1, 1, -1))
     return m, N_old, N_new
