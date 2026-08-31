@@ -24,6 +24,14 @@
 # Single-instance lock: RA2 on ai died from a train/eval memory collision;
 # flock prevents concurrent instances.
 set -euo pipefail
+
+# GB10 lacks python3-dev: torch inductor JIT (cuda_utils.c) fails with
+# "fatal error: Python.h: No such file or directory" at first step.
+# Dynamo/inductor is a speed optimization, not a semantics requirement;
+# disabling it runs plain eager bf16 (same numerics class as the ai runs
+# if those also ran eager). To re-enable later: sudo apt install python3-dev
+# on gx10, then remove this export.
+export TORCHDYNAMO_DISABLE=1
 cd "$(dirname "$0")/.."
 
 exec 9>/tmp/ladder_ra2_resume.lock
