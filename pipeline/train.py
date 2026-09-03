@@ -99,6 +99,7 @@ def train(cfg: Config) -> None:
     # three masks cover everything neuron-indexed (decoder rows are h*N + n ordered).
     gate_param_masks = []
     route_neuron_mask = None
+    elem_frozen_backup = None  # grow path: bit-exact frozen-path snapshots, restored after each step
 
     # Mechanism B/grow: with init_from + grow_mult, widen the latent by fresh
     # zero-init neurons; old neurons, embed and lm_head are frozen so new-phase
@@ -160,9 +161,25 @@ def train(cfg: Config) -> None:
         if cfg.route_aware:
             print(f"route-aware: prefix mask {n_old}..{n_new} | "
                   f"loss = {cfg.route_alpha}*prefix + {1 - cfg.route_alpha}*full")
+        # Bit-exact frozen path (F-decay-leak fix): the zero-grad mask stops
+        # learning but not AdamW's decoupled weight decay, which multiplies
+        # every param with grad != None by (1 - lr_t * wd) each step. Snapshot
+        # the frozen regions here and restore them after every optimizer step
+        # (see optimizer_step). embed/lm_head need no restore: requires_grad
+        # False removes them from the optimizer entirely; attn.freqs is a
+        # buffer. Note: restoring at step end is exact by construction; a
+        # wd=0 param group alone would NOT be, because AdamW applies decay
+        # before the (zero) gradient update inside the same step.
+        enc_d, encv_d = raw_model.encoder.data, raw_model.encoder_v.data
+        dec_d = raw_model.decoder.data.view(nh, n_new, -1)
+        elem_frozen_backup = [
+            (enc_d[:, :, :n_old], enc_d[:, :, :n_old].detach().clone()),
+            (encv_d[:, :, :n_old], encv_d[:, :, :n_old].detach().clone()),
+            (dec_d[:, :n_old, :], dec_d[:, :n_old, :].detach().clone()),
+        ]
         print(f"growth: {base_mult} -> {cfg.mlp_internal_dim_multiplier} mult "
               f"(+{n_new - n_old} neurons/head trainable) | old neurons + embed + lm_head frozen"
-              f" | attn {'frozen' if cfg.freeze_attn else 'UNFROZEN'}")
+              f" (bit-exact via step-end restore) | attn {'frozen' if cfg.freeze_attn else 'UNFROZEN'}")
 
     if cfg.gate_from:
         gate_imp = None
@@ -228,6 +245,14 @@ def train(cfg: Config) -> None:
         scaler.step(optimizer)
         scaler.update()
         optimizer.zero_grad(set_to_none=True)
+        # F-decay-leak fix: bit-exact frozen path. AdamW's decoupled decay
+        # moves masked elements even at zero gradient (decay applies before
+        # the zero-gradient update inside the same step), so a wd=0 param
+        # group alone would not suffice. Restore the snapshots taken at
+        # growth time after every step.
+        if elem_frozen_backup:
+            for dst_t, snap in elem_frozen_backup:
+                dst_t.copy_(snap)
 
     for step in range(cfg.max_iters):
         lr = get_lr(step, cfg)
