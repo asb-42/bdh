@@ -107,8 +107,8 @@ def main():
                     reduction="none").view(xb.shape[0], bs)
                 joint_losses.extend(l[:, args.window:].float().mean(dim=1).cpu().tolist())
 
-    print("\nconfusion (rows=true domain, cols=routed expert):")
-    print("          " + "".join(f"{n:>9}" for n in names))
+    print("\nconfusion (rows=true domain, cols=routed prefix width):")
+    print("          " + "".join(f"{r:>9}" for r in routes))
     for i, n in enumerate(names):
         print(f"{n:>9} " + "".join(f"{conf[i, j].item():>9}" for j in range(R)))
     print(f"\n{'domain':>9} {'routed':>8}")
