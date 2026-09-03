@@ -9,7 +9,7 @@
 
 - 20/20 phases complete: base en→ro (phases 1–12, width mult 128→480), resume fi hu bg et el sk sl lt (phases 13–20, 480→736), route-aware (alpha 0.9), no-freeze-attn, zero-init growth.
 - Final phase lt: best val_loss 2.2774 (ppl 9.75), test ppl 9.43 at step 10000; checkpoint out/bdh_europarl_ladRA2-lt_best.pt.
-- All 20 phase checkpoints and routdiag outputs p13–p20 on disk. The analysis file holds cold evals for phases 1 and 13–20; phases 2–12 cold evals are not in the restarted file (they live in the original run's logs and earlier reports, not re-verified here).
+- All 20 phase checkpoints and routdiag outputs p13–p20 on disk. Cold evals exist for phases 1 and 13–20; phases 2–12 are covered by training-log best-val instead (Appendix A) — the .200-era logs are complete on gx10 and carry no cold-eval blocks.
 
 ## 2. Acquisition: no width tax
 
@@ -81,3 +81,34 @@ The confusion matrix printed DOMAIN names as column headers, but columns are ROU
 - ladRA2_routdiag_p20.txt backed up to /tmp (md5 7e1130f597c7701445ccb0a5c4b28863) before boundary-grid completion; the launcher appends (>>), so no truncation risk.
 - Boundary grid p20 (pre-registered P-Det definition) was still running (PID 85798, ~57 min) at writing time; the watcher logs ladder-RA2-resume-done on exit, after which the tree is free for pi-50's ff-only merge of this fix.
 - Scan handoff: the weight-atlas series requested in bdh-cl seq 38 (en/de/pt/lt checkpoints) now has a sharper target — verify whether bg/el segment preservation at p20 is structural (stable spectral norms) or functional-only.
+
+## Appendix A: complete acquisition curve, phases 1–20 (added post-push, same day)
+
+Source: each phase's training log (`out/logs/ladRA2_<lang>.log`, transferred from ai with md5 verification on 2026-08-31) — the `done. best val_loss` line exists for all 20 phases. Post-hoc cold evals exist only for phases 1 and 13–20 (the gx10-resumed analysis file). The two instruments agree on all 9 overlap points: cold eval reads +1.0% to +4.9% above training best-val (mean +2.4%) — consistent, no contradiction.
+
+| phase | lang | mult after | best val ppl (log) | cold eval ppl |
+|---|---|---|---|---|
+| 1 | en | 128 | 2.25 | 2.29 |
+| 2 | es | 160 | 2.40 | — |
+| 3 | pl | 192 | 3.17 | — |
+| 4 | fr | 224 | 2.45 | — |
+| 5 | de | 256 | 2.72 | — |
+| 6 | nl | 288 | 3.37 | — |
+| 7 | it | 320 | 3.43 | — |
+| 8 | sv | 352 | 8.39 | — |
+| 9 | da | 384 | 7.96 | — |
+| 10 | pt | 416 | 7.66 | — |
+| 11 | cz (=cs) | 448 | 9.66 | — |
+| 12 | ro | 480 | 9.32 | — |
+| 13 | fi | 512 | 7.90 | 8.29 |
+| 14 | hu | 544 | 8.34 | 8.47 |
+| 15 | bg | 576 | 15.06 | 15.51 |
+| 16 | et | 608 | 9.08 | 9.35 |
+| 17 | el | 640 | 14.99 | 15.24 |
+| 18 | sk | 672 | 10.09 | 10.19 |
+| 19 | sl | 704 | 9.18 | 9.45 |
+| 20 | lt | 736 | 9.75 | 9.94 |
+
+- cz carries cs data per Addendum 1; the cz log's growth line (`416 -> 448 mult`) confirms the phase-11 schedule position exactly.
+- **Within-family observation (correlational, cause not isolated):** the later sibling of each language family acquires 3–4x worse than the early one — es 2.40 (phase 2) vs pt 7.66 (phase 10); fr 2.45 (phase 4) vs ro 9.32 (phase 12); pl 3.17 (phase 3) vs cz 9.66 (phase 11); de 2.72 (phase 5) vs sv 8.39 / da 7.96 (phases 8–9). Position in the ladder predicts acquisition cost better than language identity. Confound, unstated elsewhere and unresolved here: width and frozen-segment count grow together in the base ladder, so interference (§3/§4 story) and width cannot be separated from this data alone. Note the resume ladder shows NO such rise (fi 7.90 → lt 9.75 across 480→736), so 'no width tax' (§2) holds within the resume regime; the base-ladder rise is real but its driver is open.
+- **Batch provenance (sharpens seq 40 / F-V3):** the primary phase logs contain NO batch marker at all (grep `batch` = 0 hits in every log checked: es, pt, ro, fi, lt). The only machine-written batch values are the analysis-file phase header lines (`batch=4` for phase 2). The progress-report hand table's `2` has no primary source. Machine provenance favors batch=4 for phases 2–4 (matching the committed script's `BS=4 when PREV_MULT<=192`); the hand table's 2 is unsupported by any artifact found on either host.
