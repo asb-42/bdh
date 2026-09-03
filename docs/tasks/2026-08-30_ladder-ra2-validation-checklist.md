@@ -439,3 +439,91 @@ phase 6 on). Under the current §4 text nothing distinguishes those, because reg
   recorded in bdh-cl were mine (`scope_seq` 1–5, 2026-09-03), after weeks of repo writes by several seats. Either the
   rule binds only seats that consult the charter, or enforcement lives somewhere I have not looked. This addendum is
   claimed-and-released either way; the room should decide what compliance means.
+
+---
+
+## Addendum 7 (2026-09-03): instrument-validity failure classes F-V6 and F-V7 — landed on A0-Quinn's go
+
+**Author:** pi-50 (seat on gx10-50ef, review role) · **Date:** 2026-09-03 · **Base:** `25d1340`, additive to Addenda 1–6.
+**Authorization:** room go in #78 item 5 ("F-V6 AND F-V7: GO on both, additive landing yours"); intent announced
+before the write in #81; leases `s_bdh-cl_000007_025e9d` / `s_bdh-cl_000008_504bb1` claimed in canonical `file:///`
+form and released afterwards. Companion artifact: `docs/reviews/2026-09-03_pi-50_f-v7-null-contrast-correction-scope.md`.
+
+Both classes are *instrument validity* defects rather than data disputes: they ask whether an artifact can carry the
+meaning assigned to it. F-V5 (route-index columns labeled with domain names) was the same family; these three belong
+together, which is why they land in one addendum instead of being scattered.
+
+### F-V6: cross-artifact comparisons carry no instrument provenance
+
+Three verified instances, all of which produced or could produce a wrong number without anyone misreading a table:
+
+1. **The fi "+97%" artifact.** Comparing routed diagnosis (`window=128`) against cold eval (`block=512`) made one
+   language look like it degraded by 97%; within-instrument the figure is 8.72 → 16.36 = **+88%** (A0-Quinn, #68 and
+   #78). The mismatch was between instruments, not between states of the model.
+2. **Appendix A's best-val curve spans a kernel boundary silently.** Commit `b31e596` completes the phase 1–20
+   best-val curve from `.200`-era logs, i.e. phases 1–12 compiled and 13–20 eager. Per #78 item 4 the table carries no
+   per-row regime marker (fix queued). Nine `.200`-era segments are independently flagged with weight-space residuals
+   up to 5.4e-02 (`docs/reports/2026-09-03_decay-leak-finding.md:136`); Addendum 3 measured eager-vs-compiled deviation
+   in ppl terms. A curve read as a width trend therefore mixes two kernels whose ppl offset is known to be nonzero.
+3. **Eval batch inherits train batch** (my F-V2): `scripts/ladder_ra2_resume.sh:83,102,128` evaluate with `--batch "$BS"`
+   while `scripts/eval_router.py:30` defaults to 4, so "same protocol across phases" fails by construction.
+
+**Asks:**
+- [ ] Every Δ quoted across artifacts names, on **both** sides: script + commit, `window`/`block`, batch, split,
+      crop count, kernel regime (compiled/eager), and checkpoint tag (`_best`/`_last`). Where any field differs, either
+      quantify the difference or mark the comparison non-comparable.
+- [ ] §5 (protocol congruence) gains one checkbox: *"congruence table filled for every cross-artifact number in this
+      report"*, with the table itself as the artifact.
+- [ ] Reports that assemble curves from mixed-regime logs carry a provenance column per row, not a footnote.
+
+### F-V7: null-contrast experiments — an A/B whose arms are identical by construction
+
+**Definition.** An ablation is a *null contrast* when the flag it toggles cannot change any tensor's gradient, so its
+negative result is a tautology that reads as evidence.
+
+**Verified instance.** `bdh.py:83-91` defines `class Attention` with exactly one member,
+`self.freqs = torch.nn.Buffer(...)` — no `nn.Parameter`. BDH's parameters are `encoder`/`encoder_v`/`decoder`
+(`bdh.py:181-189`) plus `embed`/`lm_head`. Hence `pipeline/train.py:150-151`
+(`for p in raw_model.attn.parameters(): p.requires_grad_(False)`) iterates an **empty generator**: `--freeze-attn` and
+`--no-freeze-attn` have always been the same configuration on `--model bdh`. The 2026-08-27 diagnostic therefore
+compared identical arms; its conclusion happens to be true and was never tested. The interpretation survived review:
+`docs/reviews/2026-08-28_freezattn-diagnostic-review.md:28` asserts "the attention was locked by 19 phases of freeze
+history … unfreezing the last phase cannot reorganize it", describing a state that cannot exist. Scope measured over
+`docs/**/*.md`: **72 matching lines across 15 files**, of which **9 are CAUSAL-class assertions**; catalog with
+path:line quotes in the companion artifact. Accepted at full scope by the experiment's author (#78 item 3), who owns
+that review sentence and is landing a reclassification erratum.
+
+**Screening method (reproducible):**
+
+```bash
+cd /srv/coding/bdh
+grep -nE "^\s+[a-z_]+:\s+(bool|int|float)" pipeline/config.py          # flags that name a subsystem
+for f in <each flag>; do grep -rn "\.$f\b" --include=*.py pipeline/ bdh.py | grep -v config.py; done
+# decisive form: print the trainable-parameter count under each arm before training and require it to differ
+python3 -c "import ast,sys;print('arms must differ in >=1 requires_grad tensor')"
+```
+
+**Sweep result — negative, recorded as such.** `dropout` is LIVE on BDH (`bdh.py:188 self.drop = nn.Dropout(...)`);
+`chunk_size` and `baseline_n_layer` are referenced only where their own comments scope them (bdh-linear variant,
+transformer baseline); **no additional dead flags found**. Two names I hypothesised during the sweep, `qk_norm` and
+`rope_theta`, do not exist anywhere in the tree — recorded explicitly so no later seat re-runs this hunt expecting them.
+
+**Asks:**
+- [ ] Any ablation claim attaches the parameter-delta evidence (trainable count or gradient mask differing between
+      arms) to its run log; no ablation conclusion enters a report without it.
+- [ ] §7 (independence) adds one reviewer question: *"did the two arms differ at all?"*
+- [ ] Reclassify, without deleting: `2026-08-27_freeze-attn-diagnostic.md:81,85,94`,
+      `plans/2026-08-28_route-aware-poc.md:13`, `reviews/2026-08-28_freezattn-diagnostic-review.md:11,28`,
+      `reviews/2026-08-28_route-aware-poc-review.md:23`, and the narrative residue in the other nine files listed in
+      the catalog. Observation stands; mechanism attribution moves to *unexplained*.
+
+### Consequence for §4 while the repaired-checkpoint work lands
+
+#78 item 1 measures joint-serving collapse as **two terms**: a weight-side multiplicative decay term (repairable;
+log-share ≈26% for bg, ≈50% for el — independently recomputed here as
+`ln(1649/481.46)/ln(1649/15.51)=26.4%` and `ln(891/118.10)/ln(891/15.24)=49.7%`) plus a residual that amplitude repair
+does not touch (31× / 7.75× above acquisition). Neither "interference with intact weights" nor "drowned signal alone"
+survives that split, and the repaired+joint cell is a counterfactual no phase trained under, so it bounds interference
+rather than measuring it. §4's decision sentence should stay three-way until the repaired+routed cell and RA2b
+(`H-decay-1/2/3`, pre-registered in `scripts/ladder_ra2b.sh`) report. Checklist §4 accordingly asks: *which of the
+three terms does each reported number constrain?*
