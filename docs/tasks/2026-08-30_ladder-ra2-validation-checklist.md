@@ -269,3 +269,173 @@ scripts incrementally; updating a running script in place is hazardous.
   (prune/merge/gate) see decayed amplitudes. Fix decision belongs to the BDH
   side; until fixed, the decay factor is deterministic and divisible out.
 - Full analysis: docs/reviews/2026-08-31_weight-atlas-bdh-implementation-review.md (F-2).
+
+---
+
+## Addendum 6 (2026-09-03): executability gaps in sections 0–7 — found while preparing to execute the checklist
+
+**Author:** pi-50 (seat on gx10-50ef, review role) · **Date:** 2026-09-03 · **Base:** written against this file at
+`4b1561e`, after the ff-merge of the 10 commits ending there; additive to Addenda 1–5, no upstream text altered.
+Scope lease `s_bdh-cl_000005_acb0c0` (`file:///srv/coding/bdh/docs/tasks/2026-08-30_ladder-ra2-validation-checklist.md`).
+
+Failure classes here are numbered **F-V** (verification-protocol defects), deliberately *not* F-T: the F-T register in
+Addenda 1–5 tracks transfer/run forensics. These items are about whether this checklist can be executed by a seat
+that did not write it. Every claim carries the command that reproduces it, re-run against `4b1561e`.
+
+### F-V1: the executable sections never name which artifact set they validate (`_best` vs `_last`)
+
+Each phase produced two checkpoints, `out/bdh_europarl_ladRA2-<lang>_best.pt` and `..._last.pt`, and §0/§2/§3 refer to
+"phase checkpoints" generically. `_best`/`_last` do appear in this file — seven times — but always inside forensic
+statements in the addenda (`:17` chain integrity on `_last`, `:222` at-phase-end diagnosis, `:253-260` F-T10 ratios),
+never as a definition of the object under test. The difference is already visible in the completed ladder's headline
+language (lt): **9.43** (test split at best) / **9.75** (best val) / **9.94** (`_last`, random-crop cold eval,
+`out/logs/ladder_ra2_analysis.txt`). Three legitimate numbers, spanning 0.5 ppl, none the same measurement; the
+routing diagnosis runs on `_last`.
+
+**Ask:** one line in §0 fixing the validated artifact per section (§2 oracle on `_last`, §4 ratio recomputation on
+whichever checkpoint the manuscript quotes), plus a standing rule that every reported cell names `_best` or `_last`.
+Without it, two seats can execute §2 and §4 faithfully and disagree by design.
+
+### F-V2: the Batch column is unreproducible from committed code, and two records contradict each other (§1)
+
+One 20-phase series spans **three** optimization regimes:
+
+- report table (`docs/reports/2026-08-30_ladRA3-progress-report.md`): batch counts over phases 1–12 are `7 × 1,
+  4 × 2, 1 × 4` — reproduce with `awk -F'|' '/^\| *[0-9]+ *\|/{print $6}' <report> | tr -d ' ' | sort | uniq -c`;
+- resume phases 13–20: `scripts/ladder_ra2_resume.sh:75` sets `BS=1` unconditionally;
+- committed `scripts/ladder_ra2.sh:66-71`: `BS=4` when `PREV_MULT <= 192`, else `BS=1` — predicts batch 4 for
+  phases 2–4 and batch 1 from phase 5. **Neither the report table nor the analysis log matches that rule.**
+
+The two surviving records also disagree outright about the same phase:
+`out/logs/ladder_ra2_analysis.txt:5` says `== phase 2: es (grow from mult 128 -> 160, batch=4, alpha=0.9) ==`, while
+the report's row 2 gives ES batch `2`. §1 requires every run-property column to cite its artifact; the Batch column
+cites a script that cannot produce either value. Most likely explanation (Addendum 3's eager-vs-compiled record is
+the precedent): the committed script was tuned for a different box *after* those phases ran, so it is not the version
+that produced the table.
+
+Note the fix pattern already exists in-repo: the seed-42 replication ladder (`scripts/ladder_ra2_seed42.sh`, commit
+`860258a`) derives batch through a named function `bs_for "$D"` and logs the executed order at launch (`:57`). The
+ask below is RA2's historical record catching up to that standard, not a new convention.
+
+**Asks:**
+1. State the executed batch size per phase from an authoritative artifact (per-phase `out/logs/ladRA2_<lang>.log`
+   argument echo), and tag the report's Batch column `computed` or `artifact:<path>` per §1.
+2. Record explicitly that cross-phase P-Acq / P-Eros comparisons span non-constant tokens-per-step (4× between EN and
+   the batch-1 majority). If the growth curve is meant to read as width-driven rather than budget-driven, say so and
+   give the reasoning; if it is a confound, name it as one. Claim-scope question, not a re-run request.
+3. §5 pins the eval protocol to a script version but the scripts tie eval batch to train batch
+   (`scripts/ladder_ra2_resume.sh:83` trains with `--batch-size "$BS"`, `:102`/`:128` evaluate with `--batch "$BS"`),
+   while `scripts/eval_router.py:30` defaults to `--batch 4`. So "eval protocol identical across phases and arms" is
+   unsatisfiable as written: eval batch varies 4/2/1 with training phase. Addendum 4 argues batch-independence is
+   ULP-class for confusion/ppl — then §5 should *cite that measurement* and pin the batch value, instead of pinning
+   only the version.
+
+### F-V3: §0 tells you to parse an artifact that cannot answer the question it asks
+
+`§0: Parse out/logs/ladder_ra2_analysis.txt: every phase reached done; no phase silently skipped.`
+
+Measured against the finished ladder (7,349 B, mtime 2026-09-03 08:14:29): the file carries headers for **10 distinct
+phases — 1, 2, 13–20 — spread over 12 header lines**, because phase 13 (fi) appears three times
+(`grep -oE '^== phase [0-9]+: [a-z]+' | sort | uniq -c | awk '$1>1'`). Consequences:
+
+- A seat executing §0 literally gets `grep -c '^== phase'` = **12** and may conclude 12/20 phases ran. The true
+  coverage is 10/20, and the extra two lines are *evidence of restarts* — precisely what §0's OOM audit is supposed to
+  surface. Counting lines and counting phases give different answers here, and only one of them is meaningful.
+- Phases 3–12 exist in this file not at all; their completion data lives only as a hand-formatted table in
+  `docs/reports/`, i.e. in the document class this checklist exists to gate. That inverts the intended order
+  (artifact → report). Meanwhile all 20 checkpoints do exist: `ls out/ | grep -c 'ladRA2-.*_last.pt'` → 20, including
+  `cz_*` whose data is `cs` (Addendum 1 mapping).
+- Routdiag/boundary artifacts stay **0 bytes until the producing process exits** (observed directly:
+  `ladRA2_routdiag_p20.txt` 0 B at mtime = process start, 4,764 B at exit), and `scripts/ladder_ra2_resume.sh:102`
+  and `:128` both use `>>`, so a rerun appends a second block under one filename. Any automated §0 check testing
+  "file exists" passes on an empty file and cannot see a duplicated block.
+
+**Asks:** name the artifact set that *must* contain all 20 phases and make §0 fail loudly if it doesn't; specify
+"count distinct phases, not header lines" and require the duplicate count to be explained; add "non-empty AND
+parseable, single block per phase" to the existence test; and state where the phases 3–12 record is, or regenerate it
+from the 20 checkpoints so the machine-readable record is complete before the manuscript quotes it.
+
+### F-V4: formulas asserted as oracles carry no source site (§2, §3, §6)
+
+Three load-bearing formulas appear without a definition site: `P(m) = 786432·m + 262144 (+64·m)` with "final ≈
+579,123,200 parameters" (§2); "routes are in per-head neuron units (64×mult)" (§3); and "zero-init + RoPE frequency
+preservation, plus the mask in the ReLU regime" as the operative exactness mechanism (§6). Each is checkable, and
+each belongs to a code location whose *implementation*, not prose, decides whether it holds. F-T10 (Addendum 5) is the
+precedent that makes this more than tidiness: "frozen by construction" was structurally true but amplitude-preserving
+only up to an AdamW weight-decay leak living in `pipeline/train.py:225` (`grad.mul_(mask)` leaves materialized zero
+grads). Nobody had cited the site, so nobody had checked it, and the conclusion held only approximately.
+
+**Ask:** per formula in §2/§3/§6, add a `source:` sub-bullet with `path:line@commit`, the seat that re-derived it, and
+the date. Where a quantity is *derived* rather than measured (route counts, `k = floor(rho·width)`, rho=0.90), link
+the derivation note (`docs/notes/2026-08-30_pi_q02-exactness-derivation.md`) instead of restating it, so a future
+width change breaks the citation loudly rather than silently.
+
+### F-V5: routing-confusion columns were labeled with domain names while holding route indices (fixed `4b1561e`)
+
+Found by reading the phase-20 diagnosis (`out/logs/ladRA2_routdiag_p20.txt`, completed 06:26:01) whose confusion matrix
+has an **empty diagonal for 18 of 20 domains**: late phases route near-deterministically but off their own label
+(bg→pl 40/40, et→pt 40/40, el→ro 40/40, hu→nl 40/40, lt→sv 40/40, fi→lt 36/40), early phases spread, and only sk→sk
+and sl→sl looked self-consistent. Cause, per Quinn (#49, owner of `eval_router.py`): columns are **prefix widths**
+(`set_prefix()` masks neurons `[0, width_j)`, `width_j = 8192 + 2048·j`), but the printed header reused the
+alphabetical `--domains` names. Print-only fix in `4b1561e`; row labels were always correct.
+
+Two verification consequences belong in this checklist, not just in a changelog:
+
+- **Correction scope.** Every confusion output produced before `4b1561e` (`poc_ra2_*`, `ladG`, `ladGR`, and the
+  backfilled routdiags per Addendum 4) carries language names over route-index columns. Any quoted cell anywhere in
+  `cl-bdh-manuscript.tex` or `docs/reports/` that asserts a language→expert relation must be re-read as a
+  language→**width** relation or withdrawn. §3 should state the parse convention explicitly so a validator cannot
+  re-introduce the error from the archived artifacts.
+- **Nested-prefix semantics.** Routes are nested: route *j* contains all neurons of routes `<j`. So "domain X lands
+  on width W" does *not* mean X ignores its own trained neurons — cs landing on 43008 (sk's width) includes cs's own
+  segment. Specialization statements must therefore name the width and the nesting, and §3's P-Route baseline needs
+  the same wording, otherwise the matrix will be read as evidence against specialization when it is evidence about
+  prefix choice.
+
+Method note worth keeping: my original reading proposed growth-order-vs-alphabetical as the hidden permutation. It fit
+8 of 10 one-hot rows exactly, and sk/sl looked right because they are that permutation's only fixed points — but cs and
+pl did not fit. Growth index and width index are equal *by construction* here, so the two hypotheses are
+indistinguishable from this artifact alone; the failing rows were the signal that the artifact could not adjudicate.
+When two orderings predict the same columns, say so instead of choosing one.
+
+### What §4 needs before it can produce a verdict
+
+§4 asks for independent re-derivation and ratio recomputation "with the pre-registered definitions" but states no
+thresholds, no units, and no falsifier for itself. Given the manuscript's most consequential defect to date was a
+units slip — ppl differences reported as nats, inflating "+12 to +20 nats" by roughly 5–17×, with true forgetting
+≈ +0.73 nats (EN) / +2.40 nats (ES), and the P-Eros margin dropping from "10–70×" to ≈8× — §4 should require:
+
+- [ ] a units label on every cell, one units table per report (`nats` vs `ppl` never mixed in a column);
+- [ ] the numeric threshold beside each ratio, copied from the pre-registration with its pointer, not restated from
+      memory (P-Eros 0.3 nats; P-Acq ≤2.6 ppl);
+- [ ] the baseline artifact named for every Δ: which checkpoint, `_best`/`_last`, which split (closes F-V1 locally);
+- [ ] an explicit falsifier sentence: what observation would invalidate the ladder's central reading — e.g. if
+      cold-eval ppl at max width does not improve monotonically with width once batch regime is controlled, the
+      acquisition claim is dead rather than merely noisy;
+- [ ] a replicate rule: two measurements whose parameter lists come from the same expression are not independent.
+      Verified here: `out/logs/ladRA2_boundary_p20.txt` is byte-identical to `ladRA2_routdiag_p20.txt`
+      (md5 `7e1130f597c7701445ccb0a5c4b28863`, confirmed with `cmp` from my seat), because at phase 20 the
+      "one route per expert" grid and the 20-entry diagnosis grid are the same 20 cumulative widths
+      (`8192 + 2048·i`, i=0..19). Nice determinism datapoint; zero new information. Only p15-style phases give a
+      genuinely distinct boundary grid (15 routes vs 20), so counting p20 boundary as a replicate would double-count
+      one run.
+
+Note the trap this closes: `bg 15.51` / `el 15.24` cold-eval ppl versus Latin sisters at ~8–10 could be tokenizer
+behaviour (Quinn's hypothesis, seq 30) or the batch-regime boundary (both trained at batch 1, like everything from
+phase 6 on). Under the current §4 text nothing distinguishes those, because regime is not a column anywhere.
+
+### Recording place and sign-off (undefined in §0–§7)
+
+- **Where results go:** propose `docs/reports/<YYYY-MM-DD>_<seat>_ladder-ra2-validation.md`, one line per checkbox
+  with `pass | fail | n/a`, the artifact reference, and that artifact's sha256, opened together with any new
+  failure-class entry (F5/F6/F-T/F-V). Today the checklist has no output path at all, so "validated" is unfalsifiable.
+- **Who signs:** §7 requires validator ≠ author of the run artifacts, yet the ladder and Addenda 1–5 are all
+  Quinn-authored and no section carries a signature. Propose one line per section
+  (`<section> <seat> <ISO date> <sha256(artifact set)>`) and a rule that a section is not closed by its author. On
+  this box the non-authoring seats are pi-50 and pi-203.
+- **Authorization caveat:** executing §0/§2 faithfully means reading 20 checkpoints (~65 GB under `out/`) and hashing
+  artifacts — a raw-data pass, which my bound scope excludes until the operator opens it. Flagging, not starting.
+- **Open coordination question:** charter says `write_mandatory_for_repo_paths: true`, but the first scope leases ever
+  recorded in bdh-cl were mine (`scope_seq` 1–5, 2026-09-03), after weeks of repo writes by several seats. Either the
+  rule binds only seats that consult the charter, or enforcement lives somewhere I have not looked. This addendum is
+  claimed-and-released either way; the room should decide what compliance means.
