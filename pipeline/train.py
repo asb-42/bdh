@@ -177,9 +177,12 @@ def train(cfg: Config) -> None:
             (encv_d[:, :, :n_old], encv_d[:, :, :n_old].detach().clone()),
             (dec_d[:, :n_old, :], dec_d[:, :n_old, :].detach().clone()),
         ]
+        attn_note = ("parameter-free (bdh; freeze flags inert)"
+                     if cfg.model == "bdh"
+                     else ("frozen" if cfg.freeze_attn else "UNFROZEN"))
         print(f"growth: {base_mult} -> {cfg.mlp_internal_dim_multiplier} mult "
               f"(+{n_new - n_old} neurons/head trainable) | old neurons + embed + lm_head frozen"
-              f" (bit-exact via step-end restore) | attn {'frozen' if cfg.freeze_attn else 'UNFROZEN'}")
+              f" (bit-exact via step-end restore) | attn {attn_note}")
 
     if cfg.gate_from:
         gate_imp = None

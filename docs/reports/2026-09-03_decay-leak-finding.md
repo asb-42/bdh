@@ -104,3 +104,44 @@ artifacts untouched). Pre-registered predictions:
   open and independent of the leak fix.
 - Re-measure joint serving on repaired checkpoints before citing any
   interference magnitudes (bdh-cl #68 erratum).
+
+## Addendum (evening): bit test passed; architecture note
+
+The corrected bit test (gx10, 2026-09-03 20:23 CEST) passed on all counts:
+encoder/encoder_v/decoder old regions bit-identical after a 10-step grow run
+under the fix; new-neuron region nonzero (restore correctly scoped);
+attn.freqs old lattice bit-identical (RoPE verbatim, S1).
+
+**Architecture note (from the checkpoint inventory):** a bdh checkpoint
+holds exactly six keys: `decoder`, `encoder`, `encoder_v`, `embed.weight`,
+`lm_head`, `attn.freqs` (buffer). **bdh attention is parameter-free** --
+there are no `attn.*` parameters. Consequences:
+
+- `--freeze-attn` / `--no-freeze-attn` are no-ops on `--model bdh` (they
+  freeze an empty parameter set; the flags only matter for the transformer
+  baseline). The "attn frozen/UNFROZEN" log lines in bdh runs are cosmetic.
+- The 2026-08-27 freeze_attn diagnostic therefore compared two effectively
+  identical configurations; its run-to-run differences are data/RNG
+  variance. Its conclusion (freeze_attn is not the routing confounder)
+  stands trivially.
+- The earlier fi-drift hypothesis "later phases rewrite shared attention"
+  is closed: there is no trainable attention to rewrite. The measured
+  mechanism remains the decay leak (c-fits + causal splice).
+- Repair completeness follows from inventory: the trainable universe is
+  exactly encoder/encoder_v/decoder, all three covered by repair_decay.py.
+
+**Repair table (lt_last, 20 segments, executed order):** measured c matches
+the schedule prediction 0.57978^(20-p) on all 20 segments to 4-5 decimals;
+self-test fits lt against itself at c = 1.000000, resid 0. 9/20 segments
+flagged resid > 0.01: en, pl, fr, de, nl, sv, da, pt, cz -- all .200-era
+phases, consistent with the compiled-vs-eager kernel delta (Addendum 3);
+the gx10-era phases fi..sl are clean (5.6e-06 .. 1.5e-05). es, it, ro ran
+.200-era yet fit cleanly -- per-phase kernel history, open detail; it does
+not affect the decay conclusion (c matches schedule everywhere).
+
+**RA2b protocol note:** RA2b runs pure eager (TORCHDYNAMO_DISABLE=1); RA2
+ran its .200-era phases compiled and the gx10 resume eager. The kernel
+delta is bounded by the repair residuals (2e-05 .. 9.5e-02 relative on
+.200-era segments) -- one to two orders below the decay signal (0.57978^k)
+-- so the pre-registered H-decay comparisons remain valid. Known protocol
+delta, recorded before first use.
