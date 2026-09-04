@@ -1,12 +1,17 @@
 # Arm G Results: Growth Without Routing
 
-> **CORRECTION (2026-08-30).** The schedule in this report is wrong: the true
-> ladder is **20 phases, ×128 → ×736** (checkpoint-verified — see
-> `docs/reports/2026-08-30_pi-checkpoint-measurement.md`). This report's table
-> dropped the `sv` row and its final cells (676, 708) match neither the
-> checkpoints nor the table's own formula. "~700M params" is also wrong (final
-> is ≈579M). The narrative conclusions are unaffected; the numeric column was
-> computed, not measured. Kept as historical record; numbers below are stale.
+> **CORRECTION 2 (2026-09-04), supersedes the 2026-08-30 banner.** Forensics
+> (see `docs/reports/2026-09-04_decay-family-two-regimes-and-boundary-repair.md` §4)
+> settled the geometry: Arm G ran **19 phases, ×128 → ×704** (~554M params).
+> The `sv` phase was **never trained** — CUDA OOM at 576→608 (`ladG_sv.log`);
+> no sv checkpoint ever existed; the resume (`ladder_armG_resume.sh`) deliberately
+> continued sk→ro. This report's table cells for sl/lt (676, 708) are arithmetic
+> errors (actual 672, 704); its "sv 53.5" at phase 20 is a zero-shot transfer
+> number on ro-trained neurons, not erosion. The 2026-08-30 banner wrongly applied
+> Arm-GR's 20-phase/×736/579M geometry to Arm G — GR is a separate run.
+> Narrative conclusions are unaffected. A completed 20-phase/×736 Arm-G chain
+> (sv backfilled, run prefix `ladG2-*`) now exists; see the 2026-09-04 report.
+> Kept as historical record; numbers below are stale.
 
 ## Setup
 - 19 sequential Europarl X→en phases with width growth
