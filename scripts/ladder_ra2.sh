@@ -73,7 +73,17 @@ for D in $SEQ; do
 
   echo "== phase $PHASE: $D (grow from mult $PREV_MULT -> $CUR_MULT, batch=$BS, alpha=0.9) ==" >> "$A"
 
-  .venv/bin/python -m pipeline.run train \n    --model bdh --dataset europarl \n    --europarl-langs "$D" --europarl-lang-mb 30 \n    --n-embd 512 --n-head 8 \n    --block-size 512 --max-iters 10000 --batch-size "$BS" \n    --warmup-iters 1000 --lr-decay-iters 10000 \n    --grow-mult "$GROW" --init-from "$INIT" \n    --no-freeze-attn \n    --route-aware --route-alpha 0.9 \n    --run-name "ladRA2-$D" \n    2>&1 | tee "${LOG}/ladRA2_${D}.log"
+  .venv/bin/python -m pipeline.run train \
+  --model bdh --dataset europarl \
+  --europarl-langs "$D" --europarl-lang-mb 30 \
+  --n-embd 512 --n-head 8 \
+  --block-size 512 --max-iters 10000 --batch-size "$BS" \
+  --warmup-iters 1000 --lr-decay-iters 10000 \
+  --grow-mult "$GROW" --init-from "$INIT" \
+  --no-freeze-attn \
+  --route-aware --route-alpha 0.9 \
+  --run-name "ladRA2-$D" \
+  2>&1 | tee "${LOG}/ladRA2_${D}.log"
 
   INIT="out/bdh_europarl_ladRA2-${D}_last.pt"
 
@@ -83,7 +93,10 @@ for D in $SEQ; do
   # Routing diagnosis: full 20-way domain grid at every phase.
   # Routes are neuron prefixes PER HEAD: 64 x mult (see NPH above).
   echo "--- routing diagnosis phase $PHASE ($D) ---" >> "$A"
-  .venv/bin/python scripts/eval_router.py "$INIT" \n    --routes $(seq -s, $((BASE_MULT * NPH)) $((GROW * NPH)) $((CUR_MULT * NPH))) \n    --domains "$DOMAINS" \n    --batch "$BS" >> "${LOG}/ladRA2_routdiag_p${PHASE}.txt" 2>&1
+  .venv/bin/python scripts/eval_router.py "$INIT" \
+  --routes $(seq -s, $((BASE_MULT * NPH)) $((GROW * NPH)) $((CUR_MULT * NPH))) \
+  --domains "$DOMAINS" \
+  --batch "$BS" >> "${LOG}/ladRA2_routdiag_p${PHASE}.txt" 2>&1
 
   # Milestones: full interference matrix + 19-way boundary grid at phases 5/10/15/20
   if [ "$PHASE" -eq 5 ] || [ "$PHASE" -eq 10 ] || [ "$PHASE" -eq 15 ] || [ "$PHASE" -eq 20 ]; then
