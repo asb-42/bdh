@@ -429,22 +429,24 @@ language is always at ${\sim}2.0$ while everything else degrades to 20--80 ppl.
 
 \subsection{Arm G: growth without routing}
 
-With width growing $+32$ neurons/head per phase ($\times128{\to}\times708$, ${\sim}554$M final
+With width growing $+32$ neurons/head per phase ($\times128{\to}\times704$, ${\sim}554$M final
 params), forgetting is \emph{identical} to fixed capacity:
 \begin{itemize}\itemsep2pt
 \item Target acquisition degrades at later phases (peak 3.49 at LT, $>2.6$ threshold).
-\item Final erosion: EN $=41.2$ ppl, ES $=31.7$, most earlier languages at 30--80 ppl,
+\item Final joint-serving erosion: EN $=41.2$ ppl, ES $=31.7$, most earlier languages at 30--80 ppl,
 with catastrophic outliers (BG $=1436$, EL $=1268$).
-\item The grown model \emph{does} have routable structure (prefix selection gives
-10--$19\times$ improvement for well-routed domains: CS $=5.30$, DE $=3.03$, EL $=2.96$ vs.\ joint
-57.57), but the routing is coarse, not fine-grained.
+\item Under per-domain prefix routing, however, the same model retains its languages:
+routed serving at each domain's own training width measures BG $=2.50$, EL $=2.64$
+ppl (vs.\ acquisition $2.38$/$2.58$) on the completed 20-phase chain (G2). The 20-way
+routing diagnosis resolves $99.7\%$ of crops to a correct prefix (758/760 across 19
+domains), refuting the earlier ``coarse routing'' reading of this arm.
 \end{itemize}
 
-\textbf{The critical finding.} Growth alone does not prevent forgetting. The model adds
-capacity each phase, but new neurons do not protect earlier languages---weight updates still
-overwrite them. This is exactly what the theory predicts: \textbf{without routing/selection,
-growth is just a bigger container for the same interference}. The architecture contains the
-structure for isolation (Corollary~\ref{cor:prefix}); it must be actively selected.
+\textbf{The critical finding.} Growth alone does not prevent \emph{joint-serving} forgetting:
+the model adds capacity each phase, but new neurons do not protect earlier languages at
+joint serving---weight updates still overwrite them. The structure for isolation
+(Corollary~\ref{cor:prefix}) must be actively selected, and once selected, it works:
+routing recovers every trained language to near-acquisition quality.
 
 \subsection{Implications}
 
@@ -499,6 +501,27 @@ verdict. Replay uses real tokens; synthetic replay is untested. The growth-witho
 arm (Arm G) reached ${\sim}554$M params but could not test routing heads at that scale due
 to GPU memory constraints; routing measurements used batch-1 inference. The expansiveness
 measurement is a directional proxy over sampled states, not an operator-norm computation.
+
+All accumulation-era numbers (Arms R, G, GR) were measured under a since-discovered
+optimizer defect: AdamW's decoupled weight decay eroded gradient-masked (frozen) weights
+by a closed-form per-phase factor, invisible to loss but measurable in the tensors. Single-phase
+acquisition is unaffected (bounded regime nulls at $\le 2.5\%$, within the $2.3\%$ seed
+floor), but joint-serving erosion figures carry a three-way decomposition
+caveat (decay artifact vs.\ interference vs.\ co-adaptation), and every cross-arm contrast
+from that era shares the schedule as a confound. A replication run under the fix is training
+at the time of writing; its readout supersedes the leaky-era retention numbers. We record
+the defect, its closed form, and the instrument lessons in the companion report.
+
+egin{figure}[t]
+\centering
+\includegraphics[width=0.85\linewidth]{figures/decay_regimes.pdf}
+\caption{The two decay regimes, closed form vs.\ measurement. Left: cumulative segment
+amplitude $c^k$ for the two lr-schedule families ($c{=}0.8928$ defaults vs.\ $c{=}0.5798$
+cosine). Right: measured per-segment c-fits (blue, residuals $\sim$1e-5, four chain lengths)
+and the schedule-exact RA2 transition (red, sd 2.2e-07) on the predicted curves. The leak
+is invisible to loss; the curves are not.}
+\label{fig:decay}
+\end{figure}
 
 \section{Conclusion}
 Depth-recurrent weight sharing makes continual learning \emph{harder}: freezing weights does
@@ -793,6 +816,18 @@ is not linearly extractable from per-token deep residuals.
 \item Round-robin interleaving without replay volume: retention unchanged vs floor.
 \item Top-$k$ as consolidation aid: slightly worse forgetting than ReLU at identical
 schedules.
+\item \textbf{Silent weight erosion under gradient masking (methodological negative):}
+AdamW's decoupled weight decay multiplies every parameter with a gradient by
+$(1-\mathrm{lr}_t\cdot\mathrm{wd})$ each step, even when the gradient is exactly zero---
+so a gradient mask that zeroes frozen weights does not stop their erosion. On our
+ladders this decayed masked segments by a closed-form per-phase factor
+(p$_{\text{exit}}$ = p$_{\text{entry}}\cdot\prod_t(1-\mathrm{lr}_t\cdot\mathrm{wd})$),
+invisible to the loss curve, and would have gone unnoticed had we not inspected
+tensors directly. Independent teams have reported the same signature in MoE training
+(silent expert death under AdamW+weight decay, weight norms falling toward zero while
+evaluations stay normal; cf.\ concurrent MoE stabilization work surfaced via the Marin
+project's public tracker). The lesson generalizes: aggregate training metrics cannot
+detect silent weight erosion; per-segment statistical monitoring can.
 \end{enumerate}
 
 \section*{Acknowledgments}
