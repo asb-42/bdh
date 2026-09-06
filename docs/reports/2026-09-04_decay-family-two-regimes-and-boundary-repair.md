@@ -109,3 +109,56 @@ Open (for the manuscript §4 rewrite, after RA2b):
 - Backfill checkpoints: `.200:/media/data/coding/bdh/out/bdh_europarl_ladG2-*.pt` (group `coding`, g+rw).
 - Tools: `scripts/repair_decay.py` (per-segment c-fit), `scripts/boundary_repair.py` (single-scalar boundary restore; `--phase j --c 0.8927|0.57978`), `scripts/eval_router.py` (routes = prefix widths; single-domain probes with `--routes <width>`).
 - Staging note: the G2 repair used symlinked sources under a `ladGX` prefix (ladG phases 1–15 + ladG2 phases 16–20).
+
+## Appendix B (2026-09-06): amendments — closed form, replicate floors, regime nulls, compile transparency
+
+Post-publication measurements (2026-09-05/06, .200/RTX-4090, chains S0a–S0e/M/M-fixed under HAK bdh-cl #113–#125). All amendments fold into the sections above where noted.
+
+### B.1 The decay constant is a closed form, not a fit (upgrades §1)
+
+For any coordinate whose gradient is the zero tensor (not None), AdamW's decoupled decay gives `p_exit = p_entry · Π_t(1 − lr_t·wd)` exactly, independent of data, loss, or routing (pi-50, #96/#123; mechanism at train.py:96-101 gradient-mask path). The measured per-phase factors are therefore derivations:
+
+| family | schedule (from flags) | schedule product (f64) | f32 scalar realization | measured |
+|---|---|---|---|---|
+| G/GR/G2 | defaults 30/300, min_lr 1e-4 | 0.892752 | 0.892635 | 0.892636(2) — 17 transitions (pi-50 weight-norm ratios) |
+| RA2 | 1000/10000 cosine | 0.579775 | — (no plateau) | 0.579775 sd 2.2e-07 on the es→en_best transition (pi-50 #123[2]) |
+
+The f32 term: at the plateau lr=1e-4, f32(1 − 1e-5) = 0.99998998 is below the true 0.99999 by 1.36e-8/step; over ~9,700 plateau steps the accumulated offset is −1.32e-4, matching the measured −1.303e-4 to +1.4e-6 (Quinn, #102/#124). Deterministic sign (f32 rounds down here) — this is why the offset is fixed, not noisy. Three instruments, four-decimal agreement: torch c-fits (0.89263), weight-norm ratios (0.892636(2)), atlas elementwise means (0.8926).
+
+### B.2 Fork points are provenance lookups, not uncertainty (replaces the fork-band caveat in §5/§6)
+
+The .200-era base-ladder phases initialized from the parent's `_best` checkpoint (script comment documents the later `_best`→`_last` fix; the executed era forked from `_best`). Each transition's decay factor is therefore `Π_child / Π_tail(parent_best_step)` — and the fork step is readable from checkpoint metadata (en_best.pt: step=9200, best_val=0.8087). All ten base-era transitions replicate exactly from log argmins (Quinn #102); the es transition independently re-measured at the schedule-exact 0.579775 by pi-50 (#123[2]). Consequence: cite fork identity per figure; the closed form holds with the same precision everywhere.
+
+### B.3 Replicate floors and regime nulls (the 2×2, adds error bars to §2/§5)
+
+bg phase, init hu_last (mult 416→448), 10k steps, batch 1, .200/RTX-4090, seed as noted, pre-registrations #113/#120/#124:
+
+| run | seed | regime | acq (best-val) | joint | routed @28672 |
+|---|---|---|---|---|---|
+| S0a | 1337 | leaky cd89ed7 | 2.74 | 2.79 | 2.90 |
+| S0b | 1337 | leaky cd89ed7 | 2.74 | 2.79 | 2.90 |
+| S0c | 1338 | fixed 5422561 | 2.62 | 2.64 | 2.75 |
+| S0d | 1337 | fixed 45450e3 | 2.68 | 2.74 | 2.87 |
+| M | 1337 | leaky + aggressive cosine | 2.55 | 2.61 | 2.72 |
+| M-fixed | 1337 | fixed + aggressive cosine | 2.49 | 2.56 | 2.67 |
+| S0e | 1337 | fixed, eager (TORCHDYNAMO_DISABLE=1) | 2.66 | 2.72 | 2.85 |
+
+Verdicts (all against pre-registrations, signed):
+- **S1 (kernel determinism): PASS** — S0a/S0b bit-identical on all six tensors; the evaluator is also deterministic (A10a: identical outputs twice).
+- **S1d (seed floor): 2.3–4.4 %** (S0c vs S0d, both fixed): acq 2.3 %, joint 3.8 %, routed 4.4 %. This is the error bar for every single-cell number in this report. The G-vs-GR spread (10–18 %) remains mostly real, but sub-5 % contrasts are noise-level.
+- **S2d + MF1/MF2 (single-phase regime effect): NULL** — under default schedule (S0a vs S0d: 2.2 %) and under aggressive cosine (M vs M-fixed: 1.9–2.4 %), all below the seed floor. The leak does not measurably hurt single-phase acquisition; damage is cumulative across phases (consistent with M2/M3: RA2-style collapse is a multi-phase phenomenon).
+- **S1e (compile transparency): PASS** — S0e (eager) vs S0d (compiled): all deltas −0.7 %, well below the seed floor. torch.compile does not perturb the science; kernel-mode stays a provenance column, not a variance term.
+- **S4 (fix in-chain): PASS ×4** — c-factor vs parent = 1.000000 exact on S0c, S0d, M-fixed (this host) and on the live RA2b chain en→es→pl (gx10, `scripts/p5_inchain_check.py`).
+- **A10b (eval batch): +1.1 %** (batch 4 vs 1) — small; kept separate from the training-batch effect below.
+
+### B.4 S2 correction: the 2.74-vs-2.41 gap is the training batch (retracts the era-drift hypothesis)
+
+The Aug-26 reference (ladG-bg, ppl 2.41) trained with **batch_size=2**; all S/M runs used batch_size=1 (checkpoint cfgs verified; pi-50 #123[1]). At fixed seed/geometry/steps/lr, halving the training batch costs **+13.7 %** acquisition ppl (n=1, carrying the 2.3 % seed floor). The earlier "~12 % unexplained era term" in this thread is retracted: same interpreter stack both sides (venv untouched since 2026-08-22), same evaluator, both eras compiled (identical 1400 ms first-step warmup signature). Process adoptions: training batch is a mandatory cfg column; cross-era comparisons diff the whole resolved cfg; requirements.txt is unpinned — a pip-freeze line belongs in every manifest.
+
+### B.5 Repaired-joint cells are unreplicated (qualification on §2)
+
+The repaired-joint column (§2) spans 577.92–1591.34 on bg across arms that share geometry and schedule — an 80 % spread with one cell reversing sign (GR). This is a mechanism signal (co-adaptation strength differs by chain state), not noise; but until a third arm agrees, treat each repaired-joint cell as n=1. The repaired-ROUTED cells are better behaved (G and G2 identical at 41.31/35.08, §2 internal consistency check) and remain the load-bearing evidence.
+
+### B.6 Retention without route-awareness, stated plainly (sharpens §5.4)
+
+Under mild decay, growth + likelihood routing retains languages WITHOUT route-aware training (G2 routed bg 2.52, sv 3.27 vs acquisition 2.38/3.22 — now carrying the ±2.3–4.4 % floor). Under aggressive decay at single-phase level, nothing breaks either (M2/M3 nulls). The open question the RA2b readout answers is whether route-aware training matters at all once the leak is fixed — if RA2b's retention matches G2's, the route-aware contribution was compensating for the leak it created.
