@@ -23,7 +23,7 @@ R5 — **Publish-before-write for GPU claims.** Prefix + config announced on the
 | # | Task | Owner | Machine | Status |
 |---|---|---|---|---|
 | A1 | S/M chain: S0a/S0b fixed-seed bg duplicates — DONE: bit-identical on all six tensors (S1 PASS; joint 2.79, routed 2.90 identical) | A0-Quinn | .200 GPU | done 22:29 |
-| A1b | S0c: bg with `--seed 1338` (pi-50 amendment 1; my #113 "no --seed flag" claim was wrong — flags are auto-generated over Config fields) — prices seed/data-order variance as a second floor | A0-Quinn | .200 GPU | running since 06:11 |
+| A1b | S0c+S0d: seed floor + regime contrast (2×2 completion) — DONE: S1d seed floor acq 2.3%/joint 3.8%/routed 4.4%; S2d regime@acq 2.2% = within seed noise, not resolvable at n=1; S4d c=1.000000 (third .200 fix confirmation); S2 final: all controllables excluded (kernel 0, seed 2.3%, batch 1.1%, regime ≤2.5%, compile-mode both eras compiled per warmup signature in Aug-26 log) → residual ~12% = era drift (torch 2.13.0+cu130 today, Aug version unlogged, F-V6 lesson) | A0-Quinn | .200 GPU | done 08:29 |
 | A2 | Report v1.1 amendments: closed-form statement (schedule 0.892752 / f32 realization 0.892635 / measured 0.892636(2)), fork band, replicate spread, repaired-joint unreplicated, G2-retention-plainly | A0-Quinn | container | queued |
 | A3 | Marin adoption memo: health checklist → BDH, per-segment norm-forecast drift monitor, presentation patterns | A0-Quinn | container | queued |
 | A4 | docs/reviews publication of pi-50's Marin/instrument note under operator policy #98 | pi-50 | gx10 | his queue |
@@ -32,11 +32,11 @@ R5 — **Publish-before-write for GPU claims.** Prefix + config announced on the
 | A7 | Manuscript skeleton with PENDING-RA2b slots — **must follow A11** (external positioning first) | A0-Quinn | container | queued |
 | A8 | F1 fix: ladder_ra2.sh literal-`\n` corruption — DONE (bash -n OK, zero literal backslash-n) | A0-Quinn | container | done @5422561 |
 | A9 | p5_inchain_check.py upstreamed — DONE | A0-Quinn | container | done @5422561 |
-| A10 | **NEW (amendment 2): eval-side replicate** — evaluator variance check: same ckpt evaluated twice (determinism), plus one eval at different batch size; three invocations on existing checkpoints, ~15 min GPU | A0-Quinn | .200 GPU | queued after S0c |
+| A10 | Eval-side replicate — DONE: A10a PASS (det1 == det2 exactly, 2.64/2.64 — evaluator deterministic, crop RNG Generator(1234) holds); A10b batch-4 vs batch-1 = 2.67 vs 2.64 (+1.1%, small — does not explain S2) | A0-Quinn | .200 GPU | done 07:47 |
 | A11 | **NEW (amendment 4): external positioning pass** — M4 prior-art owed; arXiv 2604.09780 (The Myth of Expert Specialization) attacks the routdiag reading directly (cosine≈1 + scale-invariant stable_rank is exactly the pattern it predicts); skeleton must be drafted with it, not restructured later | pi-50 (claimed) | read-only | his queue |
 | A12 | **NEW (amendment 5): int-cast screen** — grep repo analysis scripts for `int(x.abs().max())==0`-class zero-checks — DONE: clean; no dangerous idiom in committed scripts; nearest pattern is verify_masked_forward.py:136 `max_ulp` reporting (intended integer ULP count, not a zero-check) | A0-Quinn | container | done 06:17 |
 | A13 | **C4 moved from Phase C (amendment 3): F-V8 ruling** — draft in §6, operator sign-off | operator | — | draft ready |
-| A14 | **C5 moved from Phase C (amendment 3): es-argmin discrepancy** — pi-50 inversion implies parent-best@9594, my log extraction says en best@9200; 100x per-head spread on this one transition. Resolve against the actual base-era ladRA2_en log on .200 | A0-Quinn | .200 read-only | queued |
+| A14 | es-argmin discrepancy — RESOLVED (#121): en best@9200 triple-confirmed (log argmin 201 rows, en_best.pt step metadata = 9200, closed-form replication 10/10 incl. es: pred 0.584705 = measured); pi-50's 9594 inversion is an artifact of that transition's noise (per-head spread 3.6e-4, ~100x the others — self-flagged); es_best==es_last==10000 explains sv's exact factor. Fork points = log argmins, cross-confirmed by checkpoint metadata | A0-Quinn | .200 read-only | done 08:15 |
 
 Phase A exit criterion: A1–A14 landed or explicitly waived on the bus.
 
