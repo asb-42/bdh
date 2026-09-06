@@ -70,10 +70,10 @@ Phase A exit criterion: A1–A14 landed or explicitly waived on the bus.
 
 ## 6. Open decisions (operator)
 
-1. ~~Plan approval~~ — **RESOLVED**: approved with amendments (#116), folded into this v1.1.
-2. **B5 partial-readout ruling** — draft below, sign-off pending.
-3. **C4/F-V8 ruling** — draft below, sign-off pending.
-4. ~~Deploy key for .200~~ — **RESOLVED** (#117): registered, origin switched, fetch + ff verified, .200 on 5422561.
+1. ~~Plan approval~~ — **RESOLVED**: approved with amendments (#116), folded into v1.1.
+2. ~~B5 partial-readout ruling~~ — **RESOLVED** (operator sign-off #119 → bus #120): per-phase acquisition quotable at exit; no retention/forgetting headline before phase-20 + full routdiag + milestones. Forward-looking for RA2b; the RA2 final report is not a retroactive violation (its retention numbers were reported at chain completion, which the ruling permits).
+3. ~~C4/F-V8 ruling~~ — **RESOLVED** (operator sign-off #119 → bus #120): fresh-optimizer-per-phase is intentional; keep saving optimizer_state as substrate for moments-census telemetry; future true-resume would be a separate explicit flag.
+4. ~~Deploy key for .200~~ — **RESOLVED** (#117): registered, origin canonical, fetch + ff verified. NOTE: operator (asb) needs his own GitHub credentials on .200 for pulls — a0-quinn has the deploy key in per-user config; asb needs (a) second deploy key, (b) HTTPS+token, or (c) sudo -u a0-quinn. Operator's call.
 
 ### Draft ruling B5 — partial RA2b readout (sign-off pending)
 
@@ -109,4 +109,4 @@ Pre-registrations in #113; S0c in #117. All numbers: bg phase, init ladG-hu_last
 - M1 (aggressive acquisition): 2.55 < 2.74 — better, as predicted (band 2.2–3.0).
 - M2 (M-joint vs S-joint): 2.61 < 2.79 — **my prediction FALSIFIED**: one aggressive phase does not hurt joint serving at phase level.
 - M3 (M-routed vs S-routed): 2.72 < 2.90 — **FALSIFIED**: one aggressive phase does not break routed serving either. RA2-style collapse is a multi-phase cumulative phenomenon (c^k over many later phases), not a single-phase effect. Sharpens the §4 three-way decomposition.
-- S0c verdicts pending (seed floor; S1c = S0a vs S0c bitwise expected DIFFER, pricing seed/data-order variance).
+- S0c verdicts (seed 1338): **REGIME-CONFOUNDED** — my deploy-key pull moved .200 from cd89ed7 (leaky) to 5422561 (fixed) between S0b and S0c, so S0c ran under the FIXED regime (growth line: 'bit-exact via step-end restore'). c-factor vs hu_last: 1.000000 (P5 cross-platform PASS on .200/RTX-4090 — first independent confirmation of the fix on this hardware). S1c (s0a vs s0c) is therefore NOT a pure seed floor — it is seed+regime combined (acq 2.74→2.62 = −4.4%; joint 2.79→2.64 = −5.4%; routed 2.90→2.75 = −5.2%). A proper seed floor needs S0d (one variable at a time), now a Phase-A nicety, not a blocker (RA2b carries the fixed regime prospectively). Filed as lesson.
