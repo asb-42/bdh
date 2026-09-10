@@ -88,12 +88,15 @@ signal**. A normalized-energy router of the form `s_j(x) = mean_{i∈N_j} a_i(x)
 work regardless of normalization. Selection must come from **functional contribution** — hence
 `exp4_selfnll_selection.py`: label-free argmin-NLL over the 23 cumulative prefixes on a
 calibration slice, scored on a disjoint test slice. Pre-registered bar: ≥90 % correct-prefix
-accuracy **and** within 10 % of oracle PPL. **Status: that harness is not yet trustworthy.** It
-fails its own sanity check — unmasked English comes out near 198 where the matrix gives 31.07 —
-so its accuracies and PPL columns must not be quoted. The defect is in the script's crop/target
-path, not in masking, because the identical masks reproduce exit values exactly in
-`exp3_masked_vs_free.py`. Labelled `KNOWN-ISSUE` in-file; reconciling it with
-`scripts/lang_eval.py` is the next action.
+accuracy **and** within 10 % of oracle PPL. **Status 2026-09-10 (later): the harness bug is fixed and it now passes its own sanity gate.**
+Root cause was pairing inputs from one buffer half with targets from the other, which drove every
+NLL to chance level (~e^5.3 ≈ 198) and made argmin correctly choose the *smallest* model — a
+silent instrument failure, not a scientific result. Three earlier `str.replace` patches had
+no-op'd without complaining, which is why the fix took several rounds; the instrumented debug run
+(free en 31.34 / masked 2.28, matching the matrix) localised it immediately. The script now aborts
+unless unmasked English lands in 15–60 and oracle-masked English below 4. First cell under the
+fixed code: label-free argmin-NLL selects width **8192 for English — its own prefix — reaching PPL
+2.36 against an oracle of 2.36** (free eval 31.36). Full 20-domain sweep running, ~9 min/domain.is the next action.
 
 ## 6. Cross-checks on the fixed-capacity arm (FCS, `bdh@3c9510b`/`d76ca5f`)
 
