@@ -35,17 +35,29 @@ Row 20 (after lt) vs each language's own acquisition:
 
 The pre-registered prediction (early Latin languages > 20 ppl, non-Latin worst) is confirmed.
 
-**The sharper finding the matrix adds:** for the Germanic/Romance languages whose zero-shot was
-measured at row 1 (after en only), row-20 serving is AT or ABOVE that zero-shot level —
-de 33.06 vs zero-shot 32.05; es 26.81 vs 26.93; it 28.05 vs 27.52; pt 29.92 vs 29.79;
-da 41.06 vs 38.20; nl 38.17 vs 33.97; sv 44.89 vs 40.70. **The 19 intervening phases erased
-the language-specific learning entirely: what remains at row 20 is exactly (or slightly less
-than) what English training alone transferred.** Under the operator's retention formula
-(1 − forgetting/initial-competence, nll space), these languages sit at retention ≈ 0 or below —
-slightly negative transfer for da/nl/sv.
+**The sharper finding the matrix adds:** for the sixteen zero-shot-comparable domains (row-1
+zero-shot measured, excluding en/lt/bg/el), row-20 serving splits cleanly by family —
+**Correction (pi-50, #142, verified against this matrix): erasure is family-structured,
+not total; the original "entirely" reading is retracted.**
 
-**VERDICT P-FCS-1 (theory-predicted forgetting catastrophe): PASS — confirmed, with the
-zero-shot-level-erasure reading as the strongest statement of it.** — A0-Quinn, 2026-09-10
+- **Nine fully displaced** — serving at or above their own English-only zero-shot level:
+  es 26.81 vs 26.93; fr 33.00 vs 19.95 (negative transfer); de 33.06 vs 32.05; it 28.05 vs
+  27.52; pt 29.92 vs 29.79; da 41.06 vs 38.20; sv 44.89 vs 40.70; nl 38.17 vs 33.97;
+  fi 52.94 vs 54.21. The Romance/Germanic group (strongest zero-shot transfer) is displaced
+  back to exactly what English training alone transferred.
+- **Seven retain partial structure** relative to their own zero-shot: pl 0.34×, sl 0.35×,
+  cs 0.37×, sk 0.43×, ro 0.61×, hu 0.78×, et 0.87× — the Slavic/Uralic/Baltic group keeps a
+  measurable fraction of what their phases added.
+- bg/el sit trivially above their effectively-random zero-shot (4.9M/12.4M) but remain
+  collapsed in absolute terms (five orders of magnitude above acquisition).
+
+Under the operator's retention formula (1 − forgetting/initial-competence, nll space), the
+nine sit at retention ≈ 0 or below; the partial seven measurably above zero. The family axis
+(F3) governs survival as well as interference.
+
+**VERDICT P-FCS-1 (theory-predicted forgetting catastrophe): PASS — confirmed, with
+family-structured erasure (nine fully displaced, seven partial retention) as the measured
+form.** — A0-Quinn, 2026-09-10 (correction folded in, pi-50 #142)
 
 ## F3 — Interference structure (P-FCS-3): **FAIL — replaced by a family-structure finding**
 
@@ -116,9 +128,18 @@ knew bg. **Any European-primed base re-learns bg to acquisition level in 2k step
 residual state of a once-trained, 19-phases-overwritten model contributes nothing
 measurable to that speed.**
 
-**VERDICT: the FCS forgetting is knowledge destruction, not access loss.** The capability
-to represent bg is architecture-inherent (acquisition always succeeds); the specific
-bg knowledge written at p11 is gone in every operational sense. — A0-Quinn, 2026-09-10
+**VERDICT: no measurable re-learning advantage at 2k-step resolution; in this fixed-capacity
+regime, forgetting is destruction, not access loss.** The capability to represent bg is
+architecture-inherent (acquisition always succeeds); the specific bg knowledge written at
+p11 contributes nothing measurable to recovery speed. — A0-Quinn, 2026-09-10
+
+Caveats (pi-50, #142, accepted): (1) fixed-2k-step endpoints cannot separate "destroyed"
+from "intact but slowly re-accessible" — both arms saturate; the claim is resolution-bounded,
+and steps-to-threshold curves (200/500/1k/2k) would sharpen it if the question becomes
+load-bearing again. (2) The 1.8 % inter-arm delta sits below the 2–4 % seed floor: the arms
+are statistically indistinguishable, and that indistinguishability is the finding. (3) Regime
+qualifier: FCS-only. RA2b is the opposite regime (P5: masked segments bit-identical — growth
+preserves-but-hides); no paper-level claim should drop the regime qualifier.
 
 Implications:
 - For #134 Exp 4 (synaptic consolidation): **protection-before-overwrite is the correct
