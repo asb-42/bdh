@@ -96,7 +96,27 @@ no-op'd without complaining, which is why the fix took several rounds; the instr
 (free en 31.34 / masked 2.28, matching the matrix) localised it immediately. The script now aborts
 unless unmasked English lands in 15–60 and oracle-masked English below 4. First cell under the
 fixed code: label-free argmin-NLL selects width **8192 for English — its own prefix — reaching PPL
-2.36 against an oracle of 2.36** (free eval 31.36). Full 20-domain sweep running, ~9 min/domain.is the next action.
+2.36 against an oracle of 2.36** (free eval 31.36).  Full sweep result: **both pre-registered bars PASS** — label-free argmin-NLL selected the
+correct own-prefix for **20/20** domains, and the PPL under the selected prefix sits within
+**±8 %** of each language's acquisition exit (mean |penalty| 3.31 %, median 2.12 %). Example:
+bg 6.18 vs exit 6.09, el 6.45 vs 6.36, hu 3.00 vs 2.88, pl 3.25 vs 3.01. Unconstrained free eval
+on the same checkpoint gives 20–76 for those languages. So on a closed set of 20 prefixes, with
+~1 MB of calibration bytes per input, internal likelihood identifies the right submodel where
+activation energy could not (A1: ≤1/20).
+
+Two self-reported defects found while scoring this: my `ppl_oracle` column used an off-by-one
+own-width formula (`(POS+3)*BLK`), which truncated each language's newest block and inflated the
+apparent oracle cost (lt 61.36 vs its true 3.83) — hence the nonsense `-89.7 %` summary line in
+the raw log; the selection column itself was unaffected, and the table above is scored against
+the independent exp-3/matrix exits. And the earlier chance-level pairing bug (§5 above).
+
+Honest limits on this positive result, in descending order of importance: (i) selection consumes
+~1 MB of same-domain calibration bytes — a token-budget sweep is required before anyone calls this
+"automatic", since real deployment offers far less; (ii) 23 masked forward passes per input is up
+to 23× inference cost, so any compute claim must net that out (binary search over widths would
+cost ~5 passes and needs its own accuracy check); (iii) there is no rejection option, so a 21st
+unseen language will be forced onto some existing prefix rather than flagged as novel — that is
+experiment A3, together with code-switched inputs and per-window versus per-sequence decisions.is the next action.
 
 ## 6. Cross-checks on the fixed-capacity arm (FCS, `bdh@3c9510b`/`d76ca5f`)
 

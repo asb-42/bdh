@@ -44,7 +44,9 @@ for l in SEQ:
     xc,_=data(l)
     scores=[nll(xc,w,IT) for w in WIDTHS]
     best=int(np.argmin(scores)); bw=WIDTHS[best]
-    own=(POS[l]+3)*BLK if l!="en" else 4*BLK
+    own=(POS[l]+4)*BLK   # phase k=POS+1 owns cumulative width 8192+2048*(k-1) = (POS+4)*BLK.
+    # Earlier (POS+3) cut each language newest block, inflating the oracle column (lt 61.36
+    # instead of 3.83). Selection column was never affected by this.
     correct = BLOCK_OF[bw//BLK-1]==l; ok+=correct
     xd,_=data(l)
     p_sel=math.exp(nll(xd,bw,IT)); p_orc=math.exp(nll(xd,own,IT)); p_free=math.exp(nll(xd,None,IT))
