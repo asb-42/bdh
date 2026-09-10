@@ -99,5 +99,41 @@ cross-arm acquisition comparisons, not to within-matrix drift (same host, same i
 Single seed; one of 20! orderings; the FCS wd term is the standard uniform regime (nothing
 masked, nothing protected — the intended fixed-capacity baseline).
 
+## F6 — Two-arm re-acquisition probe (Exp-4 companion to #134/#135): knowledge is destroyed, not hidden
+
+Motivation (#134 Exp 4, sharpened by #135): does the final FCS model still *contain* bg
+structure it has lost access to, or was the bg knowledge destroyed by 19 overwriting
+phases? Test: fine-tune on bg for 2k steps from two bases and compare recovery speed.
+
+| arm | base | bg state at base | bg after 2k steps |
+|---|---|---|---|
+| main | ladFCS-lt_last (row 20; bg trained at p11, 19 phases ago) | serving 18,613 | **1.67** |
+| control | ladFCS-en_last (row 1; bg never trained) | zero-shot 4.9M | **1.70** |
+
+Delta 1.8 % — below the measured seed floor (2–4 %). Both arms land at the acquisition
+band (bg acquisition at p11 was 1.54) in 2k steps regardless of whether the base ever
+knew bg. **Any European-primed base re-learns bg to acquisition level in 2k steps; the
+residual state of a once-trained, 19-phases-overwritten model contributes nothing
+measurable to that speed.**
+
+**VERDICT: the FCS forgetting is knowledge destruction, not access loss.** The capability
+to represent bg is architecture-inherent (acquisition always succeeds); the specific
+bg knowledge written at p11 is gone in every operational sense. — A0-Quinn, 2026-09-10
+
+Implications:
+- For #134 Exp 4 (synaptic consolidation): **protection-before-overwrite is the correct
+  family** — post-hoc recovery has nothing left to recover faster than scratch. Growth+
+  masks (RA2b) are the extreme version of this and the only measured configuration that
+  retains; replay (H1p) re-writes instead of protecting.
+- Side readings, consistent with F3: bg re-training moved en 29.02 → 21.48 (cross-family
+  byte-statistics help) and lt 2.13 → 14.45 (most-recent language takes the overwrite
+  damage) — family structure and recency co-occur, family dominates.
+- Honest bound: this probe measures re-learning *speed*, the practically decisive axis;
+  it cannot exclude sub-threshold residual structure (below the 2-4 % floor) — which by
+  the same bound is operationally irrelevant.
+
+Artifacts: out/logs/fcs_bg_reacq.log, out/logs/fcs_bg_ctl.log, checkpoints
+ladFCS-bgREACQ / ladFCS-bgCTL on .200.
+
 — A0-Quinn, 2026-09-10 · artifacts: .200 out/logs/fixedcap_matrix.txt, fixedcap_<lang>.log × 20,
 ladFCS-* checkpoints × 40
