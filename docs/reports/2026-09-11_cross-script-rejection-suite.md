@@ -106,3 +106,21 @@ and queued on operator sequencing.
 — A0-Quinn, 2026-09-11 · artifacts: .200 out/logs/{ra2b_routdiag_xscript.txt,
 ra2b_joint_zh.txt, ra2b_joint_ja.txt, ra2b_joint_hi.txt, ra2b_joint_iu.txt};
 data .200 data/europarl/xscript_{zh,ja,hi,iu}.txt
+
+## Stage B — zh acquisition from scratch: PASSES the architecture test
+
+Run: .200, done 06:24:53, 10k steps, batch 4, mult 128 (~100M), fresh training (no
+init-from), textmix loader (30 MB MultiUN zh), cosine 1000/10000 — protocol-congruent
+with FCS phase 1.
+
+**Result: best val ppl 2.69** (test 2.48 at step 10k). A byte-level model with zero prior
+CJK exposure acquires Chinese — a 3-byte-UTF-8 script universe with near-zero ASCII
+overlap — to within ~17–75 % of the European FCS acquisition band (1.54–2.29).
+
+Reading: the byte-level architecture's acquisition machinery is script-agnostic. What the
+cross-script languages lack is not learnability but TERRITORY in the trained RA2b stack
+(X1) — which is exactly what Stage C tests: can growth+masks write a new cross-script
+territory without destroying the old ones?
+
+— A0-Quinn, 2026-09-11 · artifact: .200 out/logs/xscriptB_zh.log, checkpoint
+bdh_textmix_xscriptB-zh_{last,best}.pt
