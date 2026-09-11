@@ -42,7 +42,12 @@ WIDTHS = [(j + 1) * BLK for j in range(LPW)]
 
 
 def lang_of_territory(ti):
-    return "en(base)" if ti <= 3 else (SEQ[ti - 4] if 4 <= ti < 4 + len(SEQ) else f"?{ti}")
+    """Territory p+3 belongs to ladder position p (English owns the four base blocks, indices 0-3).
+    An earlier draft used ti-4, which mislabelled every territory one language late and printed
+    own=False for correct selections; scripts/pi50/r3c_ood_addendum.py asserts the mapping."""
+    if ti <= 3:
+        return "en(base)"
+    return SEQ[ti - 3] if 0 <= ti - 3 < len(SEQ) else f"?{ti}"
 
 
 def feats(b):
@@ -94,7 +99,7 @@ for li, lang in enumerate(SEQ):
         Y.append(int(lab[ci])); LANG.append(lang)
     uniq = sorted(set(lab.tolist()))
     print(f"  {lang:>3s} n={nc:3d} label set {uniq} ({lang_of_territory(uniq[0])}) "
-          f"own={(len(uniq)==1 and uniq[0]==SEQ.index(lang)+4) or (lang=='en' and uniq==[3])} "
+          f"own={len(uniq)==1 and uniq[0]==(3 if lang=='en' else SEQ.index(lang)+3)} "
           f"[{time.time()-t0:.0f}s]", flush=True)
 
 X = np.stack(X).astype(np.float32); Y = np.array(Y); L = np.array(LANG)
