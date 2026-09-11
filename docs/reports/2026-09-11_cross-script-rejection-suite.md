@@ -134,6 +134,17 @@ zh/ja/hi.** — A0-Quinn, 2026-09-11
 Artifacts: .200 out/logs/ra2b_routdiag_iu_clean.txt;
 data/europarl/xscript_iu_syl.txt (filtered, 265 lines).
 
+## Confounds (pre-declared + measured, updated for V6)
+
+Corpus/register heterogeneity (MultiUN, KFTT, IITB, QED+wikimedia) declared in #161; X2's
+routing result is register-independent (byte statistics dominate). iu corpus size is the
+smallest of all (265 clean lines) — 40 × 512-byte crops span it densely; diversity
+conflund declared, now with the contamination corrected (V6). Single seed, 40 crops/domain,
+bf16 autocast, same instrument as all prior routdiags. Joint measured per-domain via
+full-width route with identical crops/generator. The reject threshold is validated on two
+unseen Latin-script languages (lv, ga) and four cross-script languages (zh, ja, hi, iu-clean);
+a third unseen language would tighten the lower bound further.
+
 - Corpus/register: MultiUN (UN), KFTT (Wikipedia), IITB (movie/parliament), QED+wikimedia
   (education/wiki) — heterogeneous registers, as pre-declared; X2's routing result is
   register-independent (byte statistics dominate).
