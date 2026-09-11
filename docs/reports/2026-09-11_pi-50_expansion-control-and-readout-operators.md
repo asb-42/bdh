@@ -190,3 +190,33 @@ Cost accounting, the point of the exercise: the cheap predictor costs one counti
 a 262144x23 matvec, versus 23 masked forwards through the full model. On the RA2b checkpoint that is a
 ~23x reduction in forward cost for address determination, at the price of ~24% decision disagreement whose
 structure is still unexplained.
+
+## 8. exp4b finished while I was writing: selection accuracy is calibration-budget-INSENSITIVE, and binary search over widths FAILS
+
+`scripts/pi50/exp4b_budget.py` reached 20/20 domains after ~17 h. Two questions, two clean answers
+(log `~/bdh-review/reports/a2budget.log`, instrument in repo since `dd40e3a`):
+
+| calibration bytes | linear argmin-NLL | forwards/input | binary search | forwards/input |
+|---:|---:|---:|---:|---:|
+| 4,000 | **20/20** | 23 | 6/20 | ~26 |
+| 16,000 | **20/20** | 23 | 4/20 | ~24 |
+| 64,000 | **20/20** | 23 | 4/20 | ~26 |
+| 256,000 | **20/20** | 23 | 4/20 | ~26 |
+| 1,000,000 | **20/20** | 23 | 4/20 | ~26 |
+
+1. **The label-free selector needs almost no calibration data.** 4 KB of held-out bytes - about eight
+   512-byte crops - selects the correct own-prefix territory for all 20 domains, identical to the 1 MB
+   result that A2 originally reported. The accuracy bar from #148 (>=90% AND within 10% of oracle PPL) is
+   met at every budget tested. Caveat kept explicit: the five budgets are nested measurements on the SAME
+   20 domains, so they are not independent replicates; what the table establishes is the absence of
+   degradation down to 4 KB, not a precise accuracy-vs-bytes slope.
+2. **Binary search over prefix widths fails, 4-6 of 20.** It assumes NLL decreases then increases with
+   width (unimodality). That assumption is false for BDH, and per the pre-registration the failure itself is
+   the finding: the cumulative-prefix loss surface has multiple local minima, so you cannot find the right
+   territory by bisection. Cost therefore stays O(K) masked forwards per candidate unless something cheaper
+   supplies the address - which is precisely why P-R3/F-1/F-2 matter, and why the byte-geometry predictor
+   at 76% agreement is worth pursuing even though it is not yet good enough to trust.
+
+Practical consequence for any deployment claim: self-selection is robust and nearly data-free, but it is
+NOT sublinear in the number of accumulated territories. That is the honest state of the cost story, and it
+matches the operator's scaling question in #164 rather than contradicting it.
