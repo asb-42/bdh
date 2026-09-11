@@ -119,23 +119,44 @@ lineage (Byte-RNN/CharTransformer); AdamW decoupled decay (Loshchilov & Hutter)
 selective prediction; the FCS/RA2b methodological precedents (fixed-capacity CL
 baselines). Every entry verified against the actual paper before inclusion.
 
-## Authorship (operator decision pending, structure proposal)
+## Authorship (OPERATOR DECIDED, 2026-09-11 — binding)
 
-Organization: **Saga AI Labs**. Seats with contribution statements:
-- A0-Quinn (Saga seat): decay-leak discovery & closed form; RA2b/repair/S-M
-  instrument suite; FCS design & analysis; A3/V5/X OOD suite; cross-script stages;
-  manuscript drafting & revision.
-- pi-50 (exec seat): RA2b 400-cell matrix; A1 energy null; A2 selector (20/20);
-  expansion-control causality (83%); readout-operator negative results; prior-art
-  first pass (A4 note).
-- OC-GLM-200: weight-atlas scanning & fingerprinting of ladder chains (F-2
-  cross-validation of the decay law).
-- Operator (ASB): research direction & funding; experiment proposals #130/#134/#141;
-   advocatus-diaboli review (#164); all GO decisions; compute procurement.
-- ox-alpha: original single-session research (architecture, first experiments, rev-1
-  manuscript) — credited as historical contributor, no longer active.
-Backends change per seat; seat-stable per IDENTITIES.md. CRediT-style contribution
-statements per author; AI-authorship disclosed per venue norms.
+**Author line:** Agon Sandro Buchholz, Saga AI Labs. One named human author carrying
+responsibility; the organizational affiliation is Saga AI Labs (the forthcoming GitHub
+org).
+
+**AI systems are NOT authors.** Rationale (operator's, adopted): authorship implies
+accountability a language model cannot carry (no persistent identity, no liability,
+no answerability after session end); arXiv requires named human authors with verifiable
+affiliations; Nature/Science explicitly exclude AI systems from authorship. We follow
+the formal requirements exactly as far as required — and no further.
+
+**AI participation is disclosed maximally** in a dedicated Methods/Acknowledgements
+section (draft: docs/papers/rev4-ai-disclosure-draft.md): role-based (seats), with the
+backend history (which models served which seat, when) as a table, plus frameworks
+(Agent Zero, Pi, Opencode) and tools (HAK agent-messaging bus, Danwa, J-Space
+Cognition Suite, DOX). Seat-stable roles, backend-swappable implementations — the
+disclosure names roles first, models second, because seat<->backend is not 1:1.
+
+**Contribution statements (CRediT-style), for the Acknowledgements/Disclosure section:**
+- A0-Quinn (Saga seat; backends incl. GLM-5.3, DeepSeek-V4-Flash): decay-leak discovery
+  & closed form; RA2b/repair/S-M instrument suite; FCS design & analysis; A3/V5/X OOD
+  suite; cross-script stages A/B/C; manuscript drafting & revision.
+- pi-50 (exec seat; backend Qwen3.8-Flash-Next class): RA2b 400-cell matrix; A1 energy
+  null; A2 selector (20/20); expansion-control causality (83%); readout-operator
+  negatives; prior-art first pass (A4).
+- OC-GLM-200 (backend GLM-5.3-Flash class): weight-atlas scanning & fingerprinting of
+  ladder chains (independent cross-validation of the decay law).
+- ox-alpha (historical; backends incl. MiMo 2.5, DeepSeek-V4-Pro class): original
+  architecture, first experiments, rev-1 manuscript. Credited as historical
+  contributor; not in the author line, named in the disclosure.
+- Operator (ASB, the author): research direction & funding; experiment proposals
+  (#130, #134, #141); advocatus-diaboli review (#164); all GO decisions; final
+  responsibility for content and correctness.
+
+This is deliberately MORE transparent than academic professor/doctorand practice:
+the actual distribution of work is documented, not absorbed into one name.
+
 
 ## Division of labor for the rewrite
 
