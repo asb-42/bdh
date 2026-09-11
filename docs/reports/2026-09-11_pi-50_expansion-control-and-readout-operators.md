@@ -298,10 +298,11 @@ Three readings, in decreasing order of confidence:
    addressing — one counting pass instead of 23 masked forwards.
 3. **hi is the measured boundary.** Devanagari lies outside the convex hull of everything the classifier saw;
    it snaps to an arbitrary Latin territory (fi ×40) instead of bg/el. The likelihood router, which actually
-   evaluates the candidates, gets the reference answer by construction. That is the argument for a cascade
-   rather than a replacement: cheap prefilter in-support, escalate to the O(K) likelihood scan when the input
-   is far from every training territory. It also means abstention must key on distance-to-support, not on the
-   predicted route's score — hi's prediction was confidently wrong.
+   evaluates the candidates, gets the reference answer by construction. An earlier draft of this paragraph
+   called that prediction *confidently* wrong; `r3e_margins.py` (section 9.5) shows the adjective was too
+   strong — hi's margin sits below the in-support median, and a threshold catches 45 % of its crops. The
+   structural point survives: a cascade should prefilter in-support and escalate the O(K) likelihood scan when
+   the input is far from every training territory.
 
 Quinn expected iu-clean to still route bg/el; the cheap predictor says pl/ro. Either the byte model
 extrapolates poorly to syllabics as it does to devanagari, or the two addressers really do partition
@@ -319,3 +320,48 @@ pattern (non-Latin scripts outside the hull) rather than two curiosities.
   starved" produce identical-looking numbers.
 * Keep the two-axis rejection rule of #163 (ratio AND absolute competence); §9.3 point 3 supplies the
   mechanism for why the ratio axis alone cannot catch hi.
+
+### 9.5 Margin distribution: the stage-1 trigger for Sonde C, calibrated for free
+
+Quinn's #197 design note asked for the balanced arms' margin distribution rather than top-1 only, because
+Sonde C's cascade needs an uncertainty signal as its stage-1 trigger. Measured on the same fit
+(`scripts/pi50/r3e_margins.py`, artifact `docs/reports/data/r3_followups/r3e_margins.json`):
+
+**In-support reference.** On the 160 held-out trained-domain crops — all 160 correct — the top-1 minus top-2
+softmax margin has percentiles p5 = 0.030, p25 = 0.051, p50 = 0.094, p75 = 0.185, p95 = 0.513, and a minimum
+of **0.0139**. That minimum is the natural trigger floor: any threshold at or below it never fires on an
+in-support crop.
+
+**Out-of-support behaviour, against the likelihood-router reference:**
+
+| input | cheap routes | median margin | fraction below the 0.0139 floor | agrees with likelihood? |
+|-------|--------------|---------------|--------------------------------|-------------------------|
+| lv | lt ×40 | 0.104 | **0.00** | yes (lt 40/40) |
+| iu ASCII lines | en(base) ×40 | 0.090 | **0.00** | yes (English text) |
+| hi | fi ×40 | 0.015 | 0.45 | no |
+| zh | el ×36, sk ×2, bg ×1 | 0.008 | 0.82 | yes in aggregate |
+| ja | bg ×34, el ×6 | 0.007 | 0.85 | yes in aggregate |
+| ga | hu ×15, sv ×13, it ×3 | 0.004 | 0.85 | unknown |
+| iu syllabic-only | pl ×27, ro ×13 | 0.001 | **1.00** | unknown / likely no |
+
+The structure is better than expected and partly contradicts what I wrote in §9.3 before measuring it:
+
+* The two cases where the byte addresser **agrees** with the likelihood router on unseen material (lv→lt,
+  iu-ASCII→en) are exactly the two cases that sit comfortably inside the in-support margin band and would
+  never trigger escalation. The addresser is confident precisely where it is right.
+* Everything else fires the trigger between 82 % and 100 % of crops — including iu-syllabic, whose margin of
+  0.001 is the most extreme value in the table and which is also the case where the two addressers most likely
+  disagree.
+* **hi is the hard case**, and not for the reason I claimed: it commits to one territory consistently, so its
+  margin (0.015) lands just above the in-support minimum even though it is 6× below the in-support median. A
+  floor at the minimum escalates 45 % of its crops; a floor at the median would escalate essentially all of
+  them plus some legitimate in-support traffic.
+
+Design consequence for Sonde C, stated as a measurement rather than a preference: a single margin threshold
+gets you most of the way, and the residual is hi-shaped, so pair the margin with a byte-distance-to-support
+axis and let the OR of the two drive escalation. Thresholds should be frozen from the numbers above (floor
+0.0139 from n = 160 in-support crops; escalation rates quoted per input), which is the same
+freeze-before-evaluate discipline P-R4 applies to the two-axis rejection rule. Caveat to keep visible: the
+in-support floor comes from a fit that is 160/160 correct on these very crops, so it is optimistic — the real
+trigger will need its margin estimated on crops the fit did not see at all, ideally from a re-fit under the
+next growth phase, before anyone quotes a coverage guarantee from it.
