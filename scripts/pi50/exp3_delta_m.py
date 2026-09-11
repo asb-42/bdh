@@ -7,7 +7,8 @@ def per(m): return m*DM//NH
 owner={}
 for i,l in enumerate(SEQ): owner[l]= ("base(0-3)" if i==0 else f"blk{i+2}")
 M={}
-for r in csv.DictReader(open(os.path.expanduser("~/bdh-review/reports/ra2b_matrix.csv"))):
+for r in csv.DictReader(open(os.environ.get(
+        "MATRIX", "docs/reports/data/2026-09-10_ra2b_matrix.csv"))):   # was a seat-local ~/bdh-review path;
     M.setdefault(r["checkpoint"],{})[r["eval_lang"]]=float(r["ppl"])
 print("=== EXP3a: which OLD blocks actually received gradient in each phase (full nonzero count, no sampling) ===")
 rows=[]
