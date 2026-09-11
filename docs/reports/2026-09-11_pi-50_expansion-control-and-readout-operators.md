@@ -63,7 +63,7 @@ sweep measures the same phenomenon the matrix recorded.
 | absK (K=2048) | 39.37 | 48.09 | 78.73 | 1160.22 | 287.38 | **worse than doing nothing** |
 | evshift (F-V5) | 36.66 | 49.47 | 117.32 | 4122.12 | 3472.78 | **worse, catastrophically on bg/el** |
 | blkavg (÷23) | 31.14 | 35.22 | 60.85 | 227.07 | 65.29 | **provably vacuous** (see below) |
-| lognorm | pending | | | | | expected vacuous |
+| lognorm | 31.14 | 35.22 | 60.86 | 226.92 | 65.27 | **provably vacuous** - confirms the LayerNorm explanation |
 
 **No pre-registered pass condition was met.** The two candidate rescues make damaged languages worse,
 in some cases by 5–18×, and the two rescaling arms change nothing measurable.
