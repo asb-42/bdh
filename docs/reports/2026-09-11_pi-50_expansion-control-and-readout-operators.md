@@ -384,7 +384,7 @@ model recovers at 1.000 and OOD distances are interpretable.
 | zh | 94.7 % | **el 0.083, bg 0.071** | 1 / 2 | el ×36/bg ×1 | bg+el 37/40 |
 | ja | 96.4 % | **bg 0.073, el 0.073** | 1 / 2 | bg ×34/el ×6 | bg+el 40/40 |
 | hi | 86.0 % | fi 0.144, sv 0.125, en(base) 0.097 | **19 / 20** | fi ×40 | bg+el 40/40 |
-| iu syllabic | 91.3 % | en(base) 0.072, ro 0.071, cs 0.069 | **19 / 20** | pl ×27/ro ×13 | el ×28/bg ×12 |
+| iu syllabic | 91.3 % | en(base) 0.072, ro 0.071, cs 0.069 | **20 / 19** | pl ×27/ro ×13 | el ×28/bg ×12 |
 
 Three conclusions, in order of strength:
 

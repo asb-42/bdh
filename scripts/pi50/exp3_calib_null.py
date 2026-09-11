@@ -4,7 +4,7 @@ bit-identical. This measures, per domain, how much each block contributes and wh
 selector can recover the right territory without a language ID.
 
 No repo modification: rebinds model.forward to a logging copy of bdh's source.
-Run: cd /srv/coding/bdh && .venv/bin/python ~/bdh-review/tools/calib_null2.py [crops]
+Run: cd /srv/coding/bdh && .venv/bin/python scripts/pi50/exp3_calib_null.py.py [crops]
 """
 import sys, types, inspect, math
 import torch, numpy as np
