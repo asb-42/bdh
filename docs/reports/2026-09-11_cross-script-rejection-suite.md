@@ -91,7 +91,48 @@ rejection requires a two-axis rule (X3), and absolute ppl cleanly separates what
 alone cannot. Stages B (zh acquisition) and C (cross-script mini-ladder) are pre-authorized
 and queued on operator sequencing.
 
-## Confounds (pre-declared + measured)
+## V6 — Correction: the iu probe was contaminated; clean rerun strengthens X2, amends X1/X3
+
+Found by pi-50 (bus #188, verified by my own census before this correction): the 163 KB
+xscript_iu.txt was not pure Inuktitut — it mixes Canadian Aboriginal Syllabics (77 % of
+bytes per pi-50's classification; 29 % ASCII per mine — boundary differences) with **Turkish
+film-subtitle text** in the Latin column (first lines: "Beni bu hallere asl.." — QED is a
+subtitle corpus and the parallel column leaked into the iu side). 454 of 719 lines are
+Latin-script; only 265 are syllabic. The error was mine: I downloaded the file without
+censusing its content, then wrote a plausible-sounding X2 reading ("romanized corpus share
+matches the 12/40 en-routes") that was an unverified claim about data I had not inspected.
+
+Clean rerun (xscript_iu_syl.txt = 265 syllabic lines, 126 KB, done 20:41:28, same
+instrument, same 20 routes):
+
+| metric | contaminated iu | **iu-clean** | reading |
+|---|---|---|---|
+| best-route ppl | 81.07 | **303.61** | X1 still PASS (≫ 6.47); the 81 was partly in-support bytes |
+| routing | 25/40 bg+el, 12/40 en | **40/40 bg+el** | X2 STRENGTHENED: full concentration, zero Latin leakage |
+| joint (full width) | 376.51 | **576.78** | both terms move together |
+| routing advantage | 4.64× | **1.90×** | X3 amended — see below |
+
+**Effect on the verdicts:** X1 PASS unchanged (303.61 far above the trained band). X2
+STRENGTHENED — the clean data shows 40/40 high-byte concentration with zero Latin-share;
+iu now behaves exactly like zh/ja/hi. X3 amended: iu-clean's advantage (1.90×) sits in the
+low-ratio regime near lv (0.98×) and ga (1.39×), NOT in the 3.2–5.7× regime of zh/ja/hi.
+The two-axis rule still separates (absolute axis: 303.61 ≫ 10× acquisition), but the
+clean data replaces the contaminated 4.64× point in the cross-script row of Table X3 with
+1.90×, and the honest cross-script extreme-OOD set is now {zh 3.87×, ja 3.21×, hi 5.74×}.
+The iu data-reality conclusion (163 KB total public holding) is unaffected; the smallest
+corpus is also the cleanest OOD case once its Latin noise is removed.
+
+**Process note:** the contamination was caught by the second-seat cross-check pass (pi-50
+was collecting F-2 inputs when the census flagged it), and the correction was
+pre-registered (bus #194) before the rerun ran. Both numbers are reported — the
+contaminated row stays visible in the artifacts as a data-quality lesson.
+
+**VERDICT: V6 correction lands — X2 stronger (40/40), X1 unchanged, X3's iu point amended
+(4.64× → 1.90×, low-ratio regime); two-axis rule unaffected; cross-script extremes are
+zh/ja/hi.** — A0-Quinn, 2026-09-11
+
+Artifacts: .200 out/logs/ra2b_routdiag_iu_clean.txt;
+data/europarl/xscript_iu_syl.txt (filtered, 265 lines).
 
 - Corpus/register: MultiUN (UN), KFTT (Wikipedia), IITB (movie/parliament), QED+wikimedia
   (education/wiki) — heterogeneous registers, as pre-declared; X2's routing result is
