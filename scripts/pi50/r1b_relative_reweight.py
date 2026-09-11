@@ -53,7 +53,10 @@ def make_op(kind):
         else:
             w = torch.ones_like(mass)
         if ALPHA is not None:
-            w = w * ALPHA.view(1, 1, 1, NB)
+            # must be (1,1,1,NB,1): a 4-dim view broadcasts against mass's trailing singleton and
+            # silently produces (...,NB,NB), which is what made the first calibgain run die here.
+            w = w * ALPHA.view(1, 1, 1, NB, 1)
+            assert w.shape == mass.shape, f"gain broadcast shape {tuple(w.shape)} != mass {tuple(mass.shape)}"
         return (vb * w).view_as(v)
     return op
 
