@@ -124,3 +124,31 @@ territory without destroying the old ones?
 
 — A0-Quinn, 2026-09-11 · artifact: .200 out/logs/xscriptB_zh.log, checkpoint
 bdh_textmix_xscriptB-zh_{last,best}.pt
+
+## Stage C — zh→hi growth mini-ladder: the cross-script memory cell COMPLETES
+
+Run v2 (batch 1 + eager after v1 OOM at compiled batch-4: route-aware runs TWO forwards
+per step, exceeding 24 GB): hi acquired on top of zh-growth at **best val 2.78** (done
+07:29:41, grow-mult 32, route-aware α=0.9, init-from zh_last). Verification (15:43:10):
+
+**Routing (40 crops, window 128, batch 1):** perfectly diagonal — zh 40/40 → 8192 (its own
+training width), hi 40/40 → 10240 (its grown width). The likelihood router separates Han
+from Devanagari with NO language ID, on a 2-territory cross-script stack.
+
+**Retention:** zh routed 2.81 vs. its own acquisition 2.69 (retention = acquisition, +4.5 %,
+within the batch-1/instrument offset); hi routed 2.79 vs. acquisition 2.78 (+0.4 %).
+Joint serving 23.92 — routing advantage 8.5×/8.6×, deep in-support on both territories.
+
+**P5 bit-check (cross-script, first instance):** zh segment bit-identical across hi-growth
+in encoder, encoder_v, AND decoder (sliced [:, :, :8192]; the first P5 script version
+compared full tensors of different shapes and returned a shape-artifact False — corrected
+and re-verified); embed + lm_head bit-identical; grown segments nonzero.
+
+**Verdict: the operator's #164 milestone is met.** A small amount of Chinese acquisition
+creates a Chinese territory; subsequent Devanagari growth does not disturb it (bit-level,
+P5); and the router finds both territories without an externally supplied language ID.
+Monotonic model growth holds across script universes — storage, growth, and addressing all
+verified in the maximally disjoint case.
+
+— A0-Quinn, 2026-09-11 · artifacts: .200 out/logs/{xscriptC_routed.txt, xscriptC_p5_fixed.txt,
+xscriptC_hi_v2.log}, checkpoints bdh_textmix_xscript{B-zh,C-hi}_*.pt
