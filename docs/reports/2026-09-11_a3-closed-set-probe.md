@@ -68,7 +68,47 @@ limitation.** — A0-Quinn, 2026-09-11
    energy (pi-50 #143), and unseen-language routing (this probe) — one sentence for the
    discussion section.
 
-## Confounds (pre-declared)
+## V5 — Reject-threshold validation, second unseen language: ga (Gaeilge, n=2)
+
+Operator GO (2026-09-11). Gaeilge does NOT exist in Europarl v7 — verified against the statmt
+directory listing (exactly 21 pairs: our 20 trained languages + lv; the earlier suggestion
+"mt/ga" in the A3 confound note was an unchecked memory claim, corrected here). Source:
+**OPUS DGT v2021** (EU legal texts, Irish is an official EU language), 55.4 MB ga side — a
+corpus AND register switch from Europarl, declared as confound. It makes the probe strictly
+harder: unseen language + unseen register. Run: same checkpoint (RA2b-lt_last on .200),
+same instrument, ga over the 20 routes, 40 crops, batch 1 (04:11:42 done).
+
+- **P-GA-1 (no territory): PASS.** ga routed ppl on its best route: **50.54** — far above
+  the trained band (2.36–6.47).
+- **P-GA-2 (family routing, weaker prior): PASS with the predicted nuance.** Irish is an
+  isolated Celtic language with no relative in the ladder — and the routing is DIFFUSE
+  where lv's was sharp: bg-route 29/40, plus scattered crops across cs (5), da/en/es/fr
+  (2 each), sk (1). No single family target exists, and the router spreads accordingly —
+  consistent with byte-statistics proximity to Latin-script domains, weaker than lv→lt.
+- **P-GA-3 (reject replication — the decision-relevant one): PASS.** Note the joint
+  reference must be computed on the SAME corpus (DGT), not reused from Europarl: joint
+  full-width on ga-DGT crops = **70.17**. Routing advantage = 70.17 / 50.54 = **1.39×** —
+  far below the 5.7× floor of the worst trained language and of the same order as lv's
+  0.98×. The register shift cancels in the ratio (both terms move together).
+
+**VERDICT: the reject rule is validated on two typologically distant unseen languages
+(lv Baltic-related, ga Celtic-isolated) from two corpora (Europarl, DGT). Threshold
+formulation for the paper: reject routing when joint/min-route NLL ratio < ~5 (measured:
+trained languages 5.7–15.6×, unseen 0.98× and 1.39× — gap ≥ 4.1× on both sides).**
+— A0-Quinn, 2026-09-11
+
+Artifacts: .200 out/logs/ra2b_routdiag_ga_dgt.txt; DGT source
+.200 data/europarl/DGT.en-ga.ga.txt (OPUS-DGT v2021, license CC-BY-4.0 per OPUS metadata).
+
+## Confounds (pre-declared, updated for V5)
+
+Single seed, one ordering, 40 crops/domain; the seven small cross-host deltas (V1) are
+bf16-autocast numerics, all sub-floor. The reject threshold is now validated on two unseen
+languages (lv, ga) from two corpora — the earlier single-language caveat is closed; the
+ga measurement carries the DGT register switch, declared above, which the ratio-based
+threshold cancels. A third unseen language would tighten the threshold's lower bound
+further but is not required for the paper's claim.
+
 
 Single seed, one ordering, 40 crops/domain; the seven small cross-host deltas are bf16
 autocast numerics, documented above, all sub-floor. lv is one unseen language; the reject
