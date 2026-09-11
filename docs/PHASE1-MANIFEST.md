@@ -40,7 +40,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `docs/reports/2026-09-10_ra2b-fixed-regime-readout.md` | `072a5a3` | Quinn (Agent Zero) | 2026-09-10 | 6,693 | RA2b Fixed-Regime Readout (Phase B)<br>*unclassified* |
 | `docs/reports/2026-09-11_a3-closed-set-probe.md` | `2e844ca` | Quinn (Agent Zero) | 2026-09-11 | 7,133 | A3 Closed-Set Probe — Results (21st never-trained language)<br>*unclassified* |
 | `docs/reports/2026-09-11_cross-script-rejection-suite.md` | `01abc27` | Quinn (Agent Zero) | 2026-09-11 | 12,688 | Cross-Script Rejection Suite — Stage A Results<br>*unclassified* |
-| `docs/reports/2026-09-11_pi-50_expansion-control-and-readout-operators.md` | `62e1cc5` | pi-50 | 2026-09-12 | 26,570 | P-R1 / P-R2 — readout width-invariance and the expansion control<br>*CITABLE - sections 2,3,6,8,9; section 7 header carries a partial supersession banner* |
+| `docs/reports/2026-09-11_pi-50_expansion-control-and-readout-operators.md` | `62e1cc5` | pi-50 | 2026-09-12 | 30,661 | P-R1 / P-R2 — readout width-invariance and the expansion control<br>*CITABLE - sections 2,3,6,8,9; section 7 header carries a partial supersession banner* |
 
 ## reviews/  (19 files)
 
@@ -146,32 +146,35 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `docs/archive/pi-50-working/PLAN.md` | `dd40e3a` | pi-50 | 2026-09-10 | 7,330 | BDH / BDH-CL review — working plan<br>*unclassified* |
 | `docs/archive/pi-50-working/REVIEW.md` | `dd40e3a` | pi-50 | 2026-09-10 | 36,044 | Referee report — "Computation Isolation for Continual Learning in a De<br>*unclassified* |
 
-## pi50/  (18 files)
+## pi50/  (21 files)
 
 | path | last | author | date | bytes | title / status |
 |---|---|---|---|---|---|
+| `scripts/pi50/README.md` | `15e55ad` | pi-50 | 2026-09-12 | 6,578 | `scripts/pi50/` — phase-1 instruments<br>*POLICY - frozen-instrument rules, hardcoded phase-1 facts, two indexing conventions, gate inventory* |
 | `scripts/pi50/arm_identity_check.py` | `dd40e3a` | pi-50 | 2026-09-10 | 4,540 | !/usr/bin/env python3<br>*TOOLING* |
 | `scripts/pi50/atlas_territory_stats.py` | `eb4ba26` | pi-50 | 2026-09-11 | 4,199 | !/usr/bin/env python3<br>*TOOLING* |
 | `scripts/pi50/exp3_calib_null.py` | `dd40e3a` | pi-50 | 2026-09-10 | 5,357 | """A1 CALIBRATION NULL v2 - k_sparse_ratio=0.0 means NO top-k: the lat<br>*TOOLING* |
-| `scripts/pi50/exp3_delta_m.py` | `dd40e3a` | pi-50 | 2026-09-10 | 3,890 | import torch, os, csv, json<br>*TOOLING* |
+| `scripts/pi50/exp3_delta_m.py` | `15e55ad` | pi-50 | 2026-09-12 | 3,890 | import torch, os, csv, json<br>*TOOLING* |
 | `scripts/pi50/exp3_encoder_churn.py` | `dd40e3a` | pi-50 | 2026-09-10 | 1,341 | import torch<br>*TOOLING* |
 | `scripts/pi50/exp3_masked_vs_free.py` | `dd40e3a` | pi-50 | 2026-09-10 | 1,786 | import math,sys,numpy as np,torch<br>*TOOLING* |
 | `scripts/pi50/exp4_selfnll_selection.py` | `066f1e8` | pi-50 | 2026-09-11 | 4,013 | """A2: label-free prefix selection by self-supervised NLL. For each do<br>*SUPERSEDED by exp4b_budget.py (oracle-width off-by-one fixed there)* |
 | `scripts/pi50/exp4b_budget.py` | `045a61c` | pi-50 | 2026-09-11 | 4,163 | """A2 follow-ups: how much calibration does likelihood selection actua<br>*TOOLING* |
 | `scripts/pi50/matrix_eval.sh` | `dd40e3a` | pi-50 | 2026-09-10 | 7,423 | !/usr/bin/env bash<br>*TOOLING - reusable serving-matrix runner, guards ALLOW_EVAL+ANNOUNCED* |
+| `scripts/pi50/ood_script_census.py` | `15e55ad` | pi-50 | 2026-09-12 | 1,344 | import re<br>*TOOLING - script-composition census that established the iu contamination (bus 188)* |
+| `scripts/pi50/phase1_manifest.py` | `15e55ad` | pi-50 | 2026-09-12 | 7,712 | """Generate docs/PHASE1-MANIFEST.md - a living index of the phase-1 ev<br>*TOOLING - generates this file* |
 | `scripts/pi50/protocol_4090.sh` | `dd40e3a` | pi-50 | 2026-09-10 | 9,388 | !/usr/bin/env bash<br>*TOOLING - preflight guard, refuses during live jobs* |
 | `scripts/pi50/r1_readout_operators.py` | `0f1763b` | pi-50 | 2026-09-11 | 6,082 | """P-R1 READOUT WIDTH-INVARIANCE (pre-registered bus #165).<br>*TOOLING* |
 | `scripts/pi50/r1b_relative_reweight.py` | `5d47c9e` | pi-50 | 2026-09-11 | 6,924 | """P-R1b RELATIVE TERRITORY REWEIGHTING (pre-registered bus #175).<br>*TOOLING* |
 | `scripts/pi50/r2_expansion_control.py` | `0f1763b` | pi-50 | 2026-09-11 | 7,129 | """P-R2 RANDOM-EXPANSION CONTROL (pre-registered bus #165).<br>*TOOLING* |
 | `scripts/pi50/r3_byte_addressing.py` | `d4441bf` | pi-50 | 2026-09-11 | 6,634 | """P-R3 CHEAP ADDRESSING FROM BYTE GEOMETRY (pre-registered bus #175).<br>*SUPERSEDED by r3b/r3d (unbalanced fit produced the 0.762 headline)* |
-| `scripts/pi50/r3b_byte_addressing_density.py` | `e37a442` | pi-50 | 2026-09-12 | 10,360 | """P-R3 follow-ups F-1 / F-2 / F-3 (Quinn's task_request #186, accepte<br>*TOOLING* |
-| `scripts/pi50/r3c_ood_addendum.py` | `e37a442` | pi-50 | 2026-09-12 | 7,484 | """P-R3 addendum: F-2 extended to six unseen languages + F-3 confusion<br>*TOOLING* |
-| `scripts/pi50/r3d_fit_ablation.py` | `e37a442` | pi-50 | 2026-09-12 | 8,216 | """P-R3 fit ablation (CPU-only, reads persisted sparse features - zero<br>*TOOLING* |
-| `scripts/pi50/r3e_margins.py` | `62e1cc5` | pi-50 | 2026-09-12 | 6,426 | """P-R3 margin analysis for Sonde C's stage-1 trigger (bus #197 design<br>*TOOLING* |
+| `scripts/pi50/r3b_byte_addressing_density.py` | `e37a442` | pi-50 | 2026-09-12 | 10,360 | """P-R3 follow-ups F-1 / F-2 / F-3 (Quinn's task_request #186, accepte<br>*PARTIAL - labels and persisted features CITABLE; its own F-1/F-2/F-3 readouts superseded by r3d/r3c* |
+| `scripts/pi50/r3c_ood_addendum.py` | `e37a442` | pi-50 | 2026-09-12 | 7,484 | """P-R3 addendum: F-2 extended to six unseen languages + F-3 confusion<br>*CITABLE - corrected territory map asserted at import; balanced-fit F-2 route table* |
+| `scripts/pi50/r3d_fit_ablation.py` | `e37a442` | pi-50 | 2026-09-12 | 8,216 | """P-R3 fit ablation (CPU-only, reads persisted sparse features - zero<br>*CITABLE - arms A/B/C 0.681/1.000/0.988 settle starvation vs geometry* |
+| `scripts/pi50/r3e_margins.py` | `62e1cc5` | pi-50 | 2026-09-12 | 6,426 | """P-R3 margin analysis for Sonde C's stage-1 trigger (bus #197 design<br>*CITABLE - Sonde C stage-1 margin floor 0.0139 from n=160 in-support crops (optimistic, see report 9.5)* |
 
 ## Gaps this manifest exposes
 
-- **91 of 112 files carry no declared status.** Those are the ones most likely to be
+- **91 of 115 files carry no declared status.** Those are the ones most likely to be
   mis-cited during a revision: something is either citable or it is not, and 'nobody wrote it down'
   reads as permission.
 - The prior-art note still labels HSP and PCANets unverified in-file; that must be closed or
@@ -180,4 +183,4 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
   `~/bdh-review/reports/` on gx10 are ephemeral; anything quoted in the manuscript must have its
   generating log inside the repo.
 
-_Generated 2026-09-12 00:30:26 +0200 from HEAD `62e1cc5`._
+_Generated 2026-09-12 01:11:49 +0200 from HEAD `15e55ad`._

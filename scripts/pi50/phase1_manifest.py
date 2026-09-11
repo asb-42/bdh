@@ -35,6 +35,14 @@ STATUS = {
     "matrix_eval.sh": "TOOLING - reusable serving-matrix runner, guards ALLOW_EVAL+ANNOUNCED",
     "protocol_4090.sh": "TOOLING - preflight guard, refuses during live jobs",
     "phase1_manifest.py": "TOOLING - generates this file",
+    "r3b_byte_addressing_density.py": "PARTIAL - labels and persisted features CITABLE; its own F-1/F-2/F-3 readouts superseded by r3d/r3c",
+    "r3c_ood_addendum.py": "CITABLE - corrected territory map asserted at import; balanced-fit F-2 route table",
+    "r3d_fit_ablation.py": "CITABLE - arms A/B/C 0.681/1.000/0.988 settle starvation vs geometry",
+    "r3e_margins.py": "CITABLE - Sonde C stage-1 margin floor 0.0139 from n=160 in-support crops (optimistic, see report 9.5)",
+    "r3f_hull_geometry.py": "CITABLE - hull hypothesis test; LOO nearest-centroid gate 640/640; max-cosine second trigger signal",
+    "ood_script_census.py": "TOOLING - script-composition census that established the iu contamination (bus 188)",
+    "README.md": "POLICY - frozen-instrument rules, hardcoded phase-1 facts, two indexing conventions, gate inventory",
+
 }
 
 

@@ -365,3 +365,50 @@ freeze-before-evaluate discipline P-R4 applies to the two-axis rejection rule. C
 in-support floor comes from a fit that is 160/160 correct on these very crops, so it is optimistic — the real
 trigger will need its margin estimated on crops the fit did not see at all, ideally from a re-fit under the
 next growth phase, before anyone quotes a coverage guarantee from it.
+
+### 9.6 Hull geometry test: Quinn's mechanism survives, his single scalar does not, and a second trigger signal falls out
+
+Quinn's #200 synthesis proposed: "the byte addresser interpolates within the hull of trained byte statistics;
+it generalizes to scripts that neighbor the hull's high-byte boundary (zh/ja) and snaps arbitrarily for
+scripts that don't (hi/iu)." Falsifier stated before running (`scripts/pi50/r3f_hull_geometry.py`): if hi and
+iu centroids sit *nearest* bg/el in n-gram space while the model still chooses elsewhere, the failure is not
+hull distance. Validity gate first: leave-one-out nearest-centroid classification must reproduce the trained
+routes — it does, 640/640 crops, every domain 1.00, so pure distance geometry recovers what the fitted linear
+model recovers at 1.000 and OOD distances are interpretable.
+
+| input | share bytes ≥ 0x80 | nearest territory centroids (cosine) | rank of bg / el | what the addresser chose | likelihood router |
+|---|---|---|---|---|---|
+| lv | 17.1 % | lt 0.841, sl 0.789, et 0.778 | 20 / 19 | lt ×40 | lt 40/40 |
+| iu ASCII lines | 0.0 % | **en(base) 0.854**, fr 0.785 | 20 / 19 | en(base) ×40 | English text |
+| ga | 11.8 % | it 0.792, sv 0.789, es 0.787 | 20 / 19 | hu/sv/it spread | ppl 50.54 |
+| zh | 94.7 % | **el 0.083, bg 0.071** | 1 / 2 | el ×36/bg ×1 | bg+el 37/40 |
+| ja | 96.4 % | **bg 0.073, el 0.073** | 1 / 2 | bg ×34/el ×6 | bg+el 40/40 |
+| hi | 86.0 % | fi 0.144, sv 0.125, en(base) 0.097 | **19 / 20** | fi ×40 | bg+el 40/40 |
+| iu syllabic | 91.3 % | en(base) 0.072, ro 0.071, cs 0.069 | **19 / 20** | pl ×27/ro ×13 | el ×28/bg ×12 |
+
+Three conclusions, in order of strength:
+
+1. **The mechanism is confirmed, but not as "the fit snapped arbitrarily."** For hi and iu the raw centroid
+   geometry points at the *same* territories the fitted model chose (fi for hi; ro/en-base for iu) with bg/el
+   ranked 19th and 20th of 22. The addresser is not malfunctioning; it is faithfully reporting surface
+   proximity. What disagrees with it is the likelihood router, which measures realized fit instead. Two
+   different definitions of "similar" produce two different answers, and both are internally consistent.
+2. **High-byte fraction alone does not order the outcomes.** iu-syllabic is 91.3 % non-ASCII — *more* than
+   hi's 86.0 % — yet diverges more severely (margin 0.001, bg/el rank 19/20, escalation 100 %). What actually
+   separates zh/ja from hi/iu is proximity to bg/el specifically, i.e. which UTF-8 ranges the corpus covered,
+   not how many bytes fell outside ASCII. Quinn's sentence should say "neighboring the trained multi-byte
+   *regions*", not "high-byte boundary", and the scalar version should not appear in the manuscript at all.
+3. **A second stage-1 trigger signal falls out for free: maximum centroid cosine.** Across these seven inputs
+   it is bimodal with an enormous gap — 0.78–0.85 for material in the Latin training family (lv, ga, iu-ASCII)
+   versus 0.07–0.14 for everything else (zh, ja, hi, iu-syllabic). Any threshold in the interval ≈ 0.15–0.78
+   separates in-support from out-of-hull perfectly on this sample, requires no fitted parameters, and costs one
+   dot product per territory against precomputed centroids. Its cost profile is also honest: it escalates zh
+   and ja, where the addresser already agrees with the likelihood router, so it buys certainty about *divergence*
+   (hi, iu) by spending escalations on *agreement* — 4 of 7 inputs escalate here, versus 2 of 7 if we only
+   needed to catch the disagreements. Pairing it with the margin floor from §9.5 is what makes the OR-gate in
+   Sonde C's Arm-3 spec concrete rather than decorative.
+
+Contamination corroboration arrives a third way here: `iu_ascii` scores 0.854 against the English base
+centroid, higher than any other input-to-territory similarity in the table, from a distance measure that
+never saw a label or a fit. Combined with the fitted predictor's en(base) ×40 (#199) and my line census
+(#188), the reading of those 333 lines as English prose is about as well-supported as anything in this set.
