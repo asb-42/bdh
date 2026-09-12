@@ -405,11 +405,16 @@ The p19 and p20 routing diagnoses (before and after the final growth phase) are
 full growth phase, against $+88\%$ (fi) and $+21\%$ (hu) in the leaky era. Across all
 twenty domains, routed perplexity at the final checkpoint exceeds each domain's own
 acquisition exit by a median of $+4.3\%$, worst case $+8.0\%$ (hu): a measured quality
-difference, not instrumentation (Section~\ref{sec:open}). The instrument offset once
-invoked to excuse a wider spread does not exist at that size---sixteen of the twenty
-twenty-by-twenty matrix diagonal cells are, by construction, the logged acquisition
-exits themselves; the four measured under genuinely different instruments (pl, fr, es,
-en) agree to within $1\%$.
+difference, not instrumentation. The instrument-offset escape is removed on provenance
+grounds, not replaced by a substitute measurement. The ``+5--9\%'' figure traces to a
+single RA2-era lt control and was never measured across RA2b domains, so it cannot excuse
+a ratio in a sentence that also states a bound; and the sixteen matrix diagonal cells that
+agree with the logged exits do so because both come from the same random-crop evaluation
+family, differing only in implementation and crop seed, so their agreement is
+cross-implementation consistency rather than evidence about a window-versus-val offset.
+What makes the retained number strong is exactly that routed and acquisition serving are
+measured under the same evaluation family: $+4.3\%$ is the routing cost, not an instrument
+difference.
 
 \textbf{H-decay-1 PASS:} retention matches acquisition within the measured routed-cost
 band; the leaky-era ``degradation'' of fi/hu was entirely the decay artifact, and no
@@ -486,11 +491,13 @@ directly to final width, eval-only) reproduces the English result independently 
 $20.16$, $-0.4\%$), which is what licenses comparison with the number already in this
 paper. Own-era fractions then span $0.599$ (sl) to $1.472$ (el) around that single point
 estimate: a random block reproduces the majority of the log-scale damage in six of seven
-eras, so the mechanism is not an English artefact. The Greek era overshoots---a random
-block costs $186.8$ where the trained ladder costs $63.7$---the first case in these data
-where learned growth was protective relative to noise. That is a new measurement and is
-reported as one (Section~\ref{sec:open}); the 83\,\%/62\,\% headline above is specific to
-the English-era control.
+eras, so the mechanism is not an English artefact, and the pre-registered falsifier
+triggered on the seventh. The Greek value decomposes into its two factors rather than
+standing as an anomaly: Greek's random-block damage ($28.7\times$) is unremarkable---it is
+bg with a different denominator---and the fraction exceeds one because the trained ladder
+lost comparatively little there ($9.8\times$ against bg $37.5\times$), so $f_{\log}>1$ is
+driven by a small denominator, not by an extraordinary numerator. The 83\,\%/62\,\%
+headline above is specific to the English-era control.
 
 The zero-init discipline is itself load-bearing: arm C is ``growth as shipped,
 untrained''---\BDH{}'s convention of initializing new capacity at zero is the better of
@@ -552,8 +559,8 @@ routes the late positions to the arg-min. No human task IDs, no external labels.
 fixed-regime chain: \textbf{20/20 domains route to their own prefix at every calibration
 budget from $\sim$4\,KB (8 crops) to 1\,MB}---selection is nearly data-free. Routed
 serving lands within $8\%$ of acquisition exit quality across all domains (median
-$+4.3\%$, worst case $+8.0\%$ at hu; the routed-cost band and its instrument are measured
-in Section~\ref{sec:ra2b}).
+$+4.3\%$, worst case $+8.0\%$ at hu; the routed-cost band is measured in
+Section~\ref{sec:ra2b} under a single evaluation family).
 
 But selection is \emph{robust, not sublinear}: binary search over prefix widths (the
 cheap alternative to scanning all widths) collapses to 4--6/20, because the
@@ -906,15 +913,13 @@ measure and the questions we cannot yet answer are not read as the same list.
 We separate what this paper did not measure from what it measured and could not explain.
 The first list is scope; the second is results.
 
-\textbf{Results we did not explain.} (i)~\emph{The Greek-era overshoot.} Repeating the
-random-expansion control across seven era checkpoints (Section~\ref{sec:readout}) finds
-every fraction except one below the English value: $f_{\log}$ spans $0.599$ (sl) to
-$1.472$ (el) around a median of $0.880$, and the Greek era is the only case where a
-\emph{random} block costs more than the \emph{trained} ladder ($186.8$ against $63.7$).
-Learned growth in that era was therefore protective relative to noise---the opposite of
-the pattern the control was built to expose. We report it as a measured anomaly with no
-mechanism attached. A dose-response sweep per era (one width target was measured here,
-not the phase-1 six-point curve) is a separate pre-registered experiment.
+\textbf{Results we did not explain.} (i)~\emph{Why joint serving degrades unevenly
+across the high-byte territories.} bg and el have similar acquisition exits ($6.09$ and
+$6.36$) and are the two territories with substantial multi-byte exposure, yet the trained
+ladder loses $37.5\times$ at bg against $9.8\times$ at el (Section~\ref{sec:readout}). The
+asymmetry is present in the landed fixed-regime matrix and predates the expansion control,
+which is what surfaced it. We record it as a measured line with no mechanism attached, not
+as a planned experiment.
 
 (ii)~\emph{The residual joint-serving damage.} The decay repair removed the erosion
 component; the arithmetic control accounts for 83\% of what remains at the English-era

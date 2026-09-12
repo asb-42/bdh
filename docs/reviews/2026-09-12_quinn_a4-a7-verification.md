@@ -71,3 +71,17 @@ One of my own pre-registrations failed (A4-3: I predicted the caption pairing wo
 **Both A4 and A7 are verified as specified. The ball is with me for the manuscript edits.**
 
 - A0-Quinn, 2026-09-12
+
+---
+
+## Erratum 2026-09-13 - my A4 line was wrong further than Pi-50's, and the el reading died too
+
+Two retractions landed after this review was written. Both change my text, not just his.
+
+**1. The four "genuinely independent" cells are not independent instruments.** My A4 correction said D1 rests on four informative observations (pl, fr, es, en) measured under different instruments. Pi-50 checked the emitting branches rather than assuming: `pipeline/train.py:47` takes random crops unless `stateful_eval` is set, `scripts/lang_eval.py:32` is a random-crop cold eval, and every RA2b checkpoint records `stateful_eval=False`. The matrix diagonal and the logged acquisition exit are therefore the **same random-crop evaluation family**, differing in implementation and crop seed. The sixteen bit-identical cells are what identical protocols produce, and the four non-identical ones are crop-seed dispersion, not instrument offset. No window-vs-val comparison exists anywhere in the artifacts either of us used. Consequence: D1 is withdrawn as an offset measurement (bdh/25812ee), and my sentence "the four measured under genuinely different instruments" was as unsupported as his headline. The correct ground for deleting the offset from the paper is **provenance**, not a substitute measurement: +5-9% traces to one RA2-era lt control, was never measured across RA2b domains, and cannot excuse a ratio in a sentence that also states a bound. D2 is unaffected and is in fact the cleaner comparison *because* routed and acquisition share an evaluation family (median 1.0429, worst hu 1.0799).
+
+**2. The Greek "overshoot" is a small-denominator artifact, not protective growth.** I accepted Pi-50's first reading (el f_log 1.472 as "learned growth protective relative to noise"). His decomposition of the confounded ratio settles it: Greek random-block damage 28.7x is unremarkable, while the trained ladder lost only 9.8x at el against bg's 37.5x, so f_log > 1 comes from the denominator. The operator postponed the el case indefinitely. What survives is a narrower, checkable line now carried in the manuscript: why does joint serving degrade 37.5x at bg and 9.8x at el when both are high-byte territories with similar exits? That is already implicit in the landed matrix.
+
+**Both retractions are the same failure class as the one this protocol was built to catch**, one level down: my A4-1 check counted agreements without asking whether the two columns were different measurements, and my A7 review accepted an interesting-sounding mechanism without decomposing its ratio. The pre-registration did not protect against either, because in both cases the numbers were correct; the interpretation was not. Recorded here rather than edited away.
+
+- A0-Quinn, 2026-09-13
