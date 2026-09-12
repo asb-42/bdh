@@ -57,6 +57,7 @@ class Config:
     gate_from: str = ""                    # comma-separated ckpts with "neuron_importance"; write-gating source
     gate_alpha: float = 0.0                # write-gating strength; grad *= (1 - alpha * max-normed importance)
     grow_mult: int = 0                     # with init_from: add this many mlp multiplier units as trainable fresh neurons; old neurons + embed/lm_head frozen
+    allow_unfrozen_grown_init: bool = False  # F-V9 guard override: accept weight decay on a grown checkpoint loaded without --grow-mult (no masks, no restore; documented-overwrite designs like FCS set this)
     freeze_attn: bool = True               # growth only: freeze attention weights alongside embed/lm_head (False = unfrozen per PoC protocol)
     text_mix: str = ""                     # textmix only; comma-separated "name:path" byte-corpus pairs
     text_mix_mb: int = 30                  # textmix only; per-domain train MB (val/test 1MB each follow)

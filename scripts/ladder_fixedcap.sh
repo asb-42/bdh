@@ -50,7 +50,7 @@ for D in $SEQ; do
       --n-embd 512 --n-head 8 --mlp-internal-dim-multiplier 128 \
       --block-size 512 --max-iters 10000 --batch-size 4 \
       --warmup-iters 1000 --lr-decay-iters 10000 \
-      --init-from "$INIT" \
+      --init-from "$INIT" --allow-unfrozen-grown-init \
       --run-name "ladFCS-$D" \
       2>&1 | tee "${LOG}/fixedcap_${D}.log"
   fi

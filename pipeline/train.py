@@ -12,6 +12,10 @@ from bdh import detach_state, state_to_cpu
 
 from pipeline import config as cfg_mod
 from pipeline.config import Config, build_model, param_count, resolve_device, resolve_dtype
+
+# Base multiplier for an un-grown model (config default); checkpoints above this
+# are grown ladders whose old segments deserve mask/restore protection (F-V9).
+_BASE_MULT_DEFAULT = 24
 from pipeline.data import load_dataset
 
 
@@ -116,6 +120,26 @@ def train(cfg: Config) -> None:
     raw_model = build_model(cfg).to(device)
     if cfg.init_from and grow_src is None:
         ckpt = torch.load(cfg.init_from, map_location=device, weights_only=False)
+        # F-V9 guard: without --grow-mult there are no gradient masks and no
+        # step-end restore, so AdamW's decoupled weight decay erodes the loaded
+        # (old) segments at (1 - lr_t*wd) per step - the F-decay-leak failure
+        # mode, reachable by a plausible-looking command line. The correctness
+        # of the frozen path must not rest on a flag combination: assert it.
+        ckpt_mult = int(ckpt["cfg"]["mlp_internal_dim_multiplier"])
+        if ckpt_mult > cfg.mlp_internal_dim_multiplier:
+            raise ValueError(
+                f"init_from checkpoint (mult {ckpt_mult}) is wider than this run "
+                f"(mult {cfg.mlp_internal_dim_multiplier}): use --grow-mult to "
+                f"grow into it, or match --mlp-internal-dim-multiplier.")
+        if (ckpt_mult > _BASE_MULT_DEFAULT and cfg.weight_decay > 0
+                and not cfg.allow_unfrozen_grown_init):
+            raise ValueError(
+                f"refusing unfrozen init from grown checkpoint (mult {ckpt_mult}, "
+                f"weight_decay={cfg.weight_decay}): without --grow-mult the old "
+                f"segments have no masks and no step-end restore, so decoupled "
+                f"weight decay erodes them (F-decay-leak failure mode, F-V9). "
+                f"Pass --allow-unfrozen-grown-init if overwrite-with-decay is "
+                f"the intended design (e.g. FCS), or set --weight-decay 0.")
         raw_model.load_state_dict(ckpt["model_state"])
         print(f"initialized weights from {cfg.init_from} (ckpt step {ckpt.get('step')})")
 
