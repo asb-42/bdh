@@ -201,7 +201,7 @@ The 20-way routing diagnosis on the final chain (20 routes $`\times`$ 20 domains
 
 <figure id="fig:retention" data-latex-placement="t">
 <embed src="figures/f3_retention_bars.pdf" />
-<figcaption>RA2b final checkpoint: routed serving (blue) vs joint serving (orange) vs acquisition exit (black tick), per domain, log scale. Routed tracks acquisition for every domain (median ratio 1.09, range 1.02–1.13, within the window-vs-val instrument offset); joint serving erodes 2–13<span class="math inline">×</span> — the interference term that survives the fix. Sources: exttt<span>docs/reports/data/2026-09-10_ra2b_matrix.csv</span> (lt rows) and readout §B4.</figcaption>
+<figcaption>RA2b final checkpoint: routed serving (blue) vs joint serving (orange) vs acquisition exit (black tick), per domain, log scale. Routed tracks acquisition for every domain (median ratio 1.09, range 1.02–1.13, within the window-vs-val instrument offset); joint serving erodes 1.0–37.8<span class="math inline">×</span> (median 11<span class="math inline">×</span>) — the interference term that survives the fix. Sources: exttt<span>docs/reports/data/2026-09-10_ra2b_matrix.csv</span> (lt rows) and readout §B4.</figcaption>
 </figure>
 
 ## Retention: equals acquisition
@@ -212,7 +212,7 @@ The p19 and p20 routing diagnoses (before and after the final growth phase) are 
 
 ## Joint serving: recovered but not solved
 
-Joint full-width serving on the final chain recovers dramatically vs. the leaky era (bg 1649 $`\to`$ 230, el 891 $`\to`$ 64) *without any repair*—but non-lt domains still serve 2–13$`\times`$ above acquisition. The interference term is real and survives the decay fix; Section <a href="#sec:readout" data-reference-type="ref" data-reference="sec:readout">6</a> shows 83% of it is arithmetic.
+Joint full-width serving on the final chain recovers dramatically vs. the leaky era (bg 1649 $`\to`$ 230, el 891 $`\to`$ 64) *without any repair*—but non-lt domains still serve 1.0–37.8$`\times`$ above acquisition (median 11$`\times`$). The interference term is real and survives the decay fix; Section <a href="#sec:readout" data-reference-type="ref" data-reference="sec:readout">6</a> shows 83% of it is arithmetic.
 
 **H-decay-2 PASS:** joint recovery without splice confirms the decay component’s size; the residual is the readout problem.
 
@@ -222,7 +222,7 @@ The P5 protocol (masked-cell optimizer moments $`v\equiv 0`$, old-segment tensor
 
 # Readout mechanics: why joint serving degrades
 
-Storage is bit-exact (Section <a href="#sec:ra2b" data-reference-type="ref" data-reference="sec:ra2b">5</a>); routed serving is exact; yet joint serving degrades 2–13$`\times`$ over acquisition. The gap lives in the readout. Three experiments, all pre-registered, decompose it.
+Storage is bit-exact (Section <a href="#sec:ra2b" data-reference-type="ref" data-reference="sec:ra2b">5</a>); routed serving is exact; yet joint serving degrades 1.0–37.8$`\times`$ over acquisition (median 11$`\times`$, worst bg). The gap lives in the readout. Three experiments, all pre-registered, decompose it.
 
 <figure id="fig:expansion" data-latex-placement="t">
 <embed src="figures/f6_expansion_control.pdf" style="width:60.0%" />
@@ -349,7 +349,7 @@ $`^\dagger`$log-scale change relative to identity; negative $`=`$ worse.
 
 </div>
 
-The two vacuous arms are a structural finding: `bdh.py:279` applies $`y \leftarrow \mathrm{LN}(y_{\mathrm{MLP}})`$ immediately after the readout matmul, so *any* global gain change is annihilated—measured, not inferred (block-average and log-norm returned identity values to within 0.1%).
+The two vacuous arms are a structural finding: `bdh.py:279` applies $`y \leftarrow \mathrm{LN}(y_{\mathrm{MLP}})`$ immediately after the readout matmul, so *any* global gain change is annihilated—measured, not inferred (block-average and log-norm returned bit-identical identity values).
 
 The decisive arm is **calibgain**: one scalar per territory, fitted by gradient descent on English NLL alone. The fitted vector converges to base territories $`\approx 2.4`$, appended territories $`\le 0.12`$ (several at the clamp floor)—that is, the optimizer *rediscovers oracle masking*, specialized to the language it was fitted on, and necessarily silences every other territory. There is **no language-agnostic scalar reweighting of the <span class="smallcaps">bdh</span> readout that repairs growth damage**. Culling hurts more than growth helps; relative reweighting helps only the oldest or nobody.
 
@@ -361,15 +361,15 @@ Given that the correct operation is selection, we measure how well selection wor
 
 ## Label-free likelihood selection
 
-The likelihood router scores the early positions of a block under every prefix width and routes the late positions to the arg-min. No human task IDs, no external labels. On the fixed-regime chain: **20/20 domains route to their own prefix at every calibration budget from $`\sim`$<!-- -->4 KB (8 crops) to 1 MB**—selection is nearly data-free. Routed serving lands within $`\le 8\%`$ of acquisition exit quality across all domains.
+The likelihood router scores the early positions of a block under every prefix width and routes the late positions to the arg-min. No human task IDs, no external labels. On the fixed-regime chain: **20/20 domains route to their own prefix at every calibration budget from $`\sim`$<!-- -->4 KB (8 crops) to 1 MB**—selection is nearly data-free. Routed serving lands within $`\le 8\%`$ of acquisition exit quality across all domains (at the reference calibration setting).
 
-But selection is *robust, not sublinear*: binary search over prefix widths (the cheap alternative to scanning all widths) collapses to 4–6/20, because the cumulative-prefix NLL surface is **not unimodal**—multiple widths can locally minimize the score, and the wrong local minimum wins for 5–6 languages. The failed assumption is the finding: selection scales linearly in territory count unless a cheaper addresser exists below it.
+But selection is *robust, not sublinear*: binary search over prefix widths (the cheap alternative to scanning all widths) collapses to 4–6/20, because the cumulative-prefix NLL surface is **not unimodal**—multiple widths can locally minimize the score, and only 4–6 of 20 languages recover their own territory by bisection; 14–16 land in a wrong local minimum. The failed assumption is the finding: selection scales linearly in territory count unless a cheaper addresser exists below it.
 
 ## Cheap addressing from byte geometry
 
 The chain’s address geometry is byte-statistical (Section <a href="#sec:xscript" data-reference-type="ref" data-reference="sec:xscript">8</a>); can a cheap input-side model reproduce the likelihood router’s decisions? A multinomial logistic regression on hashed byte 1–4-gram counts ($`2^{18}`$ buckets) predicts the arg-min route: under a **class-balanced fit**, agreement is $`1.000`$ (Wilson $`[0.977, 1.000]`$) on all 160 held-out crops, at $`\sim`$<!-- -->4–8 KB calibration text per domain. The cost is one counting pass plus a $`2^{18}\times 23`$ matvec—a $`\sim`$<!-- -->23$`\times`$ reduction in forward cost versus scanning all widths.
 
-Two design lessons from this result’s own history, stated for the record: the first fit (76% agreement, four Latin-neighbor domains at zero) was withdrawn by its author after he found a composition confound—giving four domains 96 training crops shifted every class’s share of a fixed-budget L2 fit; the balanced re-fit resolved the four domains to 1.00 and confirmed the failure was starvation, not geometry. And the density curve (8/16/32/64 crops, controls pinned) shows all domains at 1.00 by 8–16 crops. The withdrawal sequence is itself evidence for the process discipline this project runs on.
+Two design lessons from this result’s own history, stated for the record: the first fit (76% agreement, three Latin-neighbor domains at zero and one at two-thirds) was withdrawn by its author after he found a composition confound—giving four domains 96 training crops shifted every class’s share of a fixed-budget L2 fit; the balanced re-fit resolved the four domains to 1.00 and confirmed the failure was starvation, not geometry. And the density curve (8/16/32/64 crops, controls pinned) shows all domains at 1.00 by 8–16 crops. The withdrawal sequence is itself evidence for the process discipline this project runs on.
 
 <figure id="fig:ood" data-latex-placement="t">
 <embed src="figures/f4_ood_scatter.pdf" style="width:80.0%" />
@@ -382,15 +382,15 @@ Can the system tell *seen* from *unseen*? We probe the final chain with six lang
 
 **The one-axis rule fails, informatively.** For trained languages the advantage is 5.7–15.6$`\times`$. For the byte-adjacent unseen languages it collapses: lv 0.98$`\times`$ (routing slightly *worse* than joint), ga 1.39$`\times`$—correctly below any trained floor. But for the cross-script languages the ratio *inflates* past the trained floor: zh 3.87$`\times`$, ja 3.21$`\times`$, hi 5.74$`\times`$, iu-clean 1.90$`\times`$ (but see the contamination correction below)—because their joint perplexity is so catastrophic (1614–4204) that even maximally foreign territory is consistently “less bad,” and the router finds it. hi exceeds the worst trained language’s floor. A pure ratio threshold does not separate cross-script unseen from trained.
 
-**The two-axis rule separates all 26 languages.** Add the absolute axis: reject routing when the best-route perplexity exceeds $`\sim`$<!-- -->10$`\times`$ the acquisition band (2.36–6.47). Cross-script unseen languages sit at 82–732 (zh 417, ja 571, hi 732, iu-clean 304)—orders above any trained domain; byte-adjacent unseen sit at 37–51, also above. With both axes, all 20 trained languages pass and all 6 unseen reject. The thresholds are empirical for this checkpoint and instrument; we state them as a measured rule, not an architectural constant, and the conformal calibration that would freeze them non-arbitrarily is future work (Section <a href="#sec:limits" data-reference-type="ref" data-reference="sec:limits">11</a>).
+**The two-axis rule separates all 26 languages.** Add the absolute axis: reject routing when the best-route perplexity exceeds $`\sim`$<!-- -->10$`\times`$ the acquisition band (2.36–6.47). Cross-script unseen languages sit at 304–732 (zh 417, ja 571, hi 732, iu-clean 304)—orders above any trained domain; byte-adjacent unseen sit at 37–51, also above. With both axes, all 20 trained languages pass and all 6 unseen reject. The thresholds are empirical for this checkpoint and instrument; we state them as a measured rule, not an architectural constant, and the conformal calibration that would freeze them non-arbitrarily is future work (Section <a href="#sec:limits" data-reference-type="ref" data-reference="sec:limits">11</a>).
 
-**The cheap addresser and the likelihood router are two instruments, not rivals.** When the balanced byte addresser and the likelihood router disagree—hi routes to bg/el under likelihood but to Latin territories under the byte fit, and clean Inuktitut does the same—neither is wrong. Centroid geometry shows hi and iu-syllabic sit nearest Latin territories in byte $`n`$-gram space (bg/el rank 19–20 of 22 by cosine), so the cheap addresser faithfully reports *distributional proximity*; the likelihood router answers a different question, *realized fit*, and bg/el fit every 3-byte script better than any Latin territory. Maximum-centroid cosine separates the two regimes with zero fitted parameters: Latin-family inputs at 0.78–0.85, cross-script inputs at 0.07–0.14. The cascade consequence is concrete: escalate to the likelihood scan when the margin is low *or* the maximum cosine falls in the out-of-hull band; margin alone lets half the Hindi crops through unsafely.
+**The cheap addresser and the likelihood router are two instruments, not rivals.** When the balanced byte addresser and the likelihood router disagree—hi routes to bg/el under likelihood but to Latin territories under the byte fit, and clean Inuktitut does the same—neither is wrong. Centroid geometry shows hi and iu-syllabic sit nearest Latin territories in byte $`n`$-gram space (bg/el rank 19–20 of 22 by cosine), so the cheap addresser faithfully reports *distributional proximity*; the likelihood router answers a different question, *realized fit*, and bg/el fit each of the four 3-byte scripts tested better than any Latin territory. Maximum-centroid cosine separates the two regimes with zero fitted parameters: Latin-family inputs at 0.78–0.85, cross-script inputs at 0.07–0.14. The cascade consequence is concrete: escalate to the likelihood scan when the margin is low *or* the maximum cosine falls in the out-of-hull band; margin alone lets half the Hindi crops through unsafely.
 
 **The iu contamination, disclosed.** The original Inuktitut file mixed syllabic text with Turkish film-subtitle lines from the parallel column (454 of 719 lines Latin). The contamination was caught by an independent census during a different experiment, the clean re-run (265 syllabic lines) strengthens the byte-geometry result (routing concentration rises from 25/40 to 40/40 high-byte) and moves the advantage to 1.90$`\times`$. Both numbers are reported; the correction is a worked example of the second-seat cross-check discipline.
 
 # Cross-script generalization
 
-All results so far live inside the Latin-script byte continuum (plus Cyrillic and Greek as the only high-byte territories). We now test the growth–selection–addressing stack at maximum byte distance: four script universes with near-zero ASCII overlap and no linguistic kinship to anything trained.
+All results so far live inside the Latin-script byte continuum (plus Cyrillic and Greek as the only substantially multi-byte territories). We now test the growth–selection–addressing stack at maximum byte distance: four script universes with near-zero ASCII overlap and no linguistic kinship to anything trained.
 
 <figure id="fig:xscript" data-latex-placement="t">
 <embed src="figures/f5_cross_script.pdf" style="width:70.0%" />
@@ -399,7 +399,7 @@ All results so far live inside the Latin-script byte continuum (plus Cyrillic an
 
 ## Out-of-support routing: byte geometry, not linguistics
 
-Probing the fixed-regime chain (Section <a href="#sec:ra2b" data-reference-type="ref" data-reference="sec:ra2b">5</a>) with Chinese (zh, Han), Japanese (ja), Hindi (hi, Devanagari), and Inuktitut (iu, Canadian Syllabics; contaminated file corrected as in Section <a href="#sec:ood" data-reference-type="ref" data-reference="sec:ood">7.3</a>): pre-registered prediction was that routing would concentrate on the only two territories with substantial multi-byte training exposure— bg (Cyrillic) and el (Greek)—despite zero linguistic relationship. Measured confusion: zh 37/40 to bg+el, ja 40/40, hi 40/40, iu-clean 40/40. Every systematic routing decision lands on a high-byte territory; the pre-registered falsification case (Latin-route attraction) never occurred. Even the contaminated iu’s Latin share (12/40 to en) matched its actual Latin-script (Turkish subtitle) content, and was eliminated by cleaning.
+Probing the fixed-regime chain (Section <a href="#sec:ra2b" data-reference-type="ref" data-reference="sec:ra2b">5</a>) with Chinese (zh, Han), Japanese (ja), Hindi (hi, Devanagari), and Inuktitut (iu, Canadian Syllabics; contaminated file corrected as in Section <a href="#sec:ood" data-reference-type="ref" data-reference="sec:ood">7.3</a>): pre-registered prediction was that routing would concentrate on the only two territories with substantial multi-byte training exposure— bg (Cyrillic) and el (Greek)—despite zero linguistic relationship. Measured confusion: zh 37/40 to bg+el, ja 40/40, hi 40/40, iu-clean 40/40. Every systematic routing decision lands on a high-byte territory; the pre-registered falsification case (Latin-route attraction) never occurred. Even the contaminated iu’s Latin share (12/40 to en) matched its actual Latin-script content, predominantly English-prose lines; the Turkish-diacritic subset was too small to test separately.
 
 A per-territory byte census on the exact training slices quantifies "substantial": bg and el encode 82% of characters as 2-byte sequences against 11.7% for the next-highest territory (cs), a factor of 7. Every territory sees some non-ASCII bytes (pl 10.4%, de 3.6%)—the operative fact is the *density* of multi-byte structure, not its presence. No territory has material 3-byte exposure (maximum 0.018%, and that is typography: em dashes and ellipses), so bg and el win cross-script inputs not because they have seen those scripts—nobody has—but because they are the only territories whose weights live in a multi-byte regime at all.
 
@@ -501,7 +501,7 @@ J. Kirkpatrick, R. Pascanu, N. Rabinowitz, J. Veness, M. Desjardins, A. A.
 
 F. Zenke, B. Poole, S. Ganguli. *Continual Learning Through Synaptic Intelligence.* ICML (2017).
 
-D. M. Aljundi, R. C. F. Tuytelaars, T. Tuytelaars. *Memory Aware Synapses: Learning What (Not) to Forget.* ECCV (2018).
+R. Aljundi, M. B. French, B. S. Chakravarty, M. Tuytelaars. *Memory Aware Synapses: Learning What (Not) to Forget.* ECCV (2018).
 
 D. Lopez-Paz, M. Ranzato. *Gradient Episodic Memory for Continual Learning.* NeurIPS (2017).
 

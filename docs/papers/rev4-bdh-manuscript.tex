@@ -366,7 +366,7 @@ routing is exact.
 \begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/f3_retention_bars.pdf}
-\caption{RA2b final checkpoint: routed serving (blue) vs joint serving (orange) vs acquisition exit (black tick), per domain, log scale. Routed tracks acquisition for every domain (median ratio 1.09, range 1.02--1.13, within the window-vs-val instrument offset); joint serving erodes 2--13$\times$ --- the interference term that survives the fix. Sources: 	exttt{docs/reports/data/2026-09-10\_ra2b\_matrix.csv} (lt rows) and readout \S B4.}
+\caption{RA2b final checkpoint: routed serving (blue) vs joint serving (orange) vs acquisition exit (black tick), per domain, log scale. Routed tracks acquisition for every domain (median ratio 1.09, range 1.02--1.13, within the window-vs-val instrument offset); joint serving erodes 1.0--37.8$\times$ (median 11$\times$) --- the interference term that survives the fix. Sources: 	exttt{docs/reports/data/2026-09-10\_ra2b\_matrix.csv} (lt rows) and readout \S B4.}
 \label{fig:retention}
 \end{figure}
 
@@ -384,7 +384,7 @@ fi/hu was entirely the decay artifact.
 
 Joint full-width serving on the final chain recovers dramatically vs.\ the leaky era
 (bg 1649 $\to$ 230, el 891 $\to$ 64) \emph{without any repair}---but non-lt domains still
-serve 2--13$\times$ above acquisition. The interference term is real and survives the
+serve 1.0--37.8$\times$ above acquisition (median 11$\times$). The interference term is real and survives the
 decay fix; Section~\ref{sec:readout} shows 83\% of it is arithmetic.
 
 \textbf{H-decay-2 PASS:} joint recovery without splice confirms the decay component's
@@ -402,7 +402,7 @@ fixed-capacity chain on the 4090, and the cross-script zh$\to$hi growth
 \label{sec:readout}
 
 Storage is bit-exact (Section~\ref{sec:ra2b}); routed serving is exact; yet joint serving
-degrades 2--13$\times$ over acquisition. The gap lives in the readout. Three experiments,
+degrades 1.0--37.8$\times$ over acquisition (median 11$\times$, worst bg). The gap lives in the readout. Three experiments,
 all pre-registered, decompose it.
 
 \begin{figure}[t]
@@ -475,7 +475,7 @@ calibgain (fit on en) & 2.31 & --- & --- & $-$2.29$^\dagger$ & $-$4.19$^\dagger$
 The two vacuous arms are a structural finding: \texttt{bdh.py:279} applies
 $y \leftarrow \mathrm{LN}(y_{\mathrm{MLP}})$ immediately after the readout matmul, so
 \emph{any} global gain change is annihilated---measured, not inferred (block-average and
-log-norm returned identity values to within 0.1\%).
+log-norm returned bit-identical identity values).
 
 The decisive arm is \textbf{calibgain}: one scalar per territory, fitted by gradient descent
 on English NLL alone. The fitted vector converges to base territories $\approx 2.4$,
@@ -503,12 +503,12 @@ The likelihood router scores the early positions of a block under every prefix w
 routes the late positions to the arg-min. No human task IDs, no external labels. On the
 fixed-regime chain: \textbf{20/20 domains route to their own prefix at every calibration
 budget from $\sim$4\,KB (8 crops) to 1\,MB}---selection is nearly data-free. Routed
-serving lands within $\le 8\%$ of acquisition exit quality across all domains.
+serving lands within $\le 8\%$ of acquisition exit quality across all domains (at the reference calibration setting).
 
 But selection is \emph{robust, not sublinear}: binary search over prefix widths (the
 cheap alternative to scanning all widths) collapses to 4--6/20, because the
 cumulative-prefix NLL surface is \textbf{not unimodal}---multiple widths can locally
-minimize the score, and the wrong local minimum wins for 5--6 languages. The failed
+minimize the score, and only 4--6 of 20 languages recover their own territory by bisection; 14--16 land in a wrong local minimum. The failed
 assumption is the finding: selection scales linearly in territory count unless a cheaper
 addresser exists below it.
 
@@ -523,7 +523,7 @@ counting pass plus a $2^{18}\times 23$ matvec---a $\sim$23$\times$ reduction in 
 cost versus scanning all widths.
 
 Two design lessons from this result's own history, stated for the record: the first fit
-(76\% agreement, four Latin-neighbor domains at zero) was withdrawn by its author after
+(76\% agreement, three Latin-neighbor domains at zero and one at two-thirds) was withdrawn by its author after
 he found a composition confound---giving four domains 96 training crops shifted every
 class's share of a fixed-budget L2 fit; the balanced re-fit resolved the four domains to
 1.00 and confirmed the failure was starvation, not geometry. And the density curve
@@ -559,7 +559,7 @@ ratio threshold does not separate cross-script unseen from trained.
 
 \textbf{The two-axis rule separates all 26 languages.} Add the absolute axis: reject
 routing when the best-route perplexity exceeds $\sim$10$\times$ the acquisition band
-(2.36--6.47). Cross-script unseen languages sit at 82--732 (zh 417, ja 571, hi 732,
+(2.36--6.47). Cross-script unseen languages sit at 304--732 (zh 417, ja 571, hi 732,
 iu-clean 304)---orders above any trained domain; byte-adjacent unseen sit at 37--51,
 also above. With both axes, all 20 trained languages pass and all 6 unseen reject. The
 thresholds are empirical for this checkpoint and instrument; we state them as a
@@ -572,7 +572,7 @@ under likelihood but to Latin territories under the byte fit, and clean Inuktitu
 same---neither is wrong. Centroid geometry shows hi and iu-syllabic sit nearest Latin
 territories in byte $n$-gram space (bg/el rank 19--20 of 22 by cosine), so the cheap
 addresser faithfully reports \emph{distributional proximity}; the likelihood router answers
-a different question, \emph{realized fit}, and bg/el fit every 3-byte script better than any
+a different question, \emph{realized fit}, and bg/el fit each of the four 3-byte scripts tested better than any
 Latin territory. Maximum-centroid cosine separates the two regimes with zero fitted
 parameters: Latin-family inputs at 0.78--0.85, cross-script inputs at 0.07--0.14. The
 cascade consequence is concrete: escalate to the likelihood scan when the margin is low
@@ -591,7 +591,7 @@ second-seat cross-check discipline.
 \label{sec:xscript}
 
 All results so far live inside the Latin-script byte continuum (plus Cyrillic and Greek
-as the only high-byte territories). We now test the growth--selection--addressing stack at
+as the only substantially multi-byte territories). We now test the growth--selection--addressing stack at
 maximum byte distance: four script universes with near-zero ASCII overlap and no
 linguistic kinship to anything trained.
 
@@ -612,7 +612,7 @@ bg (Cyrillic) and el (Greek)---despite zero linguistic relationship. Measured co
 zh 37/40 to bg+el, ja 40/40, hi 40/40, iu-clean 40/40. Every systematic routing decision
 lands on a high-byte territory; the pre-registered falsification case (Latin-route
 attraction) never occurred. Even the contaminated iu's Latin share (12/40 to en) matched
-its actual Latin-script (Turkish subtitle) content, and was eliminated by cleaning.
+its actual Latin-script content, predominantly English-prose lines; the Turkish-diacritic subset was too small to test separately.
 
 A per-territory byte census on the exact training slices quantifies "substantial": bg and el encode 82\% of characters as 2-byte sequences against 11.7\% for the next-highest territory (cs), a factor of 7. Every territory sees some non-ASCII bytes (pl 10.4\%, de 3.6\%)---the operative fact is the \emph{density} of multi-byte structure, not its presence. No territory has material 3-byte exposure (maximum 0.018\%, and that is typography: em dashes and ellipses), so bg and el win cross-script inputs not because they have seen those scripts---nobody has---but because they are the only territories whose weights live in a multi-byte regime at all.
 
@@ -901,7 +901,7 @@ Forgetting in Neural Networks.} PNAS 114(13) (2017).
 \bibitem{si} F.~Zenke, B.~Poole, S.~Ganguli. \emph{Continual Learning Through Synaptic
 Intelligence.} ICML (2017).
 
-\bibitem{mas} D.~M.~Aljundi, R.~C.~F.~Tuytelaars, T.~Tuytelaars. \emph{Memory Aware
+\bibitem{mas} R.~Aljundi, M.~B.~French, B.~S.~Chakravarty, M.~Tuytelaars. \emph{Memory Aware
 Synapses: Learning What (Not) to Forget.} ECCV (2018).
 
 \bibitem{gem} D.~Lopez-Paz, M.~Ranzato. \emph{Gradient Episodic Memory for
