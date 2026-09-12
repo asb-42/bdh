@@ -12,7 +12,7 @@ Status vocabulary: **CITABLE** (established, safe to draft from) · **SUPERSEDED
 provenance) · **QUARANTINE** (withdrawn, must not reach the manuscript) · **TOOLING** (instrument, not a
 claim) · **unclassified** (nobody has declared it - gap, not absence).
 
-## reports/  (72 files)
+## reports/  (73 files)
 
 | path | last | author | date | bytes | title / status |
 |---|---|---|---|---|---|
@@ -41,6 +41,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `docs/reports/2026-09-11_a3-closed-set-probe.md` | `2e844ca` | Quinn (Agent Zero) | 2026-09-11 | 7,133 | A3 Closed-Set Probe — Results (21st never-trained language)<br>*unclassified* |
 | `docs/reports/2026-09-11_cross-script-rejection-suite.md` | `01abc27` | Quinn (Agent Zero) | 2026-09-11 | 12,688 | Cross-Script Rejection Suite — Stage A Results<br>*unclassified* |
 | `docs/reports/2026-09-11_pi-50_expansion-control-and-readout-operators.md` | `5633434` | pi-50 | 2026-09-12 | 30,692 | P-R1 / P-R2 — readout width-invariance and the expansion control<br>*CITABLE - sections 2,3,6,8,9; section 7 header carries a partial supersession banner* |
+| `docs/reports/2026-09-12_pi-50_restore-overhead.md` | `e02a5cb` | pi-50 | 2026-09-12 | 6,259 | Throughput and memory cost of the step-end frozen-region restore<br>*CITABLE - measured restore overhead + candidate F-V9 guard request* |
 | `docs/reports/data/2026-09-05_ra2b_acquisition.csv` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 1,262 | phase,lang,mult_from,mult_to,batch,tokens,cum_tokens,params,bytes,exit<br>*unclassified* |
 | `docs/reports/data/2026-09-05_ra2b_acquisition.json` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 3,989 | [<br>*unclassified* |
 | `docs/reports/data/2026-09-10_fcs_matrix.csv` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 2,823 | FCS fixed-capacity matrix, source: .200 out/logs/fixedcap_matrix.txt (<br>*unclassified* |
@@ -187,10 +188,10 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `docs/papers/figures/leakage.pdf` | `90641f5` | OC/DSv4P/JSCS | 2026-08-26 | 21,116 | %PDF-1.4<br>*unclassified* |
 | `docs/papers/figures/pareto.pdf` | `90641f5` | OC/DSv4P/JSCS | 2026-08-26 | 21,512 | %PDF-1.4<br>*unclassified* |
 | `docs/papers/rev4-ai-disclosure-draft.md` | `47a6d07` | Quinn (Agent Zero) | 2026-09-11 | 8,167 | Rev 4 — AI Participation Disclosure (Draft)<br>*unclassified* |
-| `docs/papers/rev4-bdh-manuscript.aux` | `7a8ba99` | Quinn (Agent Zero) | 2026-09-12 | 15,987 | \relax<br>*unclassified* |
-| `docs/papers/rev4-bdh-manuscript.md` | `7a8ba99` | Quinn (Agent Zero) | 2026-09-12 | 70,499 | Append-Only Neural Memory: Storage, Addressing, and Growth<br>*unclassified* |
-| `docs/papers/rev4-bdh-manuscript.pdf` | `7a8ba99` | Quinn (Agent Zero) | 2026-09-12 | 570,504 | %PDF-1.7<br>*unclassified* |
-| `docs/papers/rev4-bdh-manuscript.tex` | `7a8ba99` | Quinn (Agent Zero) | 2026-09-12 | 68,803 | \documentclass[11pt]{article}<br>*unclassified* |
+| `docs/papers/rev4-bdh-manuscript.aux` | `51dc989` | Quinn (Agent Zero) | 2026-09-12 | 16,207 | \relax<br>*unclassified* |
+| `docs/papers/rev4-bdh-manuscript.md` | `51dc989` | Quinn (Agent Zero) | 2026-09-12 | 72,522 | Append-Only Neural Memory: Storage, Addressing, and Growth<br>*unclassified* |
+| `docs/papers/rev4-bdh-manuscript.pdf` | `51dc989` | Quinn (Agent Zero) | 2026-09-12 | 578,170 | %PDF-1.7<br>*unclassified* |
+| `docs/papers/rev4-bdh-manuscript.tex` | `51dc989` | Quinn (Agent Zero) | 2026-09-12 | 70,927 | \documentclass[11pt]{article}<br>*unclassified* |
 
 ## archive/  (8 files)
 
@@ -220,7 +221,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `scripts/pi50/exp4b_budget.py` | `045a61c` | pi-50 | 2026-09-11 | 4,163 | """A2 follow-ups: how much calibration does likelihood selection actua<br>*TOOLING* |
 | `scripts/pi50/matrix_eval.sh` | `dd40e3a` | pi-50 | 2026-09-10 | 7,423 | !/usr/bin/env bash<br>*TOOLING - reusable serving-matrix runner, guards ALLOW_EVAL+ANNOUNCED* |
 | `scripts/pi50/ood_script_census.py` | `15e55ad` | pi-50 | 2026-09-12 | 1,344 | import re<br>*TOOLING - script-composition census that established the iu contamination (bus 188)* |
-| `scripts/pi50/phase1_manifest.py` | `af2fbef` | pi-50 | 2026-09-12 | 8,227 | """Generate docs/PHASE1-MANIFEST.md - a living index of the phase-1 ev<br>*TOOLING - generates this file* |
+| `scripts/pi50/phase1_manifest.py` | `e02a5cb` | pi-50 | 2026-09-12 | 8,361 | """Generate docs/PHASE1-MANIFEST.md - a living index of the phase-1 ev<br>*TOOLING - generates this file* |
 | `scripts/pi50/protocol_4090.sh` | `dd40e3a` | pi-50 | 2026-09-10 | 9,388 | !/usr/bin/env bash<br>*TOOLING - preflight guard, refuses during live jobs* |
 | `scripts/pi50/r1_readout_operators.py` | `0f1763b` | pi-50 | 2026-09-11 | 6,082 | """P-R1 READOUT WIDTH-INVARIANCE (pre-registered bus #165).<br>*TOOLING* |
 | `scripts/pi50/r1b_relative_reweight.py` | `5d47c9e` | pi-50 | 2026-09-11 | 6,924 | """P-R1b RELATIVE TERRITORY REWEIGHTING (pre-registered bus #175).<br>*TOOLING* |
@@ -235,7 +236,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 
 ## Gaps this manifest exposes
 
-- **147 of 176 files carry no declared status.** Those are the ones most likely to be
+- **147 of 177 files carry no declared status.** Those are the ones most likely to be
   mis-cited during a revision: something is either citable or it is not, and 'nobody wrote it down'
   reads as permission.
 - The prior-art note still labels HSP and PCANets unverified in-file; that must be closed or
@@ -244,4 +245,4 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
   `~/bdh-review/reports/` on gx10 are ephemeral; anything quoted in the manuscript must have its
   generating log inside the repo.
 
-_Generated 2026-09-12 05:01:56 +0200 from HEAD `af2fbef`._
+_Generated 2026-09-12 06:31:55 +0200 from HEAD `51dc989`._
