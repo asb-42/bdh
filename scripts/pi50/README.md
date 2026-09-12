@@ -69,5 +69,7 @@ on the RA2b ladder; nothing here trains anything. Index of what each artifact *e
 
 `phase1_manifest.py` records, per artifact, the short SHA of the commit that last touched it. Regenerating *before*
 committing therefore stamps the previous HEAD, and `--check` goes stale again the moment the content commit lands.
-Expected sequence, not a bug to debug: land content -> regenerate -> land a small "manifest refresh" commit. If
-`--check` reports stale while the working tree is clean, that is this case; re-run and commit.
+Expected sequence, not a bug to debug: land all content (including any prose or README edits) -> regenerate -> land ONE
+final commit whose only file is `docs/PHASE1-MANIFEST.md`. That converges because the manifest does not index itself; a
+refresh commit that also touches an indexed path just moves that row's SHA and leaves `--check` stale again. If `--check`
+reports stale while the tree is clean, re-run and check whether the last commit touched anything indexed.
