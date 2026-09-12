@@ -99,6 +99,8 @@ is used without definition, that is a fair restatement worth considering on its 
 f2_fcs_heatmap, f3_retention_bars, f4_ood_scatter, f5_cross_script, f6_expansion_control — all OK). To its credit
 the review flagged this as partial verification rather than a finding.
 
+**[SUPERSEDED 2026-09-13 — see Addendum below. This rejection is withdrawn: the pattern IS present, and my absence test was malformed.]**
+
 **B3 · `"2026;\ cite as vendor documentation"` in the engram bibitem.** Pattern absent; rev 4.4 carries a URL and
 access date there (added per #228). Same for the generic "broken LaTeX" beyond the two real sites in A1.
 
@@ -153,3 +155,62 @@ Recommendation to the operator: one person should own a **bibliography closure p
 canonical record (CVF/ACL Anthology/arXiv/IEEE), compare all fields, and land a diff with the source URL per
 entry. Roughly twenty entries, mechanical, and it is the single highest-integrity-risk surface left in the
 manuscript: a fabricated-looking citation is the defect that makes a reviewer distrust every number beside it.
+
+---
+
+## Addendum 2026-09-13 — B3 restored as a confirmed defect; my rejection was the failure, not the reviewer
+
+Kimi's report quoted the string **byte-for-byte with its LaTeX escape intact**:
+
+> broken LaTeX in a release candidate — "ext tt{…}", "extbf{Learning to Prompt}", **"2026;\ cite as vendor
+> documentation"** (bibitem engram)
+
+I wrote that exact string into this file and then declared it absent. The reason is mechanical and worth recording
+precisely, because the guard that would have caught it costs nothing:
+
+    grep -c  "; cite as vendor documentation"          -> 0   <- what I ran (escape normalized into a plain space)
+    grep -Fc '2026;\ cite as vendor documentation'    -> 1   <- what Kimi wrote, and what the file contains
+
+**Actual location and status.** The imperative sits in **body prose**, `§9.7 Production-scale conditional memory`,
+`docs/papers/rev4-bdh-manuscript.tex:848–849`: `(2026;\ cite as vendor documentation until peer-reviewed)`. It compiles
+into the PDF (`pdftotext` shows `[23] (2026; cite as vendor documentation until peer-reviewed)`). Its provenance is a
+drafting note to self introduced by `5c29939` ("Rev 4 manuscript DRAFT v0.1"), and it is **still present after rev 4.5**
+(`dc65698`), i.e. it survived five external reviews and three revision sweeps. The bibliography entry already states the
+same fact descriptively at line 1046 ("Cited as vendor documentation, not peer-reviewed work"), so the body
+parenthetical is both misvoiced and redundant. Suggested handling for whoever owns prose: delete it, or make it
+descriptive — `(2026; no peer-reviewed publication exists as of this draft)`.
+
+Sweep for other leaks of this class (done 2026-09-13, whole file, body text only): exactly **one** site — this one. No
+TODO/FIXME/TBD placeholders, no internal bus references (`#NNN`), no seat or reviewer names, no other editor-directed
+imperatives.
+
+**Corrected tally for this review.** Nine confirmed, two rejected — not eight and three. Of the two remaining
+rejections: B1 (`k_sparse_ratio` absent from the manuscript) holds under six spellings including `k\_sparse\_ratio` and
+`top-$k$`, so that one stands (the reviewer almost certainly read it out of `docs/reports/2026-08-24_progress-report.md`
+or a sibling); B2 (figures exist) was a positive existence check against every `\includegraphics` target, not an absence
+test. Judgment-based rejections (theory conflation, optimizer generality) are immune to this specific bug but cannot be
+re-tested mechanically, so they remain my opinion rather than a finding.
+
+**The point Kimi made that none of us engaged, including in this file.** Its §5 item 6: the Engram citation "is properly
+flagged by the authors, but it props up the 'production-scale validation' narrative." That is a substance question
+about how much weight a vendor model card may bear, and it is independent of where the caveat is printed. Our prior-art
+section says massive dormant capacity with input-gated sparse access is "a validated production design". If that
+sentence is load-bearing for the argument that our substrate choice is mainstream rather than exotic, then the honest
+options are to demote the verb (vendor documentation validates *existence of the design in a shipping product*, not its
+behavior under continual learning) or to attach the limitation explicitly. Nobody has answered it; it is recorded here
+so that it does not disappear behind my bad grep.
+
+**Guards adopted, in order of how much they would have helped:**
+1. An "absent" claim may be produced only by running **the same bytes quoted in the claim**, fixed-string (`grep -F`),
+   with no normalization of escapes, case, or whitespace. My search silently converted `;\ cite` into `; cite` and the
+   conversion was the whole error.
+2. Every published rejection carries its **command and hit count** next to its verdict, so a reader can audit the test
+   rather than trust the assertion. This file violated that while enforcing it on others.
+3. When a reviewer quotes source material with markup or escapes intact, treat that as evidence it read the file, and
+   weigh it before contradicting it. Machine reviewers that paraphrase are guessing more often than ones that copy.
+
+**Why this matters more than the single defect.** We built a review-of-reviews layer specifically to filter noise from
+machine reviewers, and it worked as designed — it also deleted a true finding, silently. Misses leave traces in the
+artifact (an unquoted sentence stays in the PDF, which is how the operator found this one); suppressions leave no trace
+at all except the reviewer's own word. Asymmetric detectability means the filter's errors are the dangerous ones. Hence
+guard 2: make rejections auditable, not just numerous.
