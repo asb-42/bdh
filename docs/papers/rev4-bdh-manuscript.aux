@@ -50,67 +50,66 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Bit-exactness: four independent confirmations}{9}{subsection.5.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {6}Readout mechanics: why joint serving degrades}{9}{section.6}\protected@file@percent }
 \newlabel{sec:readout}{{6}{9}{Readout mechanics: why joint serving degrades}{section.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}The random-expansion control: 83\% is arithmetic}{9}{subsection.6.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Expansion control on the en base (one growth step; instrument gate reproduces matrix exit at 2.33 vs 2.31, PASS). Random Gaussian blocks cost $4.1\times $; inert zeros cost nothing --- the zero-init convention is load-bearing; the real ladder's joint damage is 83\% arithmetic.}}{10}{figure.4}\protected@file@percent }
-\newlabel{fig:expansion}{{4}{10}{Expansion control on the en base (one growth step; instrument gate reproduces matrix exit at 2.33 vs 2.31, PASS). Random Gaussian blocks cost $4.1\times $; inert zeros cost nothing --- the zero-init convention is load-bearing; the real ladder's joint damage is 83\% arithmetic}{figure.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}The random-expansion control: mostly arithmetic (83\% log-scale, 62\% linear)}{9}{subsection.6.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Expansion control on the en base (one growth step; instrument gate reproduces matrix exit at 2.33 vs 2.31, PASS). Random Gaussian blocks cost $4.1\times $; inert zeros cost nothing --- the zero-init convention is load-bearing; the real ladder's joint damage is 83\% arithmetic on the log scale (62\% in linear perplexity).}}{10}{figure.4}\protected@file@percent }
+\newlabel{fig:expansion}{{4}{10}{Expansion control on the en base (one growth step; instrument gate reproduces matrix exit at 2.33 vs 2.31, PASS). Random Gaussian blocks cost $4.1\times $; inert zeros cost nothing --- the zero-init convention is load-bearing; the real ladder's joint damage is 83\% arithmetic on the log scale (62\% in linear perplexity)}{figure.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Seven fixed readout operators, all refuted}{10}{subsection.6.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {7}Selection and out-of-support detection}{11}{section.7}\protected@file@percent }
 \newlabel{sec:selection}{{7}{11}{Selection and out-of-support detection}{section.7}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Label-free likelihood selection}{11}{subsection.7.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Cheap addressing from byte geometry}{11}{subsection.7.2}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Two-axis OOD separation. Blue: 20 trained languages (ratio $\ge 5\times $, absolute ppl $\le 6.5$). Diamonds: 6 unseen — byte-adjacent (lv, ga) collapse on the ratio axis; cross-script (zh, ja, hi, iu) sit orders above on the absolute axis. hi breaches the trained ratio floor (5.74$\times $): the one-axis rule fails informatively; both axes together separate all 26.}}{12}{figure.5}\protected@file@percent }
 \newlabel{fig:ood}{{5}{12}{Two-axis OOD separation. Blue: 20 trained languages (ratio $\ge 5\times $, absolute ppl $\le 6.5$). Diamonds: 6 unseen — byte-adjacent (lv, ga) collapse on the ratio axis; cross-script (zh, ja, hi, iu) sit orders above on the absolute axis. hi breaches the trained ratio floor (5.74$\times $): the one-axis rule fails informatively; both axes together separate all 26}{figure.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Cheap addressing from byte geometry}{12}{subsection.7.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Out-of-support detection: two axes, not one}{12}{subsection.7.3}\protected@file@percent }
 \newlabel{sec:ood}{{7.3}{12}{Out-of-support detection: two axes, not one}{subsection.7.3}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {8}Cross-script generalization}{13}{section.8}\protected@file@percent }
 \newlabel{sec:xscript}{{8}{13}{Cross-script generalization}{section.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Out-of-support routing: byte geometry, not linguistics}{13}{subsection.8.1}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Cross-script routing on the fixed-regime chain (40 crops per probe). zh 37/40, ja 40/40, hi 40/40 and the decontaminated iu 40/40 concentrate on the only two territories with substantial multi-byte training exposure (bg/el: 82\% 2-byte characters vs 11.7\% next-highest); no Latin-route attraction remains after the iu correction. No linguistic kinship exists between any probe and Cyrillic or Greek.}}{14}{figure.6}\protected@file@percent }
 \newlabel{fig:xscript}{{6}{14}{Cross-script routing on the fixed-regime chain (40 crops per probe). zh 37/40, ja 40/40, hi 40/40 and the decontaminated iu 40/40 concentrate on the only two territories with substantial multi-byte training exposure (bg/el: 82\% 2-byte characters vs 11.7\% next-highest); no Latin-route attraction remains after the iu correction. No linguistic kinship exists between any probe and Cyrillic or Greek}{figure.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Acquisition from scratch: script-agnostic}{14}{subsection.8.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}The cross-script growth cell: monotonic growth holds}{14}{subsection.8.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Out-of-support routing: byte geometry, not linguistics}{14}{subsection.8.1}\protected@file@percent }
 \citation{pgn}
 \citation{packnet}
-\citation{piggyback}
-\citation{supsup}
-\citation{expertgate}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Acquisition from scratch: script-agnostic}{15}{subsection.8.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}The cross-script growth cell: monotonic growth holds}{15}{subsection.8.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {8.4}Data reality, separated from capability}{15}{subsection.8.4}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {9}Prior art, discussed}{15}{section.9}\protected@file@percent }
 \newlabel{sec:prior}{{9}{15}{Prior art, discussed}{section.9}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {9.1}Additive and parameter-isolating growth}{15}{subsection.9.1}\protected@file@percent }
 \newlabel{sec:prior:growth}{{9.1}{15}{Additive and parameter-isolating growth}{subsection.9.1}{}}
+\citation{piggyback}
+\citation{supsup}
+\citation{expertgate}
 \citation{ewc}
 \citation{si}
 \citation{mas}
 \citation{gem}
 \citation{agem}
-\citation{shazeer}
-\citation{switch}
-\citation{gshard}
 \@writefile{toc}{\contentsline {subsection}{\numberline {9.2}Task and domain addressing}{16}{subsection.9.2}\protected@file@percent }
 \newlabel{sec:prior:addressing}{{9.2}{16}{Task and domain addressing}{subsection.9.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {9.3}Consolidation and importance protection}{16}{subsection.9.3}\protected@file@percent }
 \newlabel{sec:prior:consolidation}{{9.3}{16}{Consolidation and importance protection}{subsection.9.3}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {9.4}Replay}{16}{subsection.9.4}\protected@file@percent }
 \newlabel{sec:prior:replay}{{9.4}{16}{Replay}{subsection.9.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.5}Sparse expert routing and its failure class}{16}{subsection.9.5}\protected@file@percent }
-\newlabel{sec:prior:moe}{{9.5}{16}{Sparse expert routing and its failure class}{subsection.9.5}{}}
+\citation{shazeer}
+\citation{switch}
+\citation{gshard}
 \citation{chow}
 \citation{conformal}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.5}Sparse expert routing and its failure class}{17}{subsection.9.5}\protected@file@percent }
+\newlabel{sec:prior:moe}{{9.5}{17}{Sparse expert routing and its failure class}{subsection.9.5}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {9.6}Selective prediction and rejection}{17}{subsection.9.6}\protected@file@percent }
 \newlabel{sec:prior:reject}{{9.6}{17}{Selective prediction and rejection}{subsection.9.6}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {9.7}Production-scale conditional memory}{17}{subsection.9.7}\protected@file@percent }
 \newlabel{sec:prior:engram}{{9.7}{17}{Production-scale conditional memory}{subsection.9.7}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {9.8}Continual-learning evaluation methodology}{17}{subsection.9.8}\protected@file@percent }
 \newlabel{sec:prior:method}{{9.8}{17}{Continual-learning evaluation methodology}{subsection.9.8}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {10}Discussion}{17}{section.10}\protected@file@percent }
-\newlabel{sec:discussion}{{10}{17}{Discussion}{section.10}{}}
-\bibcite{bdh}{1}
+\@writefile{toc}{\contentsline {section}{\numberline {10}Discussion}{18}{section.10}\protected@file@percent }
+\newlabel{sec:discussion}{{10}{18}{Discussion}{section.10}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {11}Limitations}{18}{section.11}\protected@file@percent }
 \newlabel{sec:limits}{{11}{18}{Limitations}{section.11}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {12}Conclusion}{18}{section.12}\protected@file@percent }
 \newlabel{sec:conclusion}{{12}{18}{Conclusion}{section.12}{}}
-\newlabel{sec:ai-disclosure}{{12}{18}{AI participation}{section*.1}{}}
+\bibcite{bdh}{1}
 \bibcite{pgn}{2}
 \bibcite{packnet}{3}
 \bibcite{piggyback}{4}
@@ -126,6 +125,7 @@
 \bibcite{switch}{14}
 \bibcite{gshard}{15}
 \bibcite{chow}{16}
+\newlabel{sec:ai-disclosure}{{12}{19}{AI participation}{section*.1}{}}
 \bibcite{conformal}{17}
 \bibcite{adamw}{18}
 \bibcite{layernorm}{19}
@@ -144,7 +144,7 @@
 \newlabel{app:proofs}{{A}{20}{Proofs and formal details}{appendix.A}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {A.1}Separability facts}{20}{subsection.A.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {A.2}Proof of Theorem~\ref {thm:dissoc}}{20}{subsection.A.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {A.3}Proof of Theorem~\ref {thm:criterion}}{20}{subsection.A.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.3}Proof of Theorem~\ref {thm:criterion}}{21}{subsection.A.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {A.4}Proof of Lemma~\ref {lem:zf}}{21}{subsection.A.4}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {A.5}Proof sketch of Proposition~\ref {prop:soft}}{21}{subsection.A.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {A.6}Proof of Proposition~\ref {prop:amp}}{21}{subsection.A.6}\protected@file@percent }

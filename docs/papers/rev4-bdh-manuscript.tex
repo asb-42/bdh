@@ -31,7 +31,7 @@
 \begin{abstract}
 We study continual learning in \BDH{}, a byte-level depth-recurrent language model whose additive growth rule appends zero-initialized neurons while leaving all existing computation bit-identical. Our central finding separates three concerns that the continual-learning literature usually conflates.
 \emph{Storage} is solved: under gradient-masked growth, previously acquired computation remains bit-exact at the tensor level across every subsequent phase (verified four independent ways, including cross-script).
-\emph{Serving} splits into two measured regimes: joint serving degrades because the summation readout accumulates contributions from all neurons (83\% of the damage is reproduced by appending a single random, untrained block), while prefix-masked serving reproduces acquisition quality exactly (retention equals acquisition, zero drift across a full growth phase, 800/800 routing accuracy).
+\emph{Serving} splits into two measured regimes: joint serving degrades because the summation readout accumulates contributions from all neurons (83\% of the damage on the log scale, 62\% in perplexity units, is reproduced by appending a single random, untrained block), while prefix-masked serving reproduces acquisition quality exactly (retention equals acquisition, zero drift across a full growth phase, 800/800 routing accuracy).
 \emph{Addressing} is the open problem: label-free likelihood selection achieves 20/20 correct prefix identification at every calibration budget from 4\,KB to 1\,MB, and a byte-level $n$-gram addresser reproduces the likelihood router perfectly ($1.000$, Wilson $[0.977,1.000]$) given $\sim$4--8\,KB of calibration text per domain---but cumulative-prefix NLL is not unimodal, so selection is robust yet not sublinear in territory count. Out-of-support detection requires two axes (relative advantage and absolute perplexity): byte-adjacent unseen languages have ratio $\approx 1$ while cross-script inputs have catastrophic joint perplexity that inflates the ratio past the trained floor. Cross-script probes confirm that the address geometry is byte-statistical, not linguistic: Chinese, Japanese, Hindi, and Inuktitut route 37--40/40 to the only two territories with substantial multi-byte training exposure (Cyrillic and Greek: 82\% of characters are 2-byte-encoded, against 11.7\% for the next-highest territory, a factor of 7), with zero linguistic kinship. A 20-phase fixed-capacity baseline shows that without growth, forgetting is destruction (not access loss). The growth mechanism generalizes across script universes: a Chinese territory grown on an English base, then Devanagari grown on Chinese, retains all three bit-exactly, routes perfectly, and serves each at acquisition quality.
 \end{abstract}
 
@@ -44,7 +44,7 @@ This paper takes \BDH{}~\cite{bdh} as its instrument and reports a measurement a
 
 \begin{enumerate}
 \item \textbf{Storage.} Under masked growth, is previously acquired computation physically preserved? We answer at the bit level: yes, four independent confirmations, including cross-script.
-\item \textbf{Serving.} Given preserved storage, does the model still serve old tasks? We decompose the serving problem into \emph{joint} (all neurons active) and \emph{routed} (prefix-masked) regimes, and show the degradation in the former is 83\% arithmetic (reproduced by random untrained blocks) while the latter is exact.
+\item \textbf{Serving.} Given preserved storage, does the model still serve old tasks? We decompose the serving problem into \emph{joint} (all neurons active) and \emph{routed} (prefix-masked) regimes, and show the degradation in the former is 83\% arithmetic on the log scale, 62\% in perplexity units (reproduced by random untrained blocks) while the latter is exact.
 \item \textbf{Addressing.} Can the model find the right territory without an external language ID? We measure label-free selection, cheap input-side addressing, out-of-support rejection, and their scaling properties.
 \end{enumerate}
 
@@ -64,13 +64,13 @@ Our experiments proceed from the simplest question to the hardest.
 
 \textbf{Preservation under growth (Section~\ref{sec:ra2b}).} With the fix active, a 20-phase route-aware ladder (579M final) shows: position-dependent acquisition cost collapses, routing is perfectly diagonal (800/800 crops), retention equals acquisition (zero within-instrument drift across a full growth phase), and bit-exactness holds at every transition.
 
-\textbf{Readout mechanics (Section~\ref{sec:readout}).} Why does joint serving degrade if storage is bit-exact? A random-expansion control answers: appending one random untrained block costs English $4.1\times$; random expansion to full width reproduces 83\% of the real damage; inert zero-blocks cost nothing. Every fixed readout operator we test (seven in total) fails to repair it, including gradient-fitted per-territory gains that converge to oracle masking. The correct operation is input-dependent selection.
+\textbf{Readout mechanics (Section~\ref{sec:readout}).} Why does joint serving degrade if storage is bit-exact? A random-expansion control answers: appending one random untrained block costs English $4.1\times$; random expansion to full width reproduces 83\% of the real damage (log scale; 62\% in linear perplexity); inert zero-blocks cost nothing. Every fixed readout operator we test (seven in total) fails to repair it, including gradient-fitted per-territory gains that converge to oracle masking. The correct operation is input-dependent selection.
 
 \textbf{Selection (Section~\ref{sec:selection}).} A label-free self-NLL selector identifies the correct prefix for all 20 domains at every calibration budget from 4\,KB to 1\,MB. A byte 1--4-gram logistic addresser reproduces the likelihood router perfectly under a class-balanced fit, given $\sim$4--8\,KB of calibration text per domain. But binary search over prefix widths collapses: the cumulative-prefix NLL surface is not unimodal, so selection is robust but not sublinear in territory count.
 
 \textbf{Out-of-support detection (Section~\ref{sec:ood}).} A reject rule on two axes separates 20 trained languages from 6 unseen ones: routing advantage (joint/best-route ratio, $\ge 5\times$ for trained, $\approx 1\times$ for byte-adjacent unseen) and absolute best-route perplexity (within $\sim 10\times$ of the acquisition band). Cross-script unseen languages expose the ratio's degeneration: their joint perplexity is so catastrophic that the ratio inflates past the trained floor.
 
-\textbf{Cross-script generalization (Section~\ref{sec:xscript}).} The address geometry is byte-statistical, not linguistic: Chinese, Japanese, Hindi, and Inuktitut route 37--40/40 to the only two high-byte territories (Cyrillic, Greek). Chinese acquires from scratch at 2.69 ppl; a Devanagari phase grown on Chinese retains both bit-exactly and serves both at acquisition quality. Monotonic model growth holds across script universes.
+\textbf{Cross-script generalization (Section~\ref{sec:xscript}).} The address geometry is byte-statistical, not linguistic: Chinese, Japanese, Hindi, and Inuktitut route 37--40/40 to the only two high-byte territories (Cyrillic, Greek). Chinese acquires from scratch at 2.69 ppl (best-val; test 2.48; `docs/reports/2026-09-11\_cross-script-rejection-suite.md`); a Devanagari phase grown on Chinese retains both bit-exactly and serves both at acquisition quality. Monotonic model growth holds across script universes.
 
 \textbf{Prior art (Section~\ref{sec:prior}).} We position each result against the literature: additive growth (Progressive Networks, PackNet, Piggyback, SupSup), task addressing (Expert Gate), consolidation (EWC/SI/MAS), replay (GEM), MoE routing (Switch/GShard), selective prediction (Chow, conformal), and production-scale conditional memory (DeepSeek Engram).
 
@@ -140,9 +140,10 @@ width on the same crops.
 
 Hardware: one RTX~4090 (24\,GB) and one NVIDIA GB10 (gx10, 121\,GB); scale is $\sim$100M
 parameters at the base width ($\times$128) and $\sim$579M at the final ladder width
-($\times$736). Every number in this paper traces to a committed artifact; pre-registrations,
-verdicts, and corrections are append-only records on the project's message bus, cited by
-envelope number.
+($\times$736). Every number in this paper traces to a committed artifact in the project repository
+(reports, plans, data files, and pre-registration headers in the training scripts); the
+project's internal message bus is the working coordination layer, and where a claim cites
+its provenance, this paper names the repository artifact.
 
 \subsection{The decay confound, closed}\label{sec:decay}
 
@@ -223,7 +224,7 @@ suffix magnitude.
 \textsc{measured} (Section~\ref{sec:readout}). With $k$\_sparse\_ratio $=0$, the readout
 sums over all $N$ ReLU candidates, and growth adds terms to an existing sum with bit-frozen
 old weights. Theorem~\ref{thm:dissoc} predicted this class of failure abstractly; the
-random-expansion control measures it: one random block costs $4.1\times$, and 83\% of the
+random-expansion control measures it: one random block costs $4.1\times$, and 83\% (log scale; 62\% in linear perplexity) of the
 real damage needs no learning at all.
 \end{remark}
 
@@ -385,7 +386,7 @@ fi/hu was entirely the decay artifact.
 Joint full-width serving on the final chain recovers dramatically vs.\ the leaky era
 (bg 1649 $\to$ 230, el 891 $\to$ 64) \emph{without any repair}---but non-lt domains still
 serve 1.0--37.8$\times$ above acquisition (median 11$\times$). The interference term is real and survives the
-decay fix; Section~\ref{sec:readout} shows 83\% of it is arithmetic.
+decay fix; Section~\ref{sec:readout} shows 83\% of it is arithmetic (log scale; 62\% in linear perplexity).
 
 \textbf{H-decay-2 PASS:} joint recovery without splice confirms the decay component's
 size; the residual is the readout problem.
@@ -408,11 +409,11 @@ all pre-registered, decompose it.
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.6\textwidth]{figures/f6_expansion_control.pdf}
-\caption{Expansion control on the en base (one growth step; instrument gate reproduces matrix exit at 2.33 vs 2.31, PASS). Random Gaussian blocks cost $4.1\times$; inert zeros cost nothing --- the zero-init convention is load-bearing; the real ladder's joint damage is 83\% arithmetic.}
+\caption{Expansion control on the en base (one growth step; instrument gate reproduces matrix exit at 2.33 vs 2.31, PASS). Random Gaussian blocks cost $4.1\times$; inert zeros cost nothing --- the zero-init convention is load-bearing; the real ladder's joint damage is 83\% arithmetic on the log scale (62\% in linear perplexity).}
 \label{fig:expansion}
 \end{figure}
 
-\subsection{The random-expansion control: 83\% is arithmetic}
+\subsection{The random-expansion control: mostly arithmetic (83\% log-scale, 62\% linear)}
 
 Take the English-era checkpoint of the fixed-regime chain and expand its latent width
 synthetically---no training, no new language, no gradient---under three arms:
@@ -437,7 +438,7 @@ C: inert at every width & 2.33 & 2.33 \\
 Three conclusions. First, \textbf{one random untrained block costs $4.1\times$}---no new
 language, no competition for knowledge, just 2048 extra positive terms summed into an
 existing readout. Second, \textbf{random expansion to full width reproduces 83\% of the
-real damage} (log scale): learned competition is real but second-order ($\sim\!17\%$).
+real damage} on the log scale ($\Delta_{\log} = \ln(\mathrm{ppl}_{\mathrm{rand}}/\mathrm{ppl}_{\mathrm{base}}) / \ln(\mathrm{ppl}_{\mathrm{real}}/\mathrm{ppl}_{\mathrm{base}}) = 0.833$; in linear perplexity units the same control yields 62\%): learned competition is real but second-order ($\sim\!17\%$ on the log scale).
 Third, \textbf{inert blocks cost exactly nothing} (bit-identical at every width), which
 simultaneously validates the row-layout handling and proves the damage requires nonzero
 contributions. Masking back to 8192 restores 2.33 under every arm: even after synthetic
@@ -469,7 +470,7 @@ softmix $\tau{=}0.5$ & 18.73 & 27.24 & 68.31 & 4486 & 4093 & helps oldest, wreck
 calibgain (fit on en) & 2.31 & --- & --- & $-$2.29$^\dagger$ & $-$4.19$^\dagger$ & converges to oracle masking \\
 \bottomrule
 \end{tabular}\\
-\footnotesize $^\dagger$log-scale change relative to identity; negative $=$ worse.
+\footnotesize $^\dagger$log-scale change relative to identity; negative $=$ worse. Identity controls differ per run: absK and ev-shift rows come from P-R1 (identity en 31.14); massnorm, softmix and calibgain from P-R1b (identity en 32.04, the control row shown). Compute cross-run ratios against the run's own control.
 \end{center}
 
 The two vacuous arms are a structural finding: \texttt{bdh.py:279} applies
@@ -553,7 +554,7 @@ be large.
 trained floor. But for the cross-script languages the ratio \emph{inflates} past the
 trained floor: zh 3.87$\times$, ja 3.21$\times$, hi 5.74$\times$, iu-clean 1.90$\times$
 (but see the contamination correction below)---because their joint perplexity is so
-catastrophic (1614--4204) that even maximally foreign territory is consistently ``less
+catastrophic (1614--4204; per-domain joint runs, `docs/reports/2026-09-11\_cross-script-rejection-suite.md`) that even maximally foreign territory is consistently ``less
 bad,'' and the router finds it. hi exceeds the worst trained language's floor. A pure
 ratio threshold does not separate cross-script unseen from trained.
 
@@ -574,10 +575,10 @@ territories in byte $n$-gram space (bg/el rank 19--20 of 22 by cosine), so the c
 addresser faithfully reports \emph{distributional proximity}; the likelihood router answers
 a different question, \emph{realized fit}, and bg/el fit each of the four 3-byte scripts tested better than any
 Latin territory. Maximum-centroid cosine separates the two regimes with zero fitted
-parameters: Latin-family inputs at 0.78--0.85, cross-script inputs at 0.07--0.14. The
+parameters: Latin-family inputs at 0.78--0.85, cross-script inputs at 0.07--0.14; the price is over-escalation: zh and ja agree with the likelihood router yet still fall out-of-hull, so this trigger escalates 4 of 7 unseen inputs where catching the divergences needs 2. The
 cascade consequence is concrete: escalate to the likelihood scan when the margin is low
 \emph{or} the maximum cosine falls in the out-of-hull band; margin alone lets half the
-Hindi crops through unsafely.
+Hindi crops through unsafely. The margin floor itself is optimistic: it comes from a fit that was 160/160 correct on those same crops, so thresholds must be re-estimated on crops the fit never saw (ideally under the next growth phase) before coverage is quoted.
 
 \textbf{The iu contamination, disclosed.} The original Inuktitut file mixed syllabic text
 with Turkish film-subtitle lines from the parallel column (454 of 719 lines Latin). The
@@ -848,7 +849,7 @@ separation have not been measured beyond it.
 
 A depth-recurrent language model with additive growth gives continual learning a shape
 the fixed-budget literature does not have: storage is exact by construction and verified
-at the bit level; serving degrades for reasons we measured to be 83\% arithmetic and
+at the bit level; serving degrades for reasons we measured to be 83\% arithmetic (log scale; 62\% in linear perplexity) and
 repairable by no fixed operator we could construct; selection---input-dependent,
 label-free, nearly data-free---repairs it exactly; out-of-support detection needs two
 measured axes; and the whole stack holds across script universes. What remains open is
