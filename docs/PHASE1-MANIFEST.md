@@ -226,7 +226,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 
 | path | last | author | date | bytes | title / status |
 |---|---|---|---|---|---|
-| `scripts/pi50/README.md` | `0343802` | pi-50 | 2026-09-13 | 7,335 | `scripts/pi50/` — phase-1 instruments<br>*POLICY - frozen-instrument rules, hardcoded phase-1 facts, two indexing conventions, gate inventory* |
+| `scripts/pi50/README.md` | `bceb4c0` | pi-50 | 2026-09-13 | 7,742 | `scripts/pi50/` — phase-1 instruments<br>*POLICY - frozen-instrument rules, hardcoded phase-1 facts, two indexing conventions, gate inventory* |
 | `scripts/pi50/a4_offset_band.py` | `1680f4a` | pi-50 | 2026-09-12 | 5,784 | !/usr/bin/env python3<br>*CITABLE - instrument offset (median 1.0000) + routed band (max 1.0799 hu); kills the +5-9% excuse* |
 | `scripts/pi50/a7_multiera_expansion.py` | `1680f4a` | pi-50 | 2026-09-12 | 15,385 | !/usr/bin/env python3<br>*CITABLE - 7-era expansion control; f_log 0.599-1.472, en reproduces 0.832 vs 0.833* |
 | `scripts/pi50/arm_identity_check.py` | `dd40e3a` | pi-50 | 2026-09-10 | 4,540 | !/usr/bin/env python3<br>*TOOLING* |
@@ -240,7 +240,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `scripts/pi50/exp4b_budget.py` | `045a61c` | pi-50 | 2026-09-11 | 4,163 | """A2 follow-ups: how much calibration does likelihood selection actua<br>*TOOLING* |
 | `scripts/pi50/matrix_eval.sh` | `dd40e3a` | pi-50 | 2026-09-10 | 7,423 | !/usr/bin/env bash<br>*TOOLING - reusable serving-matrix runner, guards ALLOW_EVAL+ANNOUNCED* |
 | `scripts/pi50/ood_script_census.py` | `15e55ad` | pi-50 | 2026-09-12 | 1,344 | import re<br>*TOOLING - script-composition census that established the iu contamination (bus 188)* |
-| `scripts/pi50/phase1_manifest.py` | `4b47071` | pi-50 | 2026-09-12 | 9,291 | """Generate docs/PHASE1-MANIFEST.md - a living index of the phase-1 ev<br>*TOOLING - generates this file* |
+| `scripts/pi50/phase1_manifest.py` | `bceb4c0` | pi-50 | 2026-09-13 | 10,092 | """Generate docs/PHASE1-MANIFEST.md - a living index of the phase-1 ev<br>*TOOLING - generates this file* |
 | `scripts/pi50/protocol_4090.sh` | `dd40e3a` | pi-50 | 2026-09-10 | 9,388 | !/usr/bin/env bash<br>*TOOLING - preflight guard, refuses during live jobs* |
 | `scripts/pi50/r1_readout_operators.py` | `0f1763b` | pi-50 | 2026-09-11 | 6,082 | """P-R1 READOUT WIDTH-INVARIANCE (pre-registered bus #165).<br>*TOOLING* |
 | `scripts/pi50/r1b_relative_reweight.py` | `5d47c9e` | pi-50 | 2026-09-11 | 6,924 | """P-R1b RELATIVE TERRITORY REWEIGHTING (pre-registered bus #175).<br>*TOOLING* |
@@ -264,4 +264,4 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
   `~/bdh-review/reports/` on gx10 are ephemeral; anything quoted in the manuscript must have its
   generating log inside the repo.
 
-_Generated 2026-09-13 00:51:54 +0200 from HEAD `0343802`._
+_Generated 2026-09-13 00:52:43 +0200 from HEAD `bceb4c0`._
