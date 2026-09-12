@@ -40,7 +40,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `docs/reports/2026-09-10_ra2b-fixed-regime-readout.md` | `072a5a3` | Quinn (Agent Zero) | 2026-09-10 | 6,693 | RA2b Fixed-Regime Readout (Phase B)<br>*unclassified* |
 | `docs/reports/2026-09-11_a3-closed-set-probe.md` | `2e844ca` | Quinn (Agent Zero) | 2026-09-11 | 7,133 | A3 Closed-Set Probe — Results (21st never-trained language)<br>*unclassified* |
 | `docs/reports/2026-09-11_cross-script-rejection-suite.md` | `01abc27` | Quinn (Agent Zero) | 2026-09-11 | 12,688 | Cross-Script Rejection Suite — Stage A Results<br>*unclassified* |
-| `docs/reports/2026-09-11_pi-50_expansion-control-and-readout-operators.md` | `8d84f98` | pi-50 | 2026-09-12 | 30,692 | P-R1 / P-R2 — readout width-invariance and the expansion control<br>*CITABLE - sections 2,3,6,8,9; section 7 header carries a partial supersession banner* |
+| `docs/reports/2026-09-11_pi-50_expansion-control-and-readout-operators.md` | `5633434` | pi-50 | 2026-09-12 | 30,692 | P-R1 / P-R2 — readout width-invariance and the expansion control<br>*CITABLE - sections 2,3,6,8,9; section 7 header carries a partial supersession banner* |
 
 ## reviews/  (19 files)
 
@@ -119,7 +119,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `docs/routing/poc_ra2_a09_routing.txt` | `cb48f62` | OC/DSv4P/JSCS | 2026-08-30 | 4,884 | router ckpt=out/bdh_europarl_poc-ra2-a09-p3_best.pt | routes=[256, 512<br>*unclassified* |
 | `docs/routing/poc_ra2_a10_routing.txt` | `cb48f62` | OC/DSv4P/JSCS | 2026-08-30 | 4,884 | router ckpt=out/bdh_europarl_poc-ra2-a10-p3_best.pt | routes=[256, 512<br>*unclassified* |
 
-## papers/  (9 files)
+## papers/  (12 files)
 
 | path | last | author | date | bytes | title / status |
 |---|---|---|---|---|---|
@@ -132,6 +132,9 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `docs/papers/figures/leakage.pdf` | `90641f5` | OC/DSv4P/JSCS | 2026-08-26 | 21,116 | %PDF-1.4<br>*unclassified* |
 | `docs/papers/figures/pareto.pdf` | `90641f5` | OC/DSv4P/JSCS | 2026-08-26 | 21,512 | %PDF-1.4<br>*unclassified* |
 | `docs/papers/rev4-ai-disclosure-draft.md` | `47a6d07` | Quinn (Agent Zero) | 2026-09-11 | 8,167 | Rev 4 — AI Participation Disclosure (Draft)<br>*unclassified* |
+| `docs/papers/rev4-bdh-manuscript.aux` | `555babf` | Quinn (Agent Zero) | 2026-09-12 | 9,059 | \relax<br>*unclassified* |
+| `docs/papers/rev4-bdh-manuscript.pdf` | `555babf` | Quinn (Agent Zero) | 2026-09-12 | 416,665 | %PDF-1.7<br>*unclassified* |
+| `docs/papers/rev4-bdh-manuscript.tex` | `5c29939` | Quinn (Agent Zero) | 2026-09-12 | 55,474 | \documentclass[11pt]{article}<br>*unclassified* |
 
 ## archive/  (8 files)
 
@@ -153,7 +156,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `scripts/pi50/README.md` | `15e55ad` | pi-50 | 2026-09-12 | 6,578 | `scripts/pi50/` — phase-1 instruments<br>*POLICY - frozen-instrument rules, hardcoded phase-1 facts, two indexing conventions, gate inventory* |
 | `scripts/pi50/arm_identity_check.py` | `dd40e3a` | pi-50 | 2026-09-10 | 4,540 | !/usr/bin/env python3<br>*TOOLING* |
 | `scripts/pi50/atlas_territory_stats.py` | `eb4ba26` | pi-50 | 2026-09-11 | 4,199 | !/usr/bin/env python3<br>*TOOLING* |
-| `scripts/pi50/exp3_calib_null.py` | `dd40e3a` | pi-50 | 2026-09-10 | 5,358 | """A1 CALIBRATION NULL v2 - k_sparse_ratio=0.0 means NO top-k: the lat<br>*TOOLING* |
+| `scripts/pi50/exp3_calib_null.py` | `5633434` | pi-50 | 2026-09-12 | 5,358 | """A1 CALIBRATION NULL v2 - k_sparse_ratio=0.0 means NO top-k: the lat<br>*TOOLING* |
 | `scripts/pi50/exp3_delta_m.py` | `15e55ad` | pi-50 | 2026-09-12 | 3,890 | import torch, os, csv, json<br>*TOOLING* |
 | `scripts/pi50/exp3_encoder_churn.py` | `dd40e3a` | pi-50 | 2026-09-10 | 1,341 | import torch<br>*TOOLING* |
 | `scripts/pi50/exp3_masked_vs_free.py` | `dd40e3a` | pi-50 | 2026-09-10 | 1,786 | import math,sys,numpy as np,torch<br>*TOOLING* |
@@ -161,7 +164,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `scripts/pi50/exp4b_budget.py` | `045a61c` | pi-50 | 2026-09-11 | 4,163 | """A2 follow-ups: how much calibration does likelihood selection actua<br>*TOOLING* |
 | `scripts/pi50/matrix_eval.sh` | `dd40e3a` | pi-50 | 2026-09-10 | 7,423 | !/usr/bin/env bash<br>*TOOLING - reusable serving-matrix runner, guards ALLOW_EVAL+ANNOUNCED* |
 | `scripts/pi50/ood_script_census.py` | `15e55ad` | pi-50 | 2026-09-12 | 1,344 | import re<br>*TOOLING - script-composition census that established the iu contamination (bus 188)* |
-| `scripts/pi50/phase1_manifest.py` | `8d84f98` | pi-50 | 2026-09-12 | 7,712 | """Generate docs/PHASE1-MANIFEST.md - a living index of the phase-1 ev<br>*TOOLING - generates this file* |
+| `scripts/pi50/phase1_manifest.py` | `8d84f98` | pi-50 | 2026-09-12 | 7,873 | """Generate docs/PHASE1-MANIFEST.md - a living index of the phase-1 ev<br>*TOOLING - generates this file* |
 | `scripts/pi50/protocol_4090.sh` | `dd40e3a` | pi-50 | 2026-09-10 | 9,388 | !/usr/bin/env bash<br>*TOOLING - preflight guard, refuses during live jobs* |
 | `scripts/pi50/r1_readout_operators.py` | `0f1763b` | pi-50 | 2026-09-11 | 6,082 | """P-R1 READOUT WIDTH-INVARIANCE (pre-registered bus #165).<br>*TOOLING* |
 | `scripts/pi50/r1b_relative_reweight.py` | `5d47c9e` | pi-50 | 2026-09-11 | 6,924 | """P-R1b RELATIVE TERRITORY REWEIGHTING (pre-registered bus #175).<br>*TOOLING* |
@@ -175,7 +178,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 
 ## Gaps this manifest exposes
 
-- **91 of 116 files carry no declared status.** Those are the ones most likely to be
+- **94 of 119 files carry no declared status.** Those are the ones most likely to be
   mis-cited during a revision: something is either citable or it is not, and 'nobody wrote it down'
   reads as permission.
 - The prior-art note still labels HSP and PCANets unverified in-file; that must be closed or
@@ -184,4 +187,4 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
   `~/bdh-review/reports/` on gx10 are ephemeral; anything quoted in the manuscript must have its
   generating log inside the repo.
 
-_Generated 2026-09-12 01:17:14 +0200 from HEAD `8d84f98`._
+_Generated 2026-09-12 01:18:59 +0200 from HEAD `5633434`._
