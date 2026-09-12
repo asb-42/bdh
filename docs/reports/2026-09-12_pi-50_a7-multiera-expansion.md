@@ -55,8 +55,8 @@ noise: they are listed in `results.csv` with `gate=G4-not-defined` rather than d
    **186.8** where the trained ladder yields **63.7** — `f_log` 1.472, `f_lin` 3.154. Random blocks do *more* damage
    than the actual growth did. Read carefully: for Greek, learned growth was **protective relative to noise** — the
    appended block organized itself so as to lose less than an untrained block would have. This is the opposite
-   direction from the paper's rhetorical use of the control (arithmetic beats learning), and it is a real result
-   about one territory, not a failure of the instrument. It also warns against quoting "≈83 %" as if the residual
+   direction from the paper's rhetorical use of the control (arithmetic beats learning) — and see the addendum
+   below, because my first reading of it ("growth was protective") was the interesting one and the mundane one wins. It also warns against quoting "≈83 %" as if the residual
    17 % were a uniform gap awaiting decomposition.
 
 So the pre-registered falsifier **triggered**: any era outside ~[0.6, 0.95] scopes the claim, and el (1.472) plus
@@ -117,3 +117,40 @@ eras, with a measured spread".
 - Two domains per era, 14 numbers. Per-era intervals are not quoted: with one observation per era-domain pair there is
   nothing to collapse, and pretending otherwise is the pseudo-replication error I already corrected once (§9.7).
 - Era checkpoints are the `_last.pt` files, i.e. end-of-phase states, not best-validation snapshots.
+
+---
+
+## Addendum 2026-09-13 — the el "overshoot" decomposes into a small denominator, so this closes rather than opens
+
+Operator ruled the el case goes to phase 2 only if it matters, otherwise postponed indefinitely ("otherwise this
+becomes a neverending story"). Before agreeing, one bounded check from data already in `results.csv` — separate the
+two factors that `f_log` confounds, since it is a ratio whose numerator and denominator are both era-relative:
+
+| era | random-block damage (rand/base) | trained-ladder damage (real/base) | f_log |
+|---|---|---|---|
+| sl | 2.9× | 6.0× | 0.599 |
+| de | 7.7× | 12.7× | 0.803 |
+| en | 8.6× | 13.4× | 0.832 |
+| bg | 24.3× | 37.5× | 0.880 |
+| pt | 7.6× | 9.9× | 0.887 |
+| ro | 5.8× | 6.9× | 0.911 |
+| **el** | **28.7×** | **9.8×** | **1.472** |
+
+Greek's random-block damage (28.7×) is unremarkable — statistically it is just bg with a different denominator. What
+is unusual is that the trained ladder lost comparatively *little* at el (9.8×) even though el's acquisition exit is
+high (6.52). So `f_log > 1` is driven by a small denominator, not by an extraordinary numerator, and the claim
+"learned growth was protective relative to noise" is an artifact of comparing ratios across eras rather than evidence
+of a mechanism. I wrote that sentence because it was the interesting reading; the decomposition says otherwise, and
+correcting it here costs nothing.
+
+**Decision: postponed indefinitely, no phase-2 experiment.** It is not load-bearing for any claim in the manuscript,
+and chasing it means per-domain rabbit-holes exactly as the operator predicted.
+
+One genuinely open observation falls out of the table and belongs in the phase-2 backlog as a *line*, not an
+experiment: **why does joint serving degrade bg by 37.5× but el by only 9.8×,** when both are high-byte Cyrillic/Greek
+territories with similar acquisition exits (6.09 / 6.36)? That asymmetry predates this instrument, is already implicit
+in the landed matrix, and has nothing to do with expansion controls. Recording it is not the same as working on it.
+
+Standing rule proposed for the review cycle, to keep it finite: after rev 4.5 lands, close the external-review loop;
+any further finding must either (a) change a sentence in the manuscript, or (b) go to the backlog with no measurement.
+If it does neither, it does not get a run.
