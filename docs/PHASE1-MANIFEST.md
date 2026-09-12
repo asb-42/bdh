@@ -12,7 +12,7 @@ Status vocabulary: **CITABLE** (established, safe to draft from) · **SUPERSEDED
 provenance) · **QUARANTINE** (withdrawn, must not reach the manuscript) · **TOOLING** (instrument, not a
 claim) · **unclassified** (nobody has declared it - gap, not absence).
 
-## reports/  (52 files)
+## reports/  (72 files)
 
 | path | last | author | date | bytes | title / status |
 |---|---|---|---|---|---|
@@ -68,8 +68,28 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `docs/reports/data/r3_followups/r3d_summary.json` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 2,077 | {<br>*unclassified* |
 | `docs/reports/data/r3_followups/r3e_margins.json` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 1,578 | {<br>*unclassified* |
 | `docs/reports/data/r3_followups/r3f_hull.json` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 3,103 | {<br>*unclassified* |
+| `docs/reports/data/ra2b_matrix_raw/raw_bg.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,075 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/ra2b_matrix_raw/raw_cs.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,076 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/ra2b_matrix_raw/raw_da.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,083 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/ra2b_matrix_raw/raw_de.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,084 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/ra2b_matrix_raw/raw_el.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,073 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/ra2b_matrix_raw/raw_en.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,088 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/ra2b_matrix_raw/raw_es.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,088 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/ra2b_matrix_raw/raw_et.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,077 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/ra2b_matrix_raw/raw_fi.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,087 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/ra2b_matrix_raw/raw_fr.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,084 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/ra2b_matrix_raw/raw_hu.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,082 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/ra2b_matrix_raw/raw_it.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,077 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/ra2b_matrix_raw/raw_lt.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,075 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/ra2b_matrix_raw/raw_nl.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,081 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/ra2b_matrix_raw/raw_pl.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,077 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/ra2b_matrix_raw/raw_pt.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,084 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/ra2b_matrix_raw/raw_ro.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,076 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/ra2b_matrix_raw/raw_sk.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,074 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/ra2b_matrix_raw/raw_sl.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,075 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/ra2b_matrix_raw/raw_sv.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,075 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
 
-## reviews/  (19 files)
+## reviews/  (20 files)
 
 | path | last | author | date | bytes | title / status |
 |---|---|---|---|---|---|
@@ -92,6 +112,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `docs/reviews/2026-09-03_pi-50_f-v7-null-contrast-correction-scope.md` | `903332c` | pi-50 | 2026-09-03 | 4,671 | Correction scope: the frozen-attention narrative (F-V7 null-contrast i<br>*unclassified* |
 | `docs/reviews/2026-09-04_pi-50_marin-hero-run-pointers.md` | `dd40e3a` | pi-50 | 2026-09-10 | 12,987 | Marin 535B-A23B hero run — pointers for BDH, and one finding it trigge<br>*unclassified* |
 | `docs/reviews/2026-09-10_pi-50_prior-art-monotonic-growth.md` | `0b68b4d` | pi-50 | 2026-09-10 | 5,526 | Prior art for monotonic growth with submodel selection — what BDH may <br>*PARTIAL - six works verified at title/abstract level; HSP and PCANets explicitly unverified in-file* |
+| `docs/reviews/2026-09-12_pi-50_rev4-adversarial-pass.md` | `32c8c3a` | pi-50 | 2026-09-12 | 10,526 | Adversarial pass — rev-4 manuscript (`docs/papers/rev4-bdh-manuscript.<br>*CITABLE - second-seat review of rev-4 with artifact-anchored objections* |
 
 ## plans/  (16 files)
 
@@ -165,10 +186,10 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `docs/papers/figures/leakage.pdf` | `90641f5` | OC/DSv4P/JSCS | 2026-08-26 | 21,116 | %PDF-1.4<br>*unclassified* |
 | `docs/papers/figures/pareto.pdf` | `90641f5` | OC/DSv4P/JSCS | 2026-08-26 | 21,512 | %PDF-1.4<br>*unclassified* |
 | `docs/papers/rev4-ai-disclosure-draft.md` | `47a6d07` | Quinn (Agent Zero) | 2026-09-11 | 8,167 | Rev 4 — AI Participation Disclosure (Draft)<br>*unclassified* |
-| `docs/papers/rev4-bdh-manuscript.aux` | `8252455` | Quinn (Agent Zero) | 2026-09-12 | 15,937 | \relax<br>*unclassified* |
-| `docs/papers/rev4-bdh-manuscript.md` | `8252455` | Quinn (Agent Zero) | 2026-09-12 | 70,176 | Append-Only Neural Memory: Storage, Addressing, and Growth<br>*unclassified* |
-| `docs/papers/rev4-bdh-manuscript.pdf` | `8252455` | Quinn (Agent Zero) | 2026-09-12 | 569,767 | %PDF-1.7<br>*unclassified* |
-| `docs/papers/rev4-bdh-manuscript.tex` | `8252455` | Quinn (Agent Zero) | 2026-09-12 | 68,513 | \documentclass[11pt]{article}<br>*unclassified* |
+| `docs/papers/rev4-bdh-manuscript.aux` | `7a8ba99` | Quinn (Agent Zero) | 2026-09-12 | 15,987 | \relax<br>*unclassified* |
+| `docs/papers/rev4-bdh-manuscript.md` | `7a8ba99` | Quinn (Agent Zero) | 2026-09-12 | 70,499 | Append-Only Neural Memory: Storage, Addressing, and Growth<br>*unclassified* |
+| `docs/papers/rev4-bdh-manuscript.pdf` | `7a8ba99` | Quinn (Agent Zero) | 2026-09-12 | 570,504 | %PDF-1.7<br>*unclassified* |
+| `docs/papers/rev4-bdh-manuscript.tex` | `7a8ba99` | Quinn (Agent Zero) | 2026-09-12 | 68,803 | \documentclass[11pt]{article}<br>*unclassified* |
 
 ## archive/  (8 files)
 
@@ -198,7 +219,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `scripts/pi50/exp4b_budget.py` | `045a61c` | pi-50 | 2026-09-11 | 4,163 | """A2 follow-ups: how much calibration does likelihood selection actua<br>*TOOLING* |
 | `scripts/pi50/matrix_eval.sh` | `dd40e3a` | pi-50 | 2026-09-10 | 7,423 | !/usr/bin/env bash<br>*TOOLING - reusable serving-matrix runner, guards ALLOW_EVAL+ANNOUNCED* |
 | `scripts/pi50/ood_script_census.py` | `15e55ad` | pi-50 | 2026-09-12 | 1,344 | import re<br>*TOOLING - script-composition census that established the iu contamination (bus 188)* |
-| `scripts/pi50/phase1_manifest.py` | `46b9404` | pi-50 | 2026-09-12 | 7,994 | """Generate docs/PHASE1-MANIFEST.md - a living index of the phase-1 ev<br>*TOOLING - generates this file* |
+| `scripts/pi50/phase1_manifest.py` | `32c8c3a` | pi-50 | 2026-09-12 | 8,116 | """Generate docs/PHASE1-MANIFEST.md - a living index of the phase-1 ev<br>*TOOLING - generates this file* |
 | `scripts/pi50/protocol_4090.sh` | `dd40e3a` | pi-50 | 2026-09-10 | 9,388 | !/usr/bin/env bash<br>*TOOLING - preflight guard, refuses during live jobs* |
 | `scripts/pi50/r1_readout_operators.py` | `0f1763b` | pi-50 | 2026-09-11 | 6,082 | """P-R1 READOUT WIDTH-INVARIANCE (pre-registered bus #165).<br>*TOOLING* |
 | `scripts/pi50/r1b_relative_reweight.py` | `5d47c9e` | pi-50 | 2026-09-11 | 6,924 | """P-R1b RELATIVE TERRITORY REWEIGHTING (pre-registered bus #175).<br>*TOOLING* |
@@ -213,7 +234,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 
 ## Gaps this manifest exposes
 
-- **127 of 154 files carry no declared status.** Those are the ones most likely to be
+- **147 of 175 files carry no declared status.** Those are the ones most likely to be
   mis-cited during a revision: something is either citable or it is not, and 'nobody wrote it down'
   reads as permission.
 - The prior-art note still labels HSP and PCANets unverified in-file; that must be closed or
@@ -222,4 +243,4 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
   `~/bdh-review/reports/` on gx10 are ephemeral; anything quoted in the manuscript must have its
   generating log inside the repo.
 
-_Generated 2026-09-12 04:12:12 +0200 from HEAD `50da792`._
+_Generated 2026-09-12 04:46:11 +0200 from HEAD `7a8ba99`._
