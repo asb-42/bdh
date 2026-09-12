@@ -12,7 +12,7 @@ Status vocabulary: **CITABLE** (established, safe to draft from) · **SUPERSEDED
 provenance) · **QUARANTINE** (withdrawn, must not reach the manuscript) · **TOOLING** (instrument, not a
 claim) · **unclassified** (nobody has declared it - gap, not absence).
 
-## reports/  (25 files)
+## reports/  (52 files)
 
 | path | last | author | date | bytes | title / status |
 |---|---|---|---|---|---|
@@ -41,6 +41,33 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `docs/reports/2026-09-11_a3-closed-set-probe.md` | `2e844ca` | Quinn (Agent Zero) | 2026-09-11 | 7,133 | A3 Closed-Set Probe — Results (21st never-trained language)<br>*unclassified* |
 | `docs/reports/2026-09-11_cross-script-rejection-suite.md` | `01abc27` | Quinn (Agent Zero) | 2026-09-11 | 12,688 | Cross-Script Rejection Suite — Stage A Results<br>*unclassified* |
 | `docs/reports/2026-09-11_pi-50_expansion-control-and-readout-operators.md` | `5633434` | pi-50 | 2026-09-12 | 30,692 | P-R1 / P-R2 — readout width-invariance and the expansion control<br>*CITABLE - sections 2,3,6,8,9; section 7 header carries a partial supersession banner* |
+| `docs/reports/data/2026-09-05_ra2b_acquisition.csv` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 1,262 | phase,lang,mult_from,mult_to,batch,tokens,cum_tokens,params,bytes,exit<br>*unclassified* |
+| `docs/reports/data/2026-09-05_ra2b_acquisition.json` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 3,989 | [<br>*unclassified* |
+| `docs/reports/data/2026-09-10_fcs_matrix.csv` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 2,823 | FCS fixed-capacity matrix, source: .200 out/logs/fixedcap_matrix.txt (<br>*unclassified* |
+| `docs/reports/data/2026-09-10_ra2b_matrix.csv` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 5,261 | checkpoint,eval_lang,ppl<br>*unclassified* |
+| `docs/reports/data/2026-09-10_ra2b_matrix.md` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 3,988 | RA2b 20x20 serving matrix (PPL)<br>*unclassified* |
+| `docs/reports/data/byte_census/territory_byte_census.json` | `0671c08` | Quinn (Agent Zero) | 2026-09-12 | 13,575 | {<br>*unclassified* |
+| `docs/reports/data/byte_census/territory_byte_census.md` | `0671c08` | Quinn (Agent Zero) | 2026-09-12 | 1,655 | Per-territory multi-byte exposure<br>*unclassified* |
+| `docs/reports/data/ood_inputs/README.md` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 3,048 | Unseen-language inputs used by F-2 (report §9.3)<br>*POLICY - frozen-instrument rules, hardcoded phase-1 facts, two indexing conventions, gate inventory* |
+| `docs/reports/data/pr3_logs/INDEX.md` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 2,782 | P-R family generating logs<br>*unclassified* |
+| `docs/reports/data/pr3_logs/a2.log` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 1,496 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/pr3_logs/a2b.log` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 3,292 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/pr3_logs/a2budget.log` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 2,730 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/pr3_logs/r1_ops.log` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 3,049 | ckpt=lt_last.pt N=47104 blocks=23 langs=['en', 'de', 'cs', 'bg', 'el']<br>*unclassified* |
+| `docs/reports/data/pr3_logs/r1b.log` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 1,790 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/pr3_logs/r1b_calib.log` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 1,297 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/pr3_logs/r2_control.log` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 598 | base=out/bdh_europarl_ladRA2b-en_last.pt N0=8192 widths=[8192, 10240, <br>*unclassified* |
+| `docs/reports/data/pr3_logs/r3_addr.log` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 2,480 | ckpt=lt_last.pt widths=23 crops/domain=16 batch=4<br>*unclassified* |
+| `docs/reports/data/pr3_logs/r3b.log` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 3,756 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
+| `docs/reports/data/pr3_logs/r3c_balanced_rerun.log` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 1,146 | territory map self-check OK: en->3 (base) ... lt->22; ro->19<br>*unclassified* |
+| `docs/reports/data/pr3_logs/r3d.log` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 1,847 | design matrix (640, 262144); crops/domain: bg:16 cs:16 da:16 de:16 el:<br>*unclassified* |
+| `docs/reports/data/r3_followups/f2_ood_routes_corrected.json` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 352 | {<br>*unclassified* |
+| `docs/reports/data/r3_followups/f3_confusion_corrected.json` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 2 | {}<br>*unclassified* |
+| `docs/reports/data/r3_followups/features_sparse.npz` | `50da792` | pi-50 | 2026-09-12 | 1,372,082 | PK-      ! �����������<br>*unclassified* |
+| `docs/reports/data/r3_followups/r3b_summary.json` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 1,176 | {<br>*unclassified* |
+| `docs/reports/data/r3_followups/r3d_summary.json` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 2,077 | {<br>*unclassified* |
+| `docs/reports/data/r3_followups/r3e_margins.json` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 1,578 | {<br>*unclassified* |
+| `docs/reports/data/r3_followups/r3f_hull.json` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 3,103 | {<br>*unclassified* |
 
 ## reviews/  (19 files)
 
@@ -119,22 +146,29 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `docs/routing/poc_ra2_a09_routing.txt` | `cb48f62` | OC/DSv4P/JSCS | 2026-08-30 | 4,884 | router ckpt=out/bdh_europarl_poc-ra2-a09-p3_best.pt | routes=[256, 512<br>*unclassified* |
 | `docs/routing/poc_ra2_a10_routing.txt` | `cb48f62` | OC/DSv4P/JSCS | 2026-08-30 | 4,884 | router ckpt=out/bdh_europarl_poc-ra2-a10-p3_best.pt | routes=[256, 512<br>*unclassified* |
 
-## papers/  (12 files)
+## papers/  (19 files)
 
 | path | last | author | date | bytes | title / status |
 |---|---|---|---|---|---|
-| `docs/papers/cl-bdh-manuscript-v0.md` | `36ae52b` | OC/DSv4P/JSCS | 2026-08-26 | 26,938 | Computation-Isolable Continual Learning in a Depth-Recurrent Language <br>*unclassified* |
+| `docs/papers/cl-bdh-manuscript-v0.md` | `8252455` | Quinn (Agent Zero) | 2026-09-12 | 27,035 | Computation-Isolable Continual Learning in a Depth-Recurrent Language <br>*unclassified* |
 | `docs/papers/cl-bdh-manuscript.pdf` | `9dd1663` | Quinn (Agent Zero) | 2026-09-06 | 510,758 | %PDF-1.7<br>*unclassified* |
 | `docs/papers/cl-bdh-manuscript.tex` | `9dd1663` | Quinn (Agent Zero) | 2026-09-06 | 45,852 | \documentclass[11pt]{article}<br>*unclassified* |
 | `docs/papers/figures/decay_regimes.pdf` | `9dd1663` | Quinn (Agent Zero) | 2026-09-06 | 25,363 | %PDF-1.4<br>*unclassified* |
+| `docs/papers/figures/f1_ladder_curves.pdf` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 21,372 | %PDF-1.4<br>*unclassified* |
+| `docs/papers/figures/f2_fcs_heatmap.pdf` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 24,863 | %PDF-1.4<br>*unclassified* |
+| `docs/papers/figures/f3_retention_bars.pdf` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 17,007 | %PDF-1.4<br>*unclassified* |
+| `docs/papers/figures/f4_ood_scatter.pdf` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 26,366 | %PDF-1.4<br>*unclassified* |
+| `docs/papers/figures/f5_cross_script.pdf` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 14,846 | %PDF-1.4<br>*unclassified* |
+| `docs/papers/figures/f6_expansion_control.pdf` | `ae791ed` | Quinn (Agent Zero) | 2026-09-12 | 16,225 | %PDF-1.4<br>*unclassified* |
 | `docs/papers/figures/forgetting.pdf` | `90641f5` | OC/DSv4P/JSCS | 2026-08-26 | 17,330 | %PDF-1.4<br>*unclassified* |
 | `docs/papers/figures/grid.pdf` | `90641f5` | OC/DSv4P/JSCS | 2026-08-26 | 22,096 | %PDF-1.4<br>*unclassified* |
 | `docs/papers/figures/leakage.pdf` | `90641f5` | OC/DSv4P/JSCS | 2026-08-26 | 21,116 | %PDF-1.4<br>*unclassified* |
 | `docs/papers/figures/pareto.pdf` | `90641f5` | OC/DSv4P/JSCS | 2026-08-26 | 21,512 | %PDF-1.4<br>*unclassified* |
 | `docs/papers/rev4-ai-disclosure-draft.md` | `47a6d07` | Quinn (Agent Zero) | 2026-09-11 | 8,167 | Rev 4 — AI Participation Disclosure (Draft)<br>*unclassified* |
-| `docs/papers/rev4-bdh-manuscript.aux` | `555babf` | Quinn (Agent Zero) | 2026-09-12 | 9,059 | \relax<br>*unclassified* |
-| `docs/papers/rev4-bdh-manuscript.pdf` | `555babf` | Quinn (Agent Zero) | 2026-09-12 | 416,665 | %PDF-1.7<br>*unclassified* |
-| `docs/papers/rev4-bdh-manuscript.tex` | `5c29939` | Quinn (Agent Zero) | 2026-09-12 | 55,474 | \documentclass[11pt]{article}<br>*unclassified* |
+| `docs/papers/rev4-bdh-manuscript.aux` | `8252455` | Quinn (Agent Zero) | 2026-09-12 | 15,937 | \relax<br>*unclassified* |
+| `docs/papers/rev4-bdh-manuscript.md` | `8252455` | Quinn (Agent Zero) | 2026-09-12 | 70,176 | Append-Only Neural Memory: Storage, Addressing, and Growth<br>*unclassified* |
+| `docs/papers/rev4-bdh-manuscript.pdf` | `8252455` | Quinn (Agent Zero) | 2026-09-12 | 569,767 | %PDF-1.7<br>*unclassified* |
+| `docs/papers/rev4-bdh-manuscript.tex` | `8252455` | Quinn (Agent Zero) | 2026-09-12 | 68,513 | \documentclass[11pt]{article}<br>*unclassified* |
 
 ## archive/  (8 files)
 
@@ -149,7 +183,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `docs/archive/pi-50-working/PLAN.md` | `dd40e3a` | pi-50 | 2026-09-10 | 7,330 | BDH / BDH-CL review — working plan<br>*unclassified* |
 | `docs/archive/pi-50-working/REVIEW.md` | `dd40e3a` | pi-50 | 2026-09-10 | 36,044 | Referee report — "Computation Isolation for Continual Learning in a De<br>*unclassified* |
 
-## pi50/  (22 files)
+## pi50/  (23 files)
 
 | path | last | author | date | bytes | title / status |
 |---|---|---|---|---|---|
@@ -164,7 +198,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `scripts/pi50/exp4b_budget.py` | `045a61c` | pi-50 | 2026-09-11 | 4,163 | """A2 follow-ups: how much calibration does likelihood selection actua<br>*TOOLING* |
 | `scripts/pi50/matrix_eval.sh` | `dd40e3a` | pi-50 | 2026-09-10 | 7,423 | !/usr/bin/env bash<br>*TOOLING - reusable serving-matrix runner, guards ALLOW_EVAL+ANNOUNCED* |
 | `scripts/pi50/ood_script_census.py` | `15e55ad` | pi-50 | 2026-09-12 | 1,344 | import re<br>*TOOLING - script-composition census that established the iu contamination (bus 188)* |
-| `scripts/pi50/phase1_manifest.py` | `8d84f98` | pi-50 | 2026-09-12 | 7,873 | """Generate docs/PHASE1-MANIFEST.md - a living index of the phase-1 ev<br>*TOOLING - generates this file* |
+| `scripts/pi50/phase1_manifest.py` | `46b9404` | pi-50 | 2026-09-12 | 7,994 | """Generate docs/PHASE1-MANIFEST.md - a living index of the phase-1 ev<br>*TOOLING - generates this file* |
 | `scripts/pi50/protocol_4090.sh` | `dd40e3a` | pi-50 | 2026-09-10 | 9,388 | !/usr/bin/env bash<br>*TOOLING - preflight guard, refuses during live jobs* |
 | `scripts/pi50/r1_readout_operators.py` | `0f1763b` | pi-50 | 2026-09-11 | 6,082 | """P-R1 READOUT WIDTH-INVARIANCE (pre-registered bus #165).<br>*TOOLING* |
 | `scripts/pi50/r1b_relative_reweight.py` | `5d47c9e` | pi-50 | 2026-09-11 | 6,924 | """P-R1b RELATIVE TERRITORY REWEIGHTING (pre-registered bus #175).<br>*TOOLING* |
@@ -175,10 +209,11 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `scripts/pi50/r3d_fit_ablation.py` | `e37a442` | pi-50 | 2026-09-12 | 8,216 | """P-R3 fit ablation (CPU-only, reads persisted sparse features - zero<br>*CITABLE - arms A/B/C 0.681/1.000/0.988 settle starvation vs geometry* |
 | `scripts/pi50/r3e_margins.py` | `62e1cc5` | pi-50 | 2026-09-12 | 6,426 | """P-R3 margin analysis for Sonde C's stage-1 trigger (bus #197 design<br>*CITABLE - Sonde C stage-1 margin floor 0.0139 from n=160 in-support crops (optimistic, see report 9.5)* |
 | `scripts/pi50/r3f_hull_geometry.py` | `8d84f98` | pi-50 | 2026-09-12 | 7,115 | """Test A0-Quinn's hull hypothesis (#200): does the byte addresser fai<br>*CITABLE - hull hypothesis test; LOO nearest-centroid gate 640/640; max-cosine second trigger signal* |
+| `scripts/pi50/territory_byte_census.py` | `46b9404` | pi-50 | 2026-09-12 | 8,852 | """Per-territory multi-byte exposure census (A0-Quinn's request, bus #<br>*CITABLE - per-territory multi-byte exposure on exact training slices (bus 204 ask); gates assert typographic-residue handling* |
 
 ## Gaps this manifest exposes
 
-- **94 of 119 files carry no declared status.** Those are the ones most likely to be
+- **127 of 154 files carry no declared status.** Those are the ones most likely to be
   mis-cited during a revision: something is either citable or it is not, and 'nobody wrote it down'
   reads as permission.
 - The prior-art note still labels HSP and PCANets unverified in-file; that must be closed or
@@ -187,4 +222,4 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
   `~/bdh-review/reports/` on gx10 are ephemeral; anything quoted in the manuscript must have its
   generating log inside the repo.
 
-_Generated 2026-09-12 01:18:59 +0200 from HEAD `5633434`._
+_Generated 2026-09-12 04:12:12 +0200 from HEAD `50da792`._

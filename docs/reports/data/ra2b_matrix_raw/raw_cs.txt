@@ -1,0 +1,41 @@
+europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl es: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl pl: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl fr: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl de: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl cs: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl da: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl pt: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl fi: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl hu: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl bg: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl it: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl et: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl el: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl sk: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl sv: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl ro: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl nl: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl sl: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl lt: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+ckpt=/home/pi50/matrix/ck/bdh_europarl_ladRA2b-cs_last.pt | block=512 | random-crop cold eval (protocol-congruent)
+  bg: nll 6.0391 | ppl 419.53
+  cs: nll 1.2475 | ppl 3.48
+  da: nll 3.6826 | ppl 39.75
+  de: nll 2.6061 | ppl 13.55
+  el: nll 6.7655 | ppl 867.42
+  en: nll 2.7967 | ppl 16.39
+  es: nll 3.1146 | ppl 22.53
+  et: nll 3.9697 | ppl 52.97
+  fi: nll 4.1979 | ppl 66.54
+  fr: nll 2.8860 | ppl 17.92
+  hu: nll 4.2665 | ppl 71.27
+  it: nll 3.2912 | ppl 26.87
+  lt: nll 4.1621 | ppl 64.21
+  nl: nll 3.5988 | ppl 36.55
+  pl: nll 3.1753 | ppl 23.93
+  pt: nll 3.3057 | ppl 27.27
+  ro: nll 3.6959 | ppl 40.28
+  sk: nll 2.4438 | ppl 11.52
+  sl: nll 3.1824 | ppl 24.11
+  sv: nll 3.8035 | ppl 44.86
