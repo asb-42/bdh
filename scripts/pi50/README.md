@@ -64,3 +64,10 @@ on the RA2b ladder; nothing here trains anything. Index of what each artifact *e
 * `docs/reports/data/ood_inputs/README.md` — where the unseen-language slices came from on `.200`, their
   sizes and checksums, and the script-composition census (the bytes themselves are deliberately **not** in
   the repo: licensed corpus text, and 10 MB of it would make the docs tree heavier than the code).
+
+### Manifest provenance is inherently a two-step commit
+
+`phase1_manifest.py` records, per artifact, the short SHA of the commit that last touched it. Regenerating *before*
+committing therefore stamps the previous HEAD, and `--check` goes stale again the moment the content commit lands.
+Expected sequence, not a bug to debug: land content -> regenerate -> land a small "manifest refresh" commit. If
+`--check` reports stale while the working tree is clean, that is this case; re-run and commit.

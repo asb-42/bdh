@@ -126,7 +126,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `docs/reviews/2026-09-10_pi-50_prior-art-monotonic-growth.md` | `0b68b4d` | pi-50 | 2026-09-10 | 5,526 | Prior art for monotonic growth with submodel selection — what BDH may <br>*PARTIAL - six works verified at title/abstract level; HSP and PCANets explicitly unverified in-file* |
 | `docs/reviews/2026-09-12_pi-50_bibliography-closure.md` | `72f2ec8` | pi-50 | 2026-09-12 | 9,721 | Bibliography closure pass — every `\bibitem` field checked against a f<br>*CITABLE - closure pass: 6 bibitems corrected, 1 compound entry removed, escape corruption repaired* |
 | `docs/reviews/2026-09-12_pi-50_external-review-3-assessment.md` | `7ac90ee` | pi-50 | 2026-09-12 | 11,359 | Assessment of the third external review (Grok 4.6, bus #223) — and a v<br>*CITABLE - review-of-review 3; source of the Wilson clustering self-correction* |
-| `docs/reviews/2026-09-12_pi-50_external-review-4-assessment.md` | `3a10e06` | pi-50 | 2026-09-12 | 18,859 | Assessment of the fourth external review (Kimi 2.x, bus #229) — plus a<br>*CITABLE - review-of-review 4; source of the TAB-corruption diagnosis + 4 extra bibitem defects* |
+| `docs/reviews/2026-09-12_pi-50_external-review-4-assessment.md` | `bab4822` | pi-50 | 2026-09-13 | 18,859 | Assessment of the fourth external review (Kimi 2.x, bus #229) — plus a<br>*CITABLE - review-of-review 4; source of the TAB-corruption diagnosis + 4 extra bibitem defects* |
 | `docs/reviews/2026-09-12_pi-50_external-review-assessment.md` | `af2fbef` | pi-50 | 2026-09-12 | 9,842 | Assessment of the first external review (Qwen3.7-Plus, relayed at bus <br>*CITABLE - review-of-the-review; source of the 83%-qualifier finding* |
 | `docs/reviews/2026-09-12_pi-50_rev4-adversarial-pass.md` | `32c8c3a` | pi-50 | 2026-09-12 | 10,526 | Adversarial pass — rev-4 manuscript (`docs/papers/rev4-bdh-manuscript.<br>*CITABLE - second-seat review of rev-4 with artifact-anchored objections* |
 | `docs/reviews/2026-09-12_quinn_a4-a7-verification-protocol.md` | `23b0b4a` | Quinn (Agent Zero) | 2026-09-12 | 5,917 | Pre-registered verification protocol: A4 (retention band) and A7 (mult<br>*unclassified* |
@@ -226,7 +226,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 
 | path | last | author | date | bytes | title / status |
 |---|---|---|---|---|---|
-| `scripts/pi50/README.md` | `15e55ad` | pi-50 | 2026-09-12 | 6,578 | `scripts/pi50/` — phase-1 instruments<br>*POLICY - frozen-instrument rules, hardcoded phase-1 facts, two indexing conventions, gate inventory* |
+| `scripts/pi50/README.md` | `15e55ad` | pi-50 | 2026-09-12 | 7,074 | `scripts/pi50/` — phase-1 instruments<br>*POLICY - frozen-instrument rules, hardcoded phase-1 facts, two indexing conventions, gate inventory* |
 | `scripts/pi50/a4_offset_band.py` | `1680f4a` | pi-50 | 2026-09-12 | 5,784 | !/usr/bin/env python3<br>*CITABLE - instrument offset (median 1.0000) + routed band (max 1.0799 hu); kills the +5-9% excuse* |
 | `scripts/pi50/a7_multiera_expansion.py` | `1680f4a` | pi-50 | 2026-09-12 | 15,385 | !/usr/bin/env python3<br>*CITABLE - 7-era expansion control; f_log 0.599-1.472, en reproduces 0.832 vs 0.833* |
 | `scripts/pi50/arm_identity_check.py` | `dd40e3a` | pi-50 | 2026-09-10 | 4,540 | !/usr/bin/env python3<br>*TOOLING* |
@@ -264,4 +264,4 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
   `~/bdh-review/reports/` on gx10 are ephemeral; anything quoted in the manuscript must have its
   generating log inside the repo.
 
-_Generated 2026-09-13 00:24:53 +0200 from HEAD `dc65698`._
+_Generated 2026-09-13 00:50:49 +0200 from HEAD `bab4822`._
