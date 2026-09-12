@@ -226,7 +226,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 
 | path | last | author | date | bytes | title / status |
 |---|---|---|---|---|---|
-| `scripts/pi50/README.md` | `15e55ad` | pi-50 | 2026-09-12 | 7,074 | `scripts/pi50/` — phase-1 instruments<br>*POLICY - frozen-instrument rules, hardcoded phase-1 facts, two indexing conventions, gate inventory* |
+| `scripts/pi50/README.md` | `0343802` | pi-50 | 2026-09-13 | 7,335 | `scripts/pi50/` — phase-1 instruments<br>*POLICY - frozen-instrument rules, hardcoded phase-1 facts, two indexing conventions, gate inventory* |
 | `scripts/pi50/a4_offset_band.py` | `1680f4a` | pi-50 | 2026-09-12 | 5,784 | !/usr/bin/env python3<br>*CITABLE - instrument offset (median 1.0000) + routed band (max 1.0799 hu); kills the +5-9% excuse* |
 | `scripts/pi50/a7_multiera_expansion.py` | `1680f4a` | pi-50 | 2026-09-12 | 15,385 | !/usr/bin/env python3<br>*CITABLE - 7-era expansion control; f_log 0.599-1.472, en reproduces 0.832 vs 0.833* |
 | `scripts/pi50/arm_identity_check.py` | `dd40e3a` | pi-50 | 2026-09-10 | 4,540 | !/usr/bin/env python3<br>*TOOLING* |
@@ -264,4 +264,4 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
   `~/bdh-review/reports/` on gx10 are ephemeral; anything quoted in the manuscript must have its
   generating log inside the repo.
 
-_Generated 2026-09-13 00:50:49 +0200 from HEAD `bab4822`._
+_Generated 2026-09-13 00:51:54 +0200 from HEAD `0343802`._
