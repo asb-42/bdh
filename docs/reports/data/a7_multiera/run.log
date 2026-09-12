@@ -6,3 +6,12 @@ eras=[(1, 'en'), (5, 'de'), (8, 'pt'), (11, 'bg'), (14, 'el'), (17, 'ro'), (19, 
   arm A [en] ppl       20.08   masked@8192      2.32
   arm C [en] ppl        2.32
   era en done in 294s
+
+=== era p5 (de), latent N0=16384 (mult 256) -> 47104 [+15 blocks] ===
+  base[de]      2.74   (era de logged exit 2.73)  G1[de]=OK
+  base[en]     11.19   (era de logged exit 2.73)  G1[en]=n/a
+  arm A [de] ppl       21.06   masked@16384      2.74
+  arm A [en] ppl       23.57   masked@16384     11.19
+  arm C [de] ppl        2.74
+  arm C [en] ppl       11.19
+  era de done in 598s

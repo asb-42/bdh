@@ -98,3 +98,26 @@ as a standing rule: **when two quoted quantities conflict, derive both before sa
 - Domain-level reporting only: 20 observations, median/min/max, no pooled interval over crops. Crops within a domain are
   not independent trials (`docs/reports/2026-09-11_pi-50_expansion-control-and-readout-operators.md` §9.7).
 - Nothing here touches the FCS ladder or the RA2-era numbers, where the original "+5–9 %" control allegedly came from.
+
+---
+
+## Addendum 2026-09-12 — response to the pre-registered protocol (`docs/reviews/2026-09-12_quinn_a4-a7-verification-protocol.md`)
+
+Quinn registered verification criteria after my measurement landed but before any manuscript edit, and his ground
+rule says a wrong check gets amended in the open rather than silently dodged. Item by item:
+
+| check | status | where |
+|---|---|---|
+| A4-1 file identity | **met** | `docs/reports/data/a4_offset_band/PROVENANCE.txt` — sha256 of all three inputs, row counts, column sets |
+| A4-2 row selection | **met** | same file: D1 = matrix cells with `checkpoint == eval_lang` (exactly 20); D2 = the 20-row routed table in `ladRA2b_routdiag_p20.txt`. No subset, no dropped domain |
+| A4-3 pairing defined in advance | **partially contested, in my favour of being wrong**: he pre-commits to "the acquisition exit value used in the Fig-3 caption (claimed median 1.09)". My denominator is exactly `exit_ppl` from the landed acquisition CSV, and I get median **1.0429**, not 1.09. Either the caption's numbers come from a different pairing than the artifact supports, or 1.09 is stale like 1.13. Flagged for him rather than quietly re-paired to hit his expectation |
+| A4-4 instrument per column | **met** | named in `PROVENANCE.txt` and in `summary.json` (`instruments`, `denominator` keys) |
+| A4-5 statistics shape | **met** | 20 domain-level observations, median + min/max (+IQR printed by the instrument); no crop-level interval anywhere |
+| A4-6 pre-committed decision rule | **applied as written** — measured band is *narrower* than +5–9 %, therefore per his own rule "**1.13 is the outlier to explain**", not the band to widen. That is the conclusion this note reaches independently |
+| A4-7 consistency sweep | **enumerated, not executed** (prose ownership): every occurrence in the TeX is line 380 caption ("span 1.02--1.13, consistent with the known instrument offset"), line 508 (§5 "within ≤ 8 % … at the reference calibration setting"), line 647 (OOD section "(instrument offset); hi routed 2.79 vs 2.78"), plus the two sites in our own report `2026-09-10_ra2b-fixed-regime-readout.md:59,96`. Line 647's parenthetical inherits the same dead excuse and must be edited in the same pass or the sweep is incomplete |
+| A4-8 falsification condition | **not triggered**: measured max 1.0799 < 1.13, so "retention equals acquisition" is not falsified — but it is also not the *strongest* true statement, and A4-7's edits should make that explicit |
+
+One methodological note on his rule 5 ("nothing is accepted that the pre-registration did not name"): I measured two
+quantities (D1 instrument offset, D2 routed cost) where he anticipated one (retention band). D1 is what dissolved the
+dispute, and it was *not* in his protocol because nobody had thought to measure the offset itself. The right reading of
+a pre-registration is a floor on post-hoc choice, not a ceiling on what may be computed from landed data.

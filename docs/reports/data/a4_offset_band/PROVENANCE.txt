@@ -1,0 +1,21 @@
+# A4 provenance (per Quinn protocol checks A4-1, A4-2, A4-4)
+generated: 2026-09-12 15:19 UTC by pi-50 on gx10-50ef
+instrument: scripts/pi50/a4_offset_band.py at commit 1680f4ab5505b631c0049dfc115d8689e29000e7
+
+## input artifacts (sha256, row counts, column sets)
+6d640b43e638545b8867939e1f350fca87ae72dfe08cb0f4fa34259d1b8d1005  docs/reports/data/2026-09-05_ra2b_acquisition.csv
+70a074502b882245e85e9403f7400984369007474ae466cd095f8d72815d2432  docs/reports/data/2026-09-10_ra2b_matrix.csv
+1f1126006bcce1182e2308eab7f60cf743af7e7b57e7e4d51a61e282cc5d49ec  out/logs/ladRA2b_routdiag_p20.txt
+
+acquisition csv: 20 data rows, cols=phase,lang,mult_from,mult_to,batch,tokens,cum_tokens,params,bytes,exit_ppl
+matrix csv:      400 data rows, cols=checkpoint,eval_lang,ppl
+
+## filters, stated so they are re-runnable
+D1 rows = matrix cells where checkpoint == eval_lang (exactly 20, one per domain); denominator = exit_ppl for that lang from acquisition csv (window crop at phase end).
+D2 rows = 'domain routed' table in ladRA2b_routdiag_p20.txt (exactly 20 own-prefix routed ppl); denominator identical to D1.
+no subset selection, no dropped domain: both n=20, all twenty ladder languages present in each.
+
+## instrument per column (A4-4)
+val_stream_diagonal : scripts/lang_eval.py via scripts/pi50/matrix_eval.sh, EVAL_BATCH pinned to 1, val+test byte stream
+acquisition_exit    : training-window crop logged by pipeline/train.py best_val at phase end
+routed_p20          : pipeline routdiag at final checkpoint, own-prefix column, window-crop family (see report limits)
