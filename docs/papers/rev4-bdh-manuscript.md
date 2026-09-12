@@ -1,6 +1,6 @@
 # Append-Only Neural Memory: Storage, Addressing, and Growth
 
-> **Rev 4 (current draft, pre-adversarial-review)** — generated from `rev4-bdh-manuscript.tex` (pandoc, 2026-09-12). The TeX/PDF pair in this directory is the source of truth; this Markdown is the readable sync copy. Full rewrite per operator GO: thesis (append-only substrate; addressing is the central problem), decay-confound closure, FCS baseline, RA2b preservation, readout mechanics (83% arithmetic, seven operators refuted), selection + OOD (20/20 data-free, two-axis rule), cross-script generalization, humanities-standard prior art (8 clusters), AI-participation disclosure. 21 pages, 6 figures, 29 refs.
+> **Rev 4 (current draft, post-external-review)** — generated from `rev4-bdh-manuscript.tex` (pandoc, 2026-09-12). The TeX/PDF pair in this directory is the source of truth; this Markdown is the readable sync copy. Full rewrite per operator GO: thesis (append-only substrate; addressing is the central problem), decay-confound closure, FCS baseline, RA2b preservation, readout mechanics (83% arithmetic, seven operators refuted), selection + OOD (20/20 data-free, two-axis rule), cross-script generalization, humanities-standard prior art (8 clusters), AI-participation disclosure. 22 pages, 6 figures, 25 refs.
 
 ---
 
@@ -201,7 +201,7 @@ The 20-way routing diagnosis on the final chain (20 routes $`\times`$ 20 domains
 
 <figure id="fig:retention" data-latex-placement="t">
 <embed src="figures/f3_retention_bars.pdf" />
-<figcaption>RA2b final checkpoint: routed serving (blue) vs joint serving (orange) vs acquisition exit (black tick), per domain, log scale. Routed tracks acquisition for every domain (median ratio 1.09, range 1.02–1.13, within the window-vs-val instrument offset); joint serving erodes 1.0–37.8<span class="math inline">×</span> (median 11<span class="math inline">×</span>) — the interference term that survives the fix. Sources: exttt<span>docs/reports/data/2026-09-10_ra2b_matrix.csv</span> (lt rows) and readout §B4.</figcaption>
+<figcaption>RA2b final checkpoint: routed serving (blue) vs joint serving (orange) vs acquisition exit (black tick), per domain, log scale. Routed tracks acquisition for every domain (median ratio 1.09, range 1.02–1.13, within the window-vs-val instrument offset); joint serving erodes 1.0–37.8<span class="math inline">×</span> (median 11<span class="math inline">×</span>) — the interference term that survives the fix. Sources: <code>docs/reports/data/2026-09-10_ra2b_matrix.csv</code> (lt rows) and readout §B4.</figcaption>
 </figure>
 
 ## Retention: equals acquisition
@@ -433,7 +433,7 @@ We discuss prior work in the format the humanities use: what each line actually 
 
 ## Task and domain addressing
 
-**Expert Gate**  studied task addressing: train a per-task autoencoder and route each input to the expert whose autoencoder reconstructs it best, for lifelong vision tasks. *Agreement:* an input-gated address that selects stored experts is the right architecture; our likelihood router is the same idea in language-model space. *Divergence:* Expert Gate requires per-task labels and per-task auxiliary networks; our selector is label-free (arg-min NLL by the model itself) and our cheap addresser needs $`\sim`$<!-- -->4–8 KB per domain of unlabeled text; and we measure the failure modes their vision setting could not exhibit—out-of-support detection with a two-axis rule, and the non-unimodality that blocks sublinear search. *Verdict:* nearest published analogue to our addressing stage; our contribution is the self-supervised label source plus the measured rejection geometry. extbfLearning to Prompt (L2P)  addresses the same problem with a learned prompt pool: task-appropriate prompts are selected per input and conditioned into a frozen model—addressing without architectural growth. *Agreement:* input-conditioned selection of stored capability is the shared idea. *Divergence:* L2P’s prompts compete for a fixed embedding budget, whereas our territories are append-only and bit-frozen; and L2P’s selection is a learned attention head, whereas our label source is the model’s own NLL. *Verdict:* complementary rather than competing—L2P conditions a fixed model, we grow and address new capacity.
+**Expert Gate**  studied task addressing: train a per-task autoencoder and route each input to the expert whose autoencoder reconstructs it best, for lifelong vision tasks. *Agreement:* an input-gated address that selects stored experts is the right architecture; our likelihood router is the same idea in language-model space. *Divergence:* Expert Gate requires per-task labels and per-task auxiliary networks; our selector is label-free (arg-min NLL by the model itself) and our cheap addresser needs $`\sim`$<!-- -->4–8 KB per domain of unlabeled text; and we measure the failure modes their vision setting could not exhibit—out-of-support detection with a two-axis rule, and the non-unimodality that blocks sublinear search. *Verdict:* nearest published analogue to our addressing stage; our contribution is the self-supervised label source plus the measured rejection geometry. **Learning to Prompt (L2P)**  addresses the same problem with a learned prompt pool: task-appropriate prompts are selected per input and conditioned into a frozen model—addressing without architectural growth. *Agreement:* input-conditioned selection of stored capability is the shared idea. *Divergence:* L2P’s prompts compete for a fixed embedding budget, whereas our territories are append-only and bit-frozen; and L2P’s selection is a learned attention head, whereas our label source is the model’s own NLL. *Verdict:* complementary rather than competing—L2P conditions a fixed model, we grow and address new capacity.
 
 ## Consolidation and importance protection
 
@@ -489,43 +489,41 @@ A. Rusu, N. Rabinowitz, Y. Guo, K. Jayaraman, S. O’Hara, O. Vinyals, S.�
 
 A. Mallya, S. Lazebnik. *PackNet: Adding Multiple Tasks to a Single Network by Iterative Pruning.* CVPR (2018).
 
-A. Mallya, D. Davis, S. Lazebnik. *Piggyback: Adapting a Single Network to Multiple Tasks by Learning to Mask Weights.* ECCV (2018).
+A. Mallya, D. Davis, S. Lazebnik. *Piggyback: Adapting a Single Network to Multiple Tasks by Learning to Mask Weights.* ECCV (2018); arXiv:1801.06519.
 
-M. Wortsman, M. C. Riemer, G. Ilharco. *Superposition Enables Many-Task Learning (SupSup).* NeurIPS (2020).
+M. Wortsman, V. Ramanujan, R. Liu, A. Kembhavi, M. Rastegari, J. Yosinski, A. Farhadi. *Supermasks in Superposition.* NeurIPS (2020); arXiv:2006.14769.
 
-R. Aljundi, P. Chakravarty, T. Tuytelaars. *Expert Gate: Task- and Expert-Conditioned Routing Networks.* CVPR (2017).
+R. Aljundi, P. Chakravarty, T. Tuytelaars. *Expert Gate: Lifelong Learning with a Network of Experts.* CVPR (2017); arXiv:1611.06194.
 
-J. Kirkpatrick, R. Pascanu, N. Rabinowitz, J. Veness, M. Desjardins, A. A. Rusu, K. Kilan, R. Google-DeepMind, et al. *Overcoming Catastrophic Forgetting in Neural Networks.* PNAS 114(13) (2017).
+J. Kirkpatrick, R. Pascanu, N. Rabinowitz, J. Veness, G. Desjardins, A.A. Rusu, et al. *Overcoming catastrophic forgetting in neural networks.* PNAS 114(13) (2017); arXiv:1612.00796.
 
-F. Zenke, B. Poole, S. Ganguli. *Continual Learning Through Synaptic Intelligence.* ICML (2017).
+F. Zenke, B. Poole, S. Ganguli. *Continual Learning Through Synaptic Intelligence.* ICML (2017); arXiv:1703.04200.
 
-R. Aljundi, M. B. French, B. S. Chakravarty, M. Tuytelaars. *Memory Aware Synapses: Learning What (Not) to Forget.* ECCV (2018).
+R. Aljundi, F. Babiloni, M. Elhoseiny, M. Rohrbach, T. Tuytelaars. *Memory Aware Synapses: Learning what (not to) forget.* ECCV (2018), pp. 139–154.
 
-D. Lopez-Paz, M. Ranzato. *Gradient Episodic Memory for Continual Learning.* NeurIPS (2017).
+D. Lopez-Paz, M. Ranzato. *Gradient Episodic Memory for Continual Learning.* NeurIPS (2017); arXiv:1706.08840.
 
-A. Chaudhry, M. Ranzato, A. Rohrbach, M. Elhoseiny. *Efficient Lifelong Learning with A-GEM.* ICLR (2019).
+A. Chaudhry, M. Ranzato, A. Rohrbach, M. Elhoseiny. *Efficient Lifelong Learning with A-GEM.* ICLR (2019); arXiv:1812.00420.
 
-N. Shazeer, A. Mirhoseini, K. Maziarz, A. Davis, Q. Le, G. Hinton, J. Dean. *Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer.* ICLR (2017).
+N. Shazeer, A. Mirhoseini, K. Maziarz, A. Davis, Q. Le, G. Hinton, J. Dean. *Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer.* ICLR (2017); arXiv:1701.06538.
 
-W. Fedus, B. Zoph, N. Shazeer. *Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity.* JMLR 21 (2021).
+W. Fedus, B. Zoph, N. Shazeer. *Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity.* JMLR 21 (2021); arXiv:2101.03961.
 
-D. Lepikhin, H. Lee, Y. Xu, G. G. Chen, H. Zhang, M. Firus, R. Anil, A. Pang. *GShard: Scaling Giant Models with Conditional Computation and Automatic Sharding.* ICLR (2021).
+D. Lepikhin, H. Lee, Y. Xu, D. Chen, et al. *GShard: Scaling Giant Models with Conditional Computation and Automatic Sharding.* ICLR (2021); arXiv:2006.16668.
 
-C. K. Chow. *On Optimum Recognition Error and Reject Tradeoff for Nonparametric Detection System.* IEEE Trans. Inf. Theory 16(1) (1970).
+C. K. Chow. *On optimum recognition error and reject tradeoff.* IEEE Trans. Inf. Theory 16(1) (1970); DOI 10.1109/TIT.1970.1054406.
 
 V. Vovk, A. Gammerman, G. Shafer. *Algorithmic Learning in a Random World.* Springer (2005); A. N. Angelopoulos, S. Bates. *A Gentle Introduction to Conformal Prediction.* arXiv:2107.07511 (2021).
 
-I. Loshchilov, F. Hutter. *Decoupled Weight Decay Regularization.* ICLR (2019).
+I. Loshchilov, F. Hutter. *Decoupled Weight Decay Regularization.* ICLR (2019); arXiv:1711.05101.
 
 J. L. Ba, J. R. Kiros, G. E. Hinton. *Layer Normalization.* arXiv:1607.06450 (2016).
 
 J. Su, Y. Lu, S. Pan, A. Murtadha, B. Wen, Y. Liu. *RoFormer: Enhanced Transformer with Rotary Position Embedding.* arXiv:2104.09864 (2021).
 
-S. Hochreiter, J. Schmidhuber. *Long Short-Term Memory.* Neural Computation 9(8) (1997); and successors applying byte/character-level models, e.g. A. van den Oord, N. Kalchbrenner, K. Kavukcuoglu. *Pixel RNN.* arXiv:1601.06759 (2016).
+C. de Masson d’Autume, S. Ruder, L. Kong, D. Yogatama. *Episodic Memory in Lifelong Language Learning.* NeurIPS (2019); arXiv:1906.01076.
 
-C. de Masson d’Autume, S. Ruder, L. Kong, D. Yogatama. *Episodic Memory in Lifelong Language Learning.* NeurIPS (2019).
-
-Z. Wang, Z. Zhang, C.-Y. Lee, H. Zhang, R. Sun, X. Ren, G. Su, V. Perot, J. Dy, T. Pfister. *Learning to Prompt for Continual Learning.* CVPR (2022).
+Z. Wang, Z. Zhang, C.-Y. Lee, H. Zhang, R. Sun, X. Ren, G. Su, V. Perot, J. Dy, T. Pfister. *Learning to Prompt for Continual Learning.* CVPR (2022); arXiv:2112.08654.
 
 D. Hall, L. Dial, et al. (Marin community). *Marin: An Open Laboratory for Foundation Models in JAX.* OpenXLA DevLab presentation (2025); project tracker at <https://mtracker.oa.dev> (thread 8818, silent expert death observation; accessed 2026-09).
 
