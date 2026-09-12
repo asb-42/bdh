@@ -101,7 +101,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `docs/reports/data/ra2b_matrix_raw/raw_sl.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,075 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
 | `docs/reports/data/ra2b_matrix_raw/raw_sv.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,075 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
 
-## reviews/  (26 files)
+## reviews/  (27 files)
 
 | path | last | author | date | bytes | title / status |
 |---|---|---|---|---|---|
@@ -131,6 +131,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `docs/reviews/2026-09-12_pi-50_rev4-adversarial-pass.md` | `32c8c3a` | pi-50 | 2026-09-12 | 10,526 | Adversarial pass — rev-4 manuscript (`docs/papers/rev4-bdh-manuscript.<br>*CITABLE - second-seat review of rev-4 with artifact-anchored objections* |
 | `docs/reviews/2026-09-12_quinn_a4-a7-verification-protocol.md` | `23b0b4a` | Quinn (Agent Zero) | 2026-09-12 | 5,917 | Pre-registered verification protocol: A4 (retention band) and A7 (mult<br>*unclassified* |
 | `docs/reviews/2026-09-12_quinn_a4-a7-verification.md` | `dc65698` | Quinn (Agent Zero) | 2026-09-13 | 11,441 | Quinn verification of A4 and A7 against the pre-registered protocol (2<br>*unclassified* |
+| `docs/reviews/2026-09-13_pi-50_gpt-adversarial-review-digest.md` | `d4b9162` | pi-50 | 2026-09-13 | 18,714 | Digesting the adversarial review (GPT, three parts, bus #249–#251)<br>*unclassified* |
 
 ## plans/  (16 files)
 
@@ -205,9 +206,9 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `docs/papers/figures/pareto.pdf` | `90641f5` | OC/DSv4P/JSCS | 2026-08-26 | 21,512 | %PDF-1.4<br>*unclassified* |
 | `docs/papers/rev4-ai-disclosure-draft.md` | `47a6d07` | Quinn (Agent Zero) | 2026-09-11 | 8,167 | Rev 4 — AI Participation Disclosure (Draft)<br>*unclassified* |
 | `docs/papers/rev4-bdh-manuscript.aux` | `dc65698` | Quinn (Agent Zero) | 2026-09-13 | 16,599 | \relax<br>*unclassified* |
-| `docs/papers/rev4-bdh-manuscript.md` | `dc65698` | Quinn (Agent Zero) | 2026-09-13 | 81,240 | Append-Only Neural Memory: Storage, Addressing, and Growth<br>*unclassified* |
-| `docs/papers/rev4-bdh-manuscript.pdf` | `dc65698` | Quinn (Agent Zero) | 2026-09-13 | 590,338 | %PDF-1.7<br>*unclassified* |
-| `docs/papers/rev4-bdh-manuscript.tex` | `dc65698` | Quinn (Agent Zero) | 2026-09-13 | 79,686 | \documentclass[11pt]{article}<br>*unclassified* |
+| `docs/papers/rev4-bdh-manuscript.md` | `874bc26` | Quinn (Agent Zero) | 2026-09-13 | 81,373 | Append-Only Neural Memory: Storage, Addressing, and Growth<br>*unclassified* |
+| `docs/papers/rev4-bdh-manuscript.pdf` | `874bc26` | Quinn (Agent Zero) | 2026-09-13 | 590,438 | %PDF-1.7<br>*unclassified* |
+| `docs/papers/rev4-bdh-manuscript.tex` | `874bc26` | Quinn (Agent Zero) | 2026-09-13 | 79,819 | \documentclass[11pt]{article}<br>*unclassified* |
 
 ## archive/  (8 files)
 
@@ -255,7 +256,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 
 ## Gaps this manifest exposes
 
-- **158 of 196 files carry no declared status.** Those are the ones most likely to be
+- **159 of 197 files carry no declared status.** Those are the ones most likely to be
   mis-cited during a revision: something is either citable or it is not, and 'nobody wrote it down'
   reads as permission.
 - The prior-art note still labels HSP and PCANets unverified in-file; that must be closed or
@@ -264,4 +265,4 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
   `~/bdh-review/reports/` on gx10 are ephemeral; anything quoted in the manuscript must have its
   generating log inside the repo.
 
-_Generated 2026-09-13 00:52:43 +0200 from HEAD `bceb4c0`._
+_Generated 2026-09-13 01:28:11 +0200 from HEAD `d4b9162`._
