@@ -1,0 +1,24 @@
+{
+ "n_eras_run": 1,
+ "n_fraction_pairs": 1,
+ "f_log_min": 0.875,
+ "f_log_median": 0.875,
+ "f_log_max": 0.875,
+ "f_linear_min": 0.626,
+ "f_linear_median": 0.626,
+ "f_linear_max": 0.626,
+ "prediction_manuscript_f_log": 0.833,
+ "iters": 3,
+ "batch": 8,
+ "target_width": 47104,
+ "protocol_source": "scripts/pi50/r2_expansion_control.py (phase-1 frozen instrument)",
+ "per_pair": [
+  {
+   "era": "bg",
+   "domain": "bg",
+   "f_log": 0.875,
+   "f_linear": 0.626,
+   "real_damage_x": 37.395
+  }
+ ]
+}

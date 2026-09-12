@@ -1,0 +1,27 @@
+{
+ "d1_instrument_offset": {
+  "n": 20,
+  "median": 1.0,
+  "mean": 1.0002,
+  "min": 0.9901,
+  "max": 1.0087,
+  "min_lang": "pl",
+  "max_lang": "en"
+ },
+ "d2_routed_cost": {
+  "n": 20,
+  "median": 1.0429,
+  "mean": 1.042,
+  "min": 0.9918,
+  "max": 1.0799,
+  "min_lang": "fr",
+  "max_lang": "hu"
+ },
+ "claim_1_02_to_1_13_reproduced": false,
+ "claim_offset_plus_5_to_9_pct_reproduced": false,
+ "instruments": {
+  "d1": "val stream, EVAL_BATCH=1, checkpoint==eval_lang diagonal",
+  "d2": "own-prefix routed ppl from ladRA2b_routdiag_p20.txt"
+ },
+ "denominator": "per-language exit_ppl from 2026-09-05_ra2b_acquisition.csv (training-window crop)"
+}

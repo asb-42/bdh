@@ -1,0 +1,5 @@
+phase,era,arm,domain,ppl,masked_ppl,base_ppl,real_joint_ppl,real_damage_x,f_log,f_linear,gate
+11,bg,A,bg,146.4246,6.1557,6.1564,230.22,37.395,0.875,0.626,
+11,bg,A,en,25.4742,22.1238,22.122,31.07,1.404,,,G4-not-defined
+11,bg,C,bg,6.1564,,6.1564,230.22,,,,G2-FAIL
+11,bg,C,en,22.122,,22.122,31.07,,,,G2-FAIL

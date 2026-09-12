@@ -1,0 +1,8 @@
+a7 multi-era expansion control | device=cuda iters=25 batch=8 target=47104
+eras=[(1, 'en'), (5, 'de'), (8, 'pt'), (11, 'bg'), (14, 'el'), (17, 'ro'), (19, 'sl')]
+
+=== era p1 (en), latent N0=8192 (mult 128) -> 47104 [+19 blocks] ===
+  base[en]      2.32   (era en logged exit 2.29)  G1[en]=OK
+  arm A [en] ppl       20.08   masked@8192      2.32
+  arm C [en] ppl        2.32
+  era en done in 294s
