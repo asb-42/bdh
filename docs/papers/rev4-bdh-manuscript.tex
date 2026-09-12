@@ -566,6 +566,19 @@ thresholds are empirical for this checkpoint and instrument; we state them as a
 measured rule, not an architectural constant, and the conformal calibration that would
 freeze them non-arbitrarily is future work (Section~\ref{sec:limits}).
 
+\textbf{The cheap addresser and the likelihood router are two instruments, not rivals.}
+When the balanced byte addresser and the likelihood router disagree---hi routes to bg/el
+under likelihood but to Latin territories under the byte fit, and clean Inuktitut does the
+same---neither is wrong. Centroid geometry shows hi and iu-syllabic sit nearest Latin
+territories in byte $n$-gram space (bg/el rank 19--20 of 22 by cosine), so the cheap
+addresser faithfully reports \emph{distributional proximity}; the likelihood router answers
+a different question, \emph{realized fit}, and bg/el fit every 3-byte script better than any
+Latin territory. Maximum-centroid cosine separates the two regimes with zero fitted
+parameters: Latin-family inputs at 0.78--0.85, cross-script inputs at 0.07--0.14. The
+cascade consequence is concrete: escalate to the likelihood scan when the margin is low
+\emph{or} the maximum cosine falls in the out-of-hull band; margin alone lets half the
+Hindi crops through unsafely.
+
 \textbf{The iu contamination, disclosed.} The original Inuktitut file mixed syllabic text
 with Turkish film-subtitle lines from the parallel column (454 of 719 lines Latin). The
 contamination was caught by an independent census during a different experiment, the

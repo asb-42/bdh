@@ -1,7 +1,8 @@
 # Computation-Isolable Continual Learning in a Depth-Recurrent Language Model
 
 > **SUPERSEDED**: this markdown draft predates external review. The submission-grade
-> revision is `cl-bdh-manuscript.tex/.pdf` in this directory: the theory section is
+> revision is `rev4-bdh-manuscript.tex/.pdf` in this directory (rev 4, the full
+> rewrite; `cl-bdh-manuscript.tex/.pdf` is rev 3, itself superseded by rev 4): the theory section is
 > restated on the two-condition criterion (invariance + restriction equivalence) after a
 > reviewer demonstrated the original commutator-iff-exactness claim was too strong; the
 > "expansiveness closes bounding" language is downgraded to measured evidence against
