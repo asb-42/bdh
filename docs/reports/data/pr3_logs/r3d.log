@@ -1,0 +1,30 @@
+design matrix (640, 262144); crops/domain: bg:16 cs:16 da:16 de:16 el:16 en:16 es:96 et:96 fi:16 fr:16 hu:16 it:16 lt:16 nl:16 pl:96 pt:16 ro:16 sk:96 sl:16 sv:16
+projected to 4096 dims (JL); norms mean 0.993
+
+split: train=480 test=160 (test crop counts/domain: bg:3, cs:2, da:4, de:5, el:5, en:4, es:24, et:22, fi:2, fr:4, hu:4, it:4, lt:3, nl:2, pl:25, pt:5, ro:4, sk:30, sl:4, sv:4)
+
+A_r3b_reproduce    agreement 0.681 [0.606,0.748]   n=160
+                   miss-attractor (predicted territory): es x33, sk x9, et x8, pl x1
+                   dense-domain rows: es:1.00 pl:1.00 sk:1.00 et:1.00
+                   control-domain mean: 0.125
+
+B_class_balanced   agreement 1.000 [0.977,1.000]   n=160
+                   miss-attractor (predicted territory): 
+                   dense-domain rows: es:1.00 pl:1.00 sk:1.00 et:1.00
+                   control-domain mean: 1.000
+
+C_one_vs_rest      agreement 0.988 [0.956,0.997]   n=160
+                   miss-attractor (predicted territory): sk x2
+                   dense-domain rows: es:1.00 pl:1.00 sk:1.00 et:1.00
+                   control-domain mean: 0.938
+
+=== composition-controlled density curve (controls pinned at 12 train crops, class weights RECOMPUTED at each point) ===
+  domain       8      16      32      64   | controls' agreement under the same fit
+      es    1.00    1.00    1.00    1.00   |  1.00  1.00  1.00  1.00
+      pl    1.00    1.00    1.00    1.00   |  1.00  1.00  1.00  1.00
+      sk    0.97    0.97    1.00    1.00   |  1.00  1.00  1.00  1.00
+      et    1.00    1.00    1.00    1.00   |  1.00  1.00  1.00  1.00
+
+wrote /home/asb/bdh-review/reports/r3b/r3d_summary.json
+READ: if arm A's attractor sits on es/pl/sk/et while B/C spread misses and lift controls, the r3b
+result was starvation, and F-2's unseen-language rows must be regenerated under a balanced fit.

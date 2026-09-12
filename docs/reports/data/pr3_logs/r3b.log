@@ -1,0 +1,75 @@
+europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+   en n= 16 label set [3] (en(base)) own=True [205s]
+europarl es: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+   es n= 96 label set [4] (en) own=False [1426s]
+europarl pl: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+   pl n= 96 label set [5] (es) own=False [2647s]
+europarl fr: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+   fr n= 16 label set [6] (pl) own=False [2851s]
+europarl de: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+   de n= 16 label set [7] (fr) own=False [3054s]
+europarl cs: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+   cs n= 16 label set [8] (de) own=False [3258s]
+europarl da: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+   da n= 16 label set [9] (cs) own=False [3462s]
+europarl pt: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+   pt n= 16 label set [10] (da) own=False [3665s]
+europarl fi: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+   fi n= 16 label set [11] (pt) own=False [3869s]
+europarl hu: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+   hu n= 16 label set [12] (fi) own=False [4072s]
+europarl bg: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+   bg n= 16 label set [13] (hu) own=False [4276s]
+europarl it: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+   it n= 16 label set [14] (bg) own=False [4480s]
+europarl et: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+   et n= 96 label set [15] (it) own=False [5701s]
+europarl el: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+   el n= 16 label set [16] (et) own=False [5905s]
+europarl sk: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+   sk n= 96 label set [17] (el) own=False [7126s]
+europarl sv: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+   sv n= 16 label set [18] (sk) own=False [7329s]
+europarl ro: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+   ro n= 16 label set [19] (sv) own=False [7533s]
+europarl nl: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+   nl n= 16 label set [20] (ro) own=False [7737s]
+europarl sl: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+   sl n= 16 label set [21] (nl) own=False [7941s]
+europarl lt: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+   lt n= 16 label set [22] (sl) own=False [8144s]
+
+persisted 640 labelled crops -> /home/asb/bdh-review/reports/r3b/features_sparse.npz
+
+=== HEADLINE (all domains, split by crop) ===
+agreement 0.681 [0.606,0.748] n=160   majority baseline 0.188
+
+=== F-3 DISAGREEMENT CONFUSION (true language -> predicted territory owner) ===
+   cs (2 misses): cs->el x2
+   da (4 misses): da->en x4
+   de (5 misses): de->en x4, de->it x1
+   en (4 misses): en->en x3, en->it x1
+   fi (2 misses): fi->it x2
+   fr (4 misses): fr->en x4
+   hu (4 misses): hu->el x4
+   it (4 misses): it->en x4
+   lt (3 misses): lt->it x2, lt->es x1
+   nl (2 misses): nl->en x2
+   pt (5 misses): pt->en x5
+   ro (4 misses): ro->en x4
+   sl (4 misses): sl->el x4
+   sv (4 misses): sv->it x3, sv->en x1
+
+=== F-1 DENSITY CURVES for es,pl,sk,et (train crops -> held-out agreement) ===
+   es 8:1.00 16:1.00 32:1.00 64:1.00 | full64 1.00 [0.89,1.00]
+   pl 8:1.00 16:1.00 32:1.00 64:1.00 | full64 1.00 [0.89,1.00]
+   sk 8:1.00 16:1.00 32:1.00 64:1.00 | full64 1.00 [0.89,1.00]
+   et 8:1.00 16:1.00 32:1.00 64:1.00 | full64 1.00 [0.89,1.00]
+
+=== F-2 UNSEEN LANGUAGES THROUGH THE FITTED PREDICTOR (no retraining) ===
+                  zh 40 crops -> es x32, el x8
+    iu_syllabic_only 40 crops -> es x40
+                  lv 40 crops -> it x32, es x8
+                  ga 40 crops -> en x17, el x17, it x6
+
+wrote /home/asb/bdh-review/reports/r3b/r3b_summary.json ; total 8320s

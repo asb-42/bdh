@@ -1,0 +1,42 @@
+ckpt=lt_last.pt N=47104 blocks=23 langs=['en', 'de', 'cs', 'bg', 'el'] ops=['id', 'absK', 'evshift', 'blkavg', 'lognorm'] absK=2048
+
+lang | exit | free(id) |       absK |    evshift |     blkavg |    lognorm | recovery(absK,evshift,blkavg,lognorm)
+europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl de: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl cs: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl bg: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl el: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+       id |      31.14      35.21      60.86     226.99      65.24
+europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl de: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl cs: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl bg: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl el: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+     absK |      39.37      48.09      78.73    1160.22     287.38
+europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl de: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl cs: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl bg: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl el: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+  evshift |      36.66      49.47     117.32    4122.12    3472.78
+europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl de: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl cs: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl bg: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl el: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+   blkavg |      31.14      35.22      60.85     227.07      65.29
+europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl de: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl cs: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl bg: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl el: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+  lognorm |      31.14      35.22      60.86     226.92      65.27
+
+lang | exit | free_id | absK>recov | evshift>recov | blkavg>recov | lognorm>recov
+  en |  2.31 |   31.14 | absK:  39.37(-0.09) evshift:  36.66(-0.06) blkavg:  31.14(+0.00) lognorm:  31.14(+0.00) 
+  de |  2.73 |   35.21 | absK:  48.09(-0.12) evshift:  49.47(-0.13) blkavg:  35.22(-0.00) lognorm:  35.22(-0.00) 
+  cs |  3.48 |   60.86 | absK:  78.73(-0.09) evshift: 117.32(-0.23) blkavg:  60.85(+0.00) lognorm:  60.86(+0.00) 
+  bg |  6.09 |  226.99 | absK:1160.22(-0.45) evshift:4122.12(-0.80) blkavg: 227.07(-0.00) lognorm: 226.92(+0.00) 
+  el |  6.36 |   65.24 | absK: 287.38(-0.64) evshift:3472.78(-1.71) blkavg:  65.29(-0.00) lognorm:  65.27(-0.00) 
+
+recovery=1.00 means the operator fully restores the acquisition exit without any mask.

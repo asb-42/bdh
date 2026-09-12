@@ -1,0 +1,81 @@
+{
+ "insupport_correct_margin_min": 0.013888612389564514,
+ "insupport_margin_percentiles": [
+  0.02951524332165718,
+  0.05085550248622894,
+  0.09367582574486732,
+  0.18489356338977814,
+  0.5127421438693933
+ ],
+ "ood": {
+  "zh": {
+   "routes": {
+    "el": 36,
+    "bg": 1,
+    "sk": 2,
+    "cs": 1
+   },
+   "margin_med": 0.008447561413049698,
+   "margin_p10": 0.003260295372456312,
+   "frac_below_insupport_floor": 0.825
+  },
+  "ja": {
+   "routes": {
+    "bg": 34,
+    "el": 6
+   },
+   "margin_med": 0.006730185821652412,
+   "margin_p10": 0.0024414830841124058,
+   "frac_below_insupport_floor": 0.85
+  },
+  "hi": {
+   "routes": {
+    "fi": 40
+   },
+   "margin_med": 0.01484186202287674,
+   "margin_p10": 0.006227042526006699,
+   "frac_below_insupport_floor": 0.45
+  },
+  "lv": {
+   "routes": {
+    "lt": 40
+   },
+   "margin_med": 0.10412586480379105,
+   "margin_p10": 0.06713735312223434,
+   "frac_below_insupport_floor": 0.0
+  },
+  "ga": {
+   "routes": {
+    "es": 2,
+    "sv": 13,
+    "hu": 15,
+    "lt": 2,
+    "it": 3,
+    "pt": 1,
+    "sk": 1,
+    "cs": 2,
+    "ro": 1
+   },
+   "margin_med": 0.003620315343141556,
+   "margin_p10": 0.00047487468691542745,
+   "frac_below_insupport_floor": 0.85
+  },
+  "iu_syllabic_only": {
+   "routes": {
+    "ro": 13,
+    "pl": 27
+   },
+   "margin_med": 0.0013466160744428635,
+   "margin_p10": 0.00035868509439751506,
+   "frac_below_insupport_floor": 1.0
+  },
+  "iu_ascii_only": {
+   "routes": {
+    "en(base)": 40
+   },
+   "margin_med": 0.08988863974809647,
+   "margin_p10": 0.03915642946958542,
+   "frac_below_insupport_floor": 0.0
+  }
+ }
+}

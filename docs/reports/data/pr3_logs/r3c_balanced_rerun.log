@@ -1,0 +1,21 @@
+territory map self-check OK: en->3 (base) ... lt->22; ro->19
+reconstructed design matrix (640, 262144), 656583 nonzeros
+projected to 4096 dims (JL, seed 2024 - must match r3d)
+
+agreement reproduced on held-out crops: 1.000 (n=160)
+
+=== F-3 CONFUSION, corrected labels (true language -> owner of predicted territory) ===
+
+=== F-2 UNSEEN LANGUAGES (six inputs; ja/hi added after Quinn's chmod) ===
+                     zh (2000 KB pool) -> el x36, sk x2, bg x1, cs x1
+                     ja (2000 KB pool) -> bg x34, el x6
+                     hi (2000 KB pool) -> fi x40
+                     lv (2000 KB pool) -> lt x40
+                     ga (2000 KB pool) -> hu x15, sv x13, it x3, es x2
+       iu_syllabic_only (126 KB pool) -> pl x27, ro x13
+  iu_turkish_lines_ONLY: too small after filter (7573 B)
+    iu_ascii_lines_ONLY (23 KB pool) -> en(base) x40
+
+wrote /home/asb/bdh-review/reports/r3b/f3_confusion_corrected.json and f2_ood_routes_corrected.json
+NOTE: no ground-truth route exists for unseen languages; these are the CHEAP predictor's answers.
+Compare against Quinn's likelihood-router counts in out/logs/ra2b_routdiag_*.txt on .200.

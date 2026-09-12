@@ -1,0 +1,53 @@
+ckpt=lt_last.pt widths=23 crops/domain=16 batch=4
+europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+  en: labels [3] (710s)
+europarl es: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+  es: labels [4] (1419s)
+europarl pl: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+  pl: labels [5] (2126s)
+europarl fr: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+  fr: labels [6] (2664s)
+europarl de: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+  de: labels [7] (3128s)
+europarl cs: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+  cs: labels [8] (3591s)
+europarl da: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+  da: labels [9] (4055s)
+europarl pt: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+  pt: labels [10] (4519s)
+europarl fi: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+  fi: labels [11] (4984s)
+europarl hu: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+  hu: labels [12] (5447s)
+europarl bg: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+  bg: labels [13] (5911s)
+europarl it: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+  it: labels [14] (6375s)
+europarl et: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+  et: labels [15] (6839s)
+europarl el: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+  el: labels [16] (7303s)
+europarl sk: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+  sk: labels [17] (7766s)
+europarl sv: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+  sv: labels [18] (8230s)
+europarl ro: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+  ro: labels [19] (8694s)
+europarl nl: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+  nl: labels [20] (9159s)
+europarl sl: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+  sl: labels [21] (9623s)
+europarl lt: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+  lt: labels [22] (10122s)
+
+fitting multinomial logistic: 262144 features, 23 classes, train=240 test=80
+
+AGREEMENT with argmin-NLL router: 0.762  [0.659, 0.842]  (n=80 held-out crops)
+  Latin-script    : 0.746 (n=67)
+  Cyrillic/Greek  : 0.846 (n=13)
+
+per-domain agreement:
+  el:1.00  sk:0.00  sv:0.80  fr:1.00  lt:1.00  et:0.67  pl:0.00  ro:1.00  fi:1.00  es:0.00  pt:1.00  da:1.00  nl:1.00  en:1.00  cs:1.00  hu:1.00  de:1.00  sl:1.00  it:1.00  bg:1.00
+
+majority-class baseline: 0.087
+cost: cheap predictor = 1 counting pass vs 23 masked forwards per candidate.

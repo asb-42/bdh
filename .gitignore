@@ -1,7 +1,7 @@
-input.txt
+/input.txt
 __pycache__/
-data/
-out/
+/data/
+/out/
 .jspace/
 .kilo/
 .kilocode/

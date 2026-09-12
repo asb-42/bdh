@@ -1,0 +1,47 @@
+europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl es: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl pl: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl fr: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl de: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl cs: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl da: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl pt: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl fi: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl hu: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl bg: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl it: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl et: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl el: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl sk: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl sv: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl ro: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl nl: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl sl: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl lt: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+ckpt=lt_last.pt LPW=23 iters=20
+
+domain | sel_width | sel_lang | oracle | correct | ppl_sel | ppl_oracle | ppl_free
+  en   |    8192   |  en     |   en  |  Y    |    2.36  |    2.36    |   31.36
+  es   |   10240   |  es     |   en  |  Y    |    2.39  |   27.67    |   26.89
+  pl   |   12288   |  pl     |   es  |  Y    |    3.25  |  174.41    |   64.81
+  fr   |   14336   |  fr     |   pl  |  Y    |    2.37  |   38.39    |   33.07
+  de   |   16384   |  de     |   fr  |  Y    |    2.59  |   39.09    |   35.26
+  cs   |   18432   |  cs     |   de  |  Y    |    3.76  |  150.57    |   60.17
+  da   |   20480   |  da     |   cs  |  Y    |    2.82  |   40.23    |   34.18
+  pt   |   22528   |  pt     |   da  |  Y    |    2.73  |   28.68    |   26.61
+  fi   |   24576   |  fi     |   pt  |  Y    |    2.92  |   71.38    |   50.48
+  hu   |   26624   |  hu     |   fi  |  Y    |    3.00  |  118.35    |   76.57
+  bg   |   28672   |  bg     |   hu  |  Y    |    6.18  | 11481.54    |  231.80
+  it   |   30720   |  it     |   bg  |  Y    |    2.74  |   24.48    |   22.08
+  et   |   32768   |  et     |   it  |  Y    |    3.32  |   54.81    |   37.09
+  el   |   34816   |  el     |   et  |  Y    |    6.45  | 12717.93    |   64.79
+  sk   |   36864   |  sk     |   el  |  Y    |    3.74  |   67.29    |   45.45
+  sv   |   38912   |  sv     |   sk  |  Y    |    3.12  |   42.17    |   30.30
+  ro   |   40960   |  ro     |   sv  |  Y    |    3.47  |   63.51    |   23.70
+  nl   |   43008   |  nl     |   ro  |  Y    |    3.06  |   33.92    |   24.53
+  sl   |   45056   |  sl     |   nl  |  Y    |    3.46  |   70.28    |   20.51
+  lt   |   47104   |  lt     |   sl  |  Y    |    4.03  |   61.36    |    4.03
+
+P(correct prefix | x) = 20/20 = 100%   (labels used only to SCORE correctness)
+mean ppl penalty of selected vs oracle prefix: -89.7%  (0% = selection as good as language ID)
+free eval vs oracle mean penalty: +22%

@@ -1,0 +1,20 @@
+europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl de: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl cs: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl bg: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl el: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+ckpt=lt_last.pt N=47104 territories=23 langs=['en', 'de', 'cs', 'bg', 'el'] arms=['id', 'calibgain']
+             id |     32.04     35.56     60.23    228.12     64.25
+   fit step   0 loss 3.454 alpha[min/med/max] 0.950/1.050/1.050
+   fit step  20 loss 1.284 alpha[min/med/max] 0.020/0.611/2.037
+   fit step  40 loss 0.915 alpha[min/med/max] 0.020/0.129/2.569
+      calibgain |      2.36     34.89    173.68 919303.83 1036639.90
+   fitted alphas: 2.41 2.16 2.31 2.53 0.02 0.02 0.02 0.02 0.02 0.09 0.02 0.02 0.02 0.02 0.08 0.02 0.06 0.12 0.03 0.02 0.02 0.03 0.03
+   base territory (0-3) mean 2.351, appended (4-22) mean 0.036
+
+[GATE] identity en=32.04 (matrix 31.07) -> OK
+
+arm | en recovery | de recovery | cs recovery | bg recovery | el recovery | mean
+      calibgain | +0.99    | +0.01    | -0.37    | -2.29    | -4.19    | -1.17
+
+recovery 1.00 = full restoration of the acquisition exit with no external mask; negative = worse than doing nothing.

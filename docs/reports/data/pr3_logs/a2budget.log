@@ -1,0 +1,52 @@
+europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl es: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl pl: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl fr: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl de: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl cs: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl da: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl pt: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl fi: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl hu: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl bg: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl it: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl et: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl el: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl sk: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl sv: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl ro: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl nl: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl sl: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl lt: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+GATE en free=31.09 (expect ~31) masked8192=2.33 (expect ~2.3)
+  en done (own width 8192)
+  es done (own width 10240)
+  pl done (own width 12288)
+  fr done (own width 14336)
+  de done (own width 16384)
+  cs done (own width 18432)
+  da done (own width 20480)
+  pt done (own width 22528)
+  fi done (own width 24576)
+  hu done (own width 26624)
+  bg done (own width 28672)
+  it done (own width 30720)
+  et done (own width 32768)
+  el done (own width 34816)
+  sk done (own width 36864)
+  sv done (own width 38912)
+  ro done (own width 40960)
+  nl done (own width 43008)
+  sl done (own width 45056)
+  lt done (own width 47104)
+
+P(correct prefix | x), 20 domains, by calibration budget
+budget_bytes | linear_argmin(/20) | forwards/input | binary_search(/20) | forwards/input
+       4000   |        20/20          |      23      |         6/20         |    ~ 26
+      16000   |        20/20          |      23      |         4/20         |    ~ 24
+      64000   |        20/20          |      23      |         4/20         |    ~ 26
+     256000   |        20/20          |      23      |         4/20         |    ~ 26
+    1000000   |        20/20          |      23      |         4/20         |    ~ 26
+
+Note: binary search assumes loss decreases then increases with width (unimodal). If that
+fails for some domain, the discrepancy itself is the finding.

@@ -26,78 +26,94 @@
 \newlabel{thm:criterion}{{2}{5}{exact-isolation criterion}{theorem.2}{}}
 \newlabel{cor:prefix}{{1}{5}{prefix growth constructs the structure}{corollary.1}{}}
 \newlabel{rem:readout}{{1}{5}{readout arithmetic, measured}{remark.1}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}The forgetting baseline: what happens without growth}{5}{section.4}\protected@file@percent }
-\newlabel{sec:fcs}{{4}{5}{The forgetting baseline: what happens without growth}{section.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Design}{5}{subsection.4.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Results}{5}{subsection.4.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5}Preservation under growth: the fixed-regime ladder}{6}{section.5}\protected@file@percent }
-\newlabel{sec:ra2b}{{5}{6}{Preservation under growth: the fixed-regime ladder}{section.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Acquisition: position-spread collapses}{6}{subsection.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Routing: perfectly diagonal}{6}{subsection.5.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Retention: equals acquisition}{7}{subsection.5.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Joint serving: recovered but not solved}{7}{subsection.5.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Bit-exactness: four independent confirmations}{7}{subsection.5.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6}Readout mechanics: why joint serving degrades}{7}{section.6}\protected@file@percent }
-\newlabel{sec:readout}{{6}{7}{Readout mechanics: why joint serving degrades}{section.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}The random-expansion control: 83\% is arithmetic}{7}{subsection.6.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Seven fixed readout operators, all refuted}{8}{subsection.6.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7}Selection and out-of-support detection}{8}{section.7}\protected@file@percent }
-\newlabel{sec:selection}{{7}{8}{Selection and out-of-support detection}{section.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Label-free likelihood selection}{8}{subsection.7.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Cheap addressing from byte geometry}{9}{subsection.7.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Out-of-support detection: two axes, not one}{9}{subsection.7.3}\protected@file@percent }
-\newlabel{sec:ood}{{7.3}{9}{Out-of-support detection: two axes, not one}{subsection.7.3}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {8}Cross-script generalization}{10}{section.8}\protected@file@percent }
-\newlabel{sec:xscript}{{8}{10}{Cross-script generalization}{section.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Out-of-support routing: byte geometry, not linguistics}{10}{subsection.8.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Acquisition from scratch: script-agnostic}{10}{subsection.8.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}The cross-script growth cell: monotonic growth holds}{10}{subsection.8.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.4}Data reality, separated from capability}{10}{subsection.8.4}\protected@file@percent }
+\newlabel{lem:zf}{{1}{5}{zero-forcing}{lemma.1}{}}
+\newlabel{prop:soft}{{1}{5}{soft gates cannot be exact}{proposition.1}{}}
+\newlabel{prop:amp}{{2}{5}{depth amplification}{proposition.2}{}}
+\newlabel{rem:exp}{{2}{5}{expansiveness: measured, not proved-impossible}{remark.2}{}}
+\newlabel{cor:sel}{{2}{5}{selector vs.\ creator, scoped}{corollary.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces FCS forgetting matrix ($\log _{10}$ ppl). Each row is the 20-domain cold eval after that phase; blue box marks the diagonal. Latin-script languages fall to their English-only zero-shot level (9/19 fully erased, 7 partially); bg/el collapse by five orders of magnitude; family-structured oscillation survives throughout.}}{6}{figure.1}\protected@file@percent }
+\newlabel{fig:fcs}{{1}{6}{FCS forgetting matrix ($\log _{10}$ ppl). Each row is the 20-domain cold eval after that phase; blue box marks the diagonal. Latin-script languages fall to their English-only zero-shot level (9/19 fully erased, 7 partially); bg/el collapse by five orders of magnitude; family-structured oscillation survives throughout}{figure.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}The forgetting baseline: what happens without growth}{6}{section.4}\protected@file@percent }
+\newlabel{sec:fcs}{{4}{6}{The forgetting baseline: what happens without growth}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Design}{6}{subsection.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Results}{7}{subsection.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Preservation under growth: the fixed-regime ladder}{7}{section.5}\protected@file@percent }
+\newlabel{sec:ra2b}{{5}{7}{Preservation under growth: the fixed-regime ladder}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Acquisition: position-spread collapses}{7}{subsection.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Routing: perfectly diagonal}{7}{subsection.5.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Ladder acquisition. RA2b (fixed regime, blue, all 20 phases): 2.25--5.99 band, position cost gone. RA2 (leaky regime, red, 12 documented phases): acquisition tracked ladder position. Green arrows: same-position same-host cells lt $9.94\to 3.72$ ($-63\%$), sl $9.45\to 3.36$ ($-64\%$). Residual spread is alphabet difficulty (bg/el), not chain state.}}{8}{figure.2}\protected@file@percent }
+\newlabel{fig:ladder}{{2}{8}{Ladder acquisition. RA2b (fixed regime, blue, all 20 phases): 2.25--5.99 band, position cost gone. RA2 (leaky regime, red, 12 documented phases): acquisition tracked ladder position. Green arrows: same-position same-host cells lt $9.94\to 3.72$ ($-63\%$), sl $9.45\to 3.36$ ($-64\%$). Residual spread is alphabet difficulty (bg/el), not chain state}{figure.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Retention: equals acquisition}{8}{subsection.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Joint serving: recovered but not solved}{8}{subsection.5.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces RA2b final checkpoint: routed serving (blue) vs joint serving (orange) vs acquisition exit (black tick), per domain, log scale. Routed tracks acquisition for every domain (median ratio 1.09, range 1.02--1.13, within the window-vs-val instrument offset); joint serving erodes 2--13$\times $ --- the interference term that survives the fix. Sources: exttt{docs/reports/data/2026-09-10\_ra2b\_matrix.csv} (lt rows) and readout \S  B4.}}{9}{figure.3}\protected@file@percent }
+\newlabel{fig:retention}{{3}{9}{RA2b final checkpoint: routed serving (blue) vs joint serving (orange) vs acquisition exit (black tick), per domain, log scale. Routed tracks acquisition for every domain (median ratio 1.09, range 1.02--1.13, within the window-vs-val instrument offset); joint serving erodes 2--13$\times $ --- the interference term that survives the fix. Sources: exttt{docs/reports/data/2026-09-10\_ra2b\_matrix.csv} (lt rows) and readout \S B4}{figure.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Bit-exactness: four independent confirmations}{9}{subsection.5.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Readout mechanics: why joint serving degrades}{9}{section.6}\protected@file@percent }
+\newlabel{sec:readout}{{6}{9}{Readout mechanics: why joint serving degrades}{section.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}The random-expansion control: 83\% is arithmetic}{9}{subsection.6.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Expansion control on the en base (one growth step; instrument gate reproduces matrix exit at 2.33 vs 2.31, PASS). Random Gaussian blocks cost $4.1\times $; inert zeros cost nothing --- the zero-init convention is load-bearing; the real ladder's joint damage is 83\% arithmetic.}}{10}{figure.4}\protected@file@percent }
+\newlabel{fig:expansion}{{4}{10}{Expansion control on the en base (one growth step; instrument gate reproduces matrix exit at 2.33 vs 2.31, PASS). Random Gaussian blocks cost $4.1\times $; inert zeros cost nothing --- the zero-init convention is load-bearing; the real ladder's joint damage is 83\% arithmetic}{figure.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Seven fixed readout operators, all refuted}{10}{subsection.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Selection and out-of-support detection}{11}{section.7}\protected@file@percent }
+\newlabel{sec:selection}{{7}{11}{Selection and out-of-support detection}{section.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Label-free likelihood selection}{11}{subsection.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Cheap addressing from byte geometry}{11}{subsection.7.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Two-axis OOD separation. Blue: 20 trained languages (ratio $\ge 5\times $, absolute ppl $\le 6.5$). Diamonds: 6 unseen — byte-adjacent (lv, ga) collapse on the ratio axis; cross-script (zh, ja, hi, iu) sit orders above on the absolute axis. hi breaches the trained ratio floor (5.74$\times $): the one-axis rule fails informatively; both axes together separate all 26.}}{12}{figure.5}\protected@file@percent }
+\newlabel{fig:ood}{{5}{12}{Two-axis OOD separation. Blue: 20 trained languages (ratio $\ge 5\times $, absolute ppl $\le 6.5$). Diamonds: 6 unseen — byte-adjacent (lv, ga) collapse on the ratio axis; cross-script (zh, ja, hi, iu) sit orders above on the absolute axis. hi breaches the trained ratio floor (5.74$\times $): the one-axis rule fails informatively; both axes together separate all 26}{figure.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Out-of-support detection: two axes, not one}{12}{subsection.7.3}\protected@file@percent }
+\newlabel{sec:ood}{{7.3}{12}{Out-of-support detection: two axes, not one}{subsection.7.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Cross-script routing on the fixed-regime chain (40 crops per probe). zh 37/40, ja 40/40, hi 40/40 and the decontaminated iu 40/40 concentrate on the two territories with by far the densest high-byte training exposure (bg/el); no Latin-route attraction remains after the iu correction. No linguistic kinship exists between any probe and Cyrillic or Greek.}}{13}{figure.6}\protected@file@percent }
+\newlabel{fig:xscript}{{6}{13}{Cross-script routing on the fixed-regime chain (40 crops per probe). zh 37/40, ja 40/40, hi 40/40 and the decontaminated iu 40/40 concentrate on the two territories with by far the densest high-byte training exposure (bg/el); no Latin-route attraction remains after the iu correction. No linguistic kinship exists between any probe and Cyrillic or Greek}{figure.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Cross-script generalization}{13}{section.8}\protected@file@percent }
+\newlabel{sec:xscript}{{8}{13}{Cross-script generalization}{section.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Out-of-support routing: byte geometry, not linguistics}{13}{subsection.8.1}\protected@file@percent }
 \citation{pgn}
 \citation{packnet}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Acquisition from scratch: script-agnostic}{14}{subsection.8.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}The cross-script growth cell: monotonic growth holds}{14}{subsection.8.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.4}Data reality, separated from capability}{14}{subsection.8.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9}Prior art, discussed}{14}{section.9}\protected@file@percent }
+\newlabel{sec:prior}{{9}{14}{Prior art, discussed}{section.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.1}Additive and parameter-isolating growth}{14}{subsection.9.1}\protected@file@percent }
+\newlabel{sec:prior:growth}{{9.1}{14}{Additive and parameter-isolating growth}{subsection.9.1}{}}
 \citation{piggyback}
 \citation{supsup}
 \citation{expertgate}
-\@writefile{toc}{\contentsline {section}{\numberline {9}Prior art, discussed}{11}{section.9}\protected@file@percent }
-\newlabel{sec:prior}{{9}{11}{Prior art, discussed}{section.9}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.1}Additive and parameter-isolating growth}{11}{subsection.9.1}\protected@file@percent }
-\newlabel{sec:prior:growth}{{9.1}{11}{Additive and parameter-isolating growth}{subsection.9.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.2}Task and domain addressing}{11}{subsection.9.2}\protected@file@percent }
-\newlabel{sec:prior:addressing}{{9.2}{11}{Task and domain addressing}{subsection.9.2}{}}
 \citation{ewc}
 \citation{si}
 \citation{mas}
 \citation{gem}
 \citation{agem}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.2}Task and domain addressing}{15}{subsection.9.2}\protected@file@percent }
+\newlabel{sec:prior:addressing}{{9.2}{15}{Task and domain addressing}{subsection.9.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.3}Consolidation and importance protection}{15}{subsection.9.3}\protected@file@percent }
+\newlabel{sec:prior:consolidation}{{9.3}{15}{Consolidation and importance protection}{subsection.9.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.4}Replay}{15}{subsection.9.4}\protected@file@percent }
+\newlabel{sec:prior:replay}{{9.4}{15}{Replay}{subsection.9.4}{}}
 \citation{shazeer}
 \citation{switch}
 \citation{gshard}
 \citation{chow}
 \citation{conformal}
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.3}Consolidation and importance protection}{12}{subsection.9.3}\protected@file@percent }
-\newlabel{sec:prior:consolidation}{{9.3}{12}{Consolidation and importance protection}{subsection.9.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.4}Replay}{12}{subsection.9.4}\protected@file@percent }
-\newlabel{sec:prior:replay}{{9.4}{12}{Replay}{subsection.9.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.5}Sparse expert routing and its failure class}{12}{subsection.9.5}\protected@file@percent }
-\newlabel{sec:prior:moe}{{9.5}{12}{Sparse expert routing and its failure class}{subsection.9.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.6}Selective prediction and rejection}{12}{subsection.9.6}\protected@file@percent }
-\newlabel{sec:prior:reject}{{9.6}{12}{Selective prediction and rejection}{subsection.9.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.7}Production-scale conditional memory}{13}{subsection.9.7}\protected@file@percent }
-\newlabel{sec:prior:engram}{{9.7}{13}{Production-scale conditional memory}{subsection.9.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.8}Continual-learning evaluation methodology}{13}{subsection.9.8}\protected@file@percent }
-\newlabel{sec:prior:method}{{9.8}{13}{Continual-learning evaluation methodology}{subsection.9.8}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {10}Discussion}{13}{section.10}\protected@file@percent }
-\newlabel{sec:discussion}{{10}{13}{Discussion}{section.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.5}Sparse expert routing and its failure class}{16}{subsection.9.5}\protected@file@percent }
+\newlabel{sec:prior:moe}{{9.5}{16}{Sparse expert routing and its failure class}{subsection.9.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.6}Selective prediction and rejection}{16}{subsection.9.6}\protected@file@percent }
+\newlabel{sec:prior:reject}{{9.6}{16}{Selective prediction and rejection}{subsection.9.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.7}Production-scale conditional memory}{16}{subsection.9.7}\protected@file@percent }
+\newlabel{sec:prior:engram}{{9.7}{16}{Production-scale conditional memory}{subsection.9.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.8}Continual-learning evaluation methodology}{17}{subsection.9.8}\protected@file@percent }
+\newlabel{sec:prior:method}{{9.8}{17}{Continual-learning evaluation methodology}{subsection.9.8}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {10}Discussion}{17}{section.10}\protected@file@percent }
+\newlabel{sec:discussion}{{10}{17}{Discussion}{section.10}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {11}Limitations}{17}{section.11}\protected@file@percent }
+\newlabel{sec:limits}{{11}{17}{Limitations}{section.11}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {12}Conclusion}{17}{section.12}\protected@file@percent }
+\newlabel{sec:conclusion}{{12}{17}{Conclusion}{section.12}{}}
 \bibcite{bdh}{1}
 \bibcite{pgn}{2}
 \bibcite{packnet}{3}
 \bibcite{piggyback}{4}
 \bibcite{supsup}{5}
-\@writefile{toc}{\contentsline {section}{\numberline {11}Limitations}{14}{section.11}\protected@file@percent }
-\newlabel{sec:limits}{{11}{14}{Limitations}{section.11}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {12}Conclusion}{14}{section.12}\protected@file@percent }
-\newlabel{sec:conclusion}{{12}{14}{Conclusion}{section.12}{}}
-\newlabel{sec:ai-disclosure}{{12}{14}{AI participation}{section*.1}{}}
 \bibcite{hsp}{6}
 \bibcite{expertgate}{7}
 \bibcite{ewc}{8}
@@ -107,6 +123,7 @@
 \bibcite{agem}{12}
 \bibcite{shazeer}{13}
 \bibcite{switch}{14}
+\newlabel{sec:ai-disclosure}{{12}{18}{AI participation}{section*.1}{}}
 \bibcite{gshard}{15}
 \bibcite{chow}{16}
 \bibcite{conformal}{17}
@@ -123,4 +140,14 @@
 \bibcite{engram}{28}
 \bibcite{europarl}{29}
 \bibcite{multiun}{30}
-\gdef \@abspage@last{16}
+\@writefile{toc}{\contentsline {section}{\numberline {A}Proofs and formal details}{19}{appendix.A}\protected@file@percent }
+\newlabel{app:proofs}{{A}{19}{Proofs and formal details}{appendix.A}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.1}Separability facts}{19}{subsection.A.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.2}Proof of Theorem~\ref {thm:dissoc}}{20}{subsection.A.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.3}Proof of Theorem~\ref {thm:criterion}}{20}{subsection.A.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.4}Proof of Lemma~\ref {lem:zf}}{20}{subsection.A.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.5}Proof sketch of Proposition~\ref {prop:soft}}{20}{subsection.A.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.6}Proof of Proposition~\ref {prop:amp}}{20}{subsection.A.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.7}Remark on the measurement (Remark~\ref {rem:exp})}{21}{subsection.A.7}\protected@file@percent }
+\newlabel{app:meas}{{A.7}{21}{Remark on the measurement (Remark~\ref {rem:exp})}{subsection.A.7}{}}
+\gdef \@abspage@last{21}

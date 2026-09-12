@@ -1,0 +1,23 @@
+europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl es: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl pl: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl fr: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl de: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl cs: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl da: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl pt: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl fi: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl hu: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl bg: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl it: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl et: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl el: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl sk: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl sv: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl ro: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl nl: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl sl: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl lt: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+ckpt=lt_last.pt LPW=23 iters=25
+
+domain | sel_width | sel_lang | oracle | correct | ppl_sel | ppl_oracle | ppl_free

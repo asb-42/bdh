@@ -1,0 +1,8 @@
+base=out/bdh_europarl_ladRA2b-en_last.pt N0=8192 widths=[8192, 10240, 47104] langs=['en'] iters=15 batch=8
+
+lang | width | A random free | C inert free | C==A check | A masked@8192 | B real-ladder free
+europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+ [en]   8192 |         2.33 |        2.33 | baseline      |             - | 2.31
+ [GATE en] un-grown free ppl=2.33 vs matrix exit 2.31 -> OK
+ [en]  10240 |         9.57 |        2.33 |                   inert OK |        2.33 | 31.07
+ [en]  47104 |        20.16 |        2.33 |                   inert OK |        2.33 | 31.07

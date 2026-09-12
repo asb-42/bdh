@@ -1,0 +1,27 @@
+europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl de: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl cs: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl bg: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+europarl el: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B
+ckpt=lt_last.pt N=47104 territories=23 langs=['en', 'de', 'cs', 'bg', 'el'] arms=['id', 'massnorm', 'softmix0.5', 'softmix1.0', 'calibgain']
+             id |     32.04     35.56     60.23    228.12     64.25
+       massnorm |     31.26     39.77     91.77 215073.03 180509.50
+     softmix0.5 |     18.73     27.24     68.31   4485.52   4092.82
+     softmix1.0 |     46.02     48.56     95.52    965.34   1035.53
+Traceback (most recent call last):
+  File "/srv/coding/bdh/scripts/pi50/r1b_relative_reweight.py", line 108, in <module>
+    lo = model(x)[0]
+         ^^^^^^^^
+  File "/srv/coding/bdh/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/srv/coding/bdh/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/srv/coding/bdh/bdh.py", line 252, in forward
+    x_sparse = _k_sparse_relu(x_latent, C.k_sparse_ratio) if C.k_sparse_ratio > 0 else F.relu(x_latent)  # B, nh, T, N
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/srv/coding/bdh/scripts/pi50/r1b_relative_reweight.py", line 57, in op
+    return (vb * w).view_as(v)
+            ~~~^~~
+RuntimeError: The size of tensor a (2048) must match the size of tensor b (23) at non-singleton dimension 4
