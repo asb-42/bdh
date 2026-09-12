@@ -62,13 +62,12 @@
 \newlabel{fig:ood}{{5}{12}{Two-axis OOD separation. Blue: 20 trained languages (ratio $\ge 5\times $, absolute ppl $\le 6.5$). Diamonds: 6 unseen — byte-adjacent (lv, ga) collapse on the ratio axis; cross-script (zh, ja, hi, iu) sit orders above on the absolute axis. hi breaches the trained ratio floor (5.74$\times $): the one-axis rule fails informatively; both axes together separate all 26}{figure.5}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Out-of-support detection: two axes, not one}{12}{subsection.7.3}\protected@file@percent }
 \newlabel{sec:ood}{{7.3}{12}{Out-of-support detection: two axes, not one}{subsection.7.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Cross-script routing on the fixed-regime chain (40 crops per probe). zh 37/40, ja 40/40, hi 40/40 and the decontaminated iu 40/40 concentrate on the two territories with by far the densest high-byte training exposure (bg/el); no Latin-route attraction remains after the iu correction. No linguistic kinship exists between any probe and Cyrillic or Greek.}}{13}{figure.6}\protected@file@percent }
-\newlabel{fig:xscript}{{6}{13}{Cross-script routing on the fixed-regime chain (40 crops per probe). zh 37/40, ja 40/40, hi 40/40 and the decontaminated iu 40/40 concentrate on the two territories with by far the densest high-byte training exposure (bg/el); no Latin-route attraction remains after the iu correction. No linguistic kinship exists between any probe and Cyrillic or Greek}{figure.6}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Cross-script routing on the fixed-regime chain (40 crops per probe). zh 37/40, ja 40/40, hi 40/40 and the decontaminated iu 40/40 concentrate on the only two territories with substantial multi-byte training exposure (bg/el: 82\% 2-byte characters vs 11.7\% next-highest); no Latin-route attraction remains after the iu correction. No linguistic kinship exists between any probe and Cyrillic or Greek.}}{13}{figure.6}\protected@file@percent }
+\newlabel{fig:xscript}{{6}{13}{Cross-script routing on the fixed-regime chain (40 crops per probe). zh 37/40, ja 40/40, hi 40/40 and the decontaminated iu 40/40 concentrate on the only two territories with substantial multi-byte training exposure (bg/el: 82\% 2-byte characters vs 11.7\% next-highest); no Latin-route attraction remains after the iu correction. No linguistic kinship exists between any probe and Cyrillic or Greek}{figure.6}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {8}Cross-script generalization}{13}{section.8}\protected@file@percent }
 \newlabel{sec:xscript}{{8}{13}{Cross-script generalization}{section.8}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Out-of-support routing: byte geometry, not linguistics}{13}{subsection.8.1}\protected@file@percent }
 \citation{pgn}
-\citation{packnet}
 \@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Acquisition from scratch: script-agnostic}{14}{subsection.8.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {8.3}The cross-script growth cell: monotonic growth holds}{14}{subsection.8.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {8.4}Data reality, separated from capability}{14}{subsection.8.4}\protected@file@percent }
@@ -76,25 +75,26 @@
 \newlabel{sec:prior}{{9}{14}{Prior art, discussed}{section.9}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {9.1}Additive and parameter-isolating growth}{14}{subsection.9.1}\protected@file@percent }
 \newlabel{sec:prior:growth}{{9.1}{14}{Additive and parameter-isolating growth}{subsection.9.1}{}}
+\citation{packnet}
 \citation{piggyback}
 \citation{supsup}
 \citation{expertgate}
 \citation{ewc}
 \citation{si}
 \citation{mas}
-\citation{gem}
-\citation{agem}
 \@writefile{toc}{\contentsline {subsection}{\numberline {9.2}Task and domain addressing}{15}{subsection.9.2}\protected@file@percent }
 \newlabel{sec:prior:addressing}{{9.2}{15}{Task and domain addressing}{subsection.9.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {9.3}Consolidation and importance protection}{15}{subsection.9.3}\protected@file@percent }
 \newlabel{sec:prior:consolidation}{{9.3}{15}{Consolidation and importance protection}{subsection.9.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.4}Replay}{15}{subsection.9.4}\protected@file@percent }
-\newlabel{sec:prior:replay}{{9.4}{15}{Replay}{subsection.9.4}{}}
+\citation{gem}
+\citation{agem}
 \citation{shazeer}
 \citation{switch}
 \citation{gshard}
 \citation{chow}
 \citation{conformal}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.4}Replay}{16}{subsection.9.4}\protected@file@percent }
+\newlabel{sec:prior:replay}{{9.4}{16}{Replay}{subsection.9.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {9.5}Sparse expert routing and its failure class}{16}{subsection.9.5}\protected@file@percent }
 \newlabel{sec:prior:moe}{{9.5}{16}{Sparse expert routing and its failure class}{subsection.9.5}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {9.6}Selective prediction and rejection}{16}{subsection.9.6}\protected@file@percent }
@@ -107,8 +107,6 @@
 \newlabel{sec:discussion}{{10}{17}{Discussion}{section.10}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {11}Limitations}{17}{section.11}\protected@file@percent }
 \newlabel{sec:limits}{{11}{17}{Limitations}{section.11}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {12}Conclusion}{17}{section.12}\protected@file@percent }
-\newlabel{sec:conclusion}{{12}{17}{Conclusion}{section.12}{}}
 \bibcite{bdh}{1}
 \bibcite{pgn}{2}
 \bibcite{packnet}{3}
@@ -120,10 +118,12 @@
 \bibcite{si}{9}
 \bibcite{mas}{10}
 \bibcite{gem}{11}
+\@writefile{toc}{\contentsline {section}{\numberline {12}Conclusion}{18}{section.12}\protected@file@percent }
+\newlabel{sec:conclusion}{{12}{18}{Conclusion}{section.12}{}}
+\newlabel{sec:ai-disclosure}{{12}{18}{AI participation}{section*.1}{}}
 \bibcite{agem}{12}
 \bibcite{shazeer}{13}
 \bibcite{switch}{14}
-\newlabel{sec:ai-disclosure}{{12}{18}{AI participation}{section*.1}{}}
 \bibcite{gshard}{15}
 \bibcite{chow}{16}
 \bibcite{conformal}{17}
