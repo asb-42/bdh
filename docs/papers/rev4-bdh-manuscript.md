@@ -1,6 +1,6 @@
 # Append-Only Neural Memory: Storage, Addressing, and Growth
 
-> **Rev 4 (current draft, post-external-review)** — generated from `rev4-bdh-manuscript.tex` (pandoc, 2026-09-12). The TeX/PDF pair in this directory is the source of truth; this Markdown is the readable sync copy. Full rewrite per operator GO: thesis (append-only substrate; addressing is the central problem), decay-confound closure, FCS baseline, RA2b preservation, readout mechanics (83% arithmetic, seven operators refuted), selection + OOD (20/20 data-free, two-axis rule), cross-script generalization, humanities-standard prior art (8 clusters), AI-participation disclosure. 22 pages, 6 figures, 25 refs.
+> **Rev 4.5 (post-external-review)** — generated from `rev4-bdh-manuscript.tex` (pandoc, 2026-09-12). The TeX/PDF pair in this directory is the source of truth; this Markdown is the readable sync copy. Full rewrite per operator GO: thesis (append-only substrate; addressing is the central problem), decay-confound closure, FCS baseline, RA2b preservation, readout mechanics (83% arithmetic, seven operators refuted), selection + OOD (20/20 data-free, two-axis rule), cross-script generalization, humanities-standard prior art (8 clusters), AI-participation disclosure. 24 pages, 6 figures, 25 refs.
 
 ---
 
@@ -12,7 +12,7 @@ This paper takes <span class="smallcaps">bdh</span>  as its instrument and repo
 
 1.  **Storage.** Under masked growth, is previously acquired computation physically preserved? We answer at the bit level for the tested configurations: yes, four independent confirmations, including cross-script.
 
-2.  **Serving.** Given preserved storage, does the model still serve old tasks? We decompose the serving problem into *joint* (all neurons active) and *routed* (prefix-masked) regimes, and show the degradation in the former is 83% arithmetic on the log scale, 62% in perplexity units (reproduced by random untrained blocks) while the latter is exact.
+2.  **Serving.** Given preserved storage, does the model still serve old tasks? We decompose the serving problem into *joint* (all neurons active) and *routed* (prefix-masked) regimes, and show the degradation in the former is 83% arithmetic on the log scale, 62% in perplexity units at the English-era checkpoint (reproduced by random untrained blocks; the mechanism holds in six of seven eras, the fraction does not) while the latter is exact.
 
 3.  **Addressing.** Can the model find the right territory without an external language ID? We measure label-free selection, cheap input-side addressing, out-of-support rejection, and their scaling properties.
 
@@ -28,9 +28,9 @@ Our experiments proceed from the simplest question to the hardest.
 
 **The decay confound (Section <a href="#sec:decay" data-reference-type="ref" data-reference="sec:decay">2.3</a>).** The original ladders carried a silent optimizer defect: AdamW’s decoupled weight decay eroded gradient-masked weights by a closed-form per-phase factor, invisible to loss curves. We derive the closed form, verify it to five decimal places, and repair it with a step-end bit-exact restore.
 
-**Preservation under growth (Section <a href="#sec:ra2b" data-reference-type="ref" data-reference="sec:ra2b">5</a>).** With the fix active, a 20-phase route-aware ladder (579M final) shows: position-dependent acquisition cost collapses, routing is perfectly diagonal (800/800 crops), retention equals acquisition (zero within-instrument drift across a full growth phase), and bit-exactness holds at every transition.
+**Preservation under growth (Section <a href="#sec:ra2b" data-reference-type="ref" data-reference="sec:ra2b">5</a>).** With the fix active, a 20-phase route-aware ladder (579M final) shows: position-dependent acquisition cost collapses, routing is perfectly diagonal (20/20 domains scored under all 20 prefix widths, 40 crops each; per-domain Wilson floor 0.91), retention equals acquisition (median $`+4.3\%`$, worst case $`+8.0\%`$, zero within-instrument drift across a full growth phase), and bit-exactness holds at every transition.
 
-**Readout mechanics (Section <a href="#sec:readout" data-reference-type="ref" data-reference="sec:readout">6</a>).** Why does joint serving degrade if storage is bit-exact? A random-expansion control answers: appending one random untrained block costs English $`4.1\times`$; random expansion to full width reproduces 83% of the real damage (log scale; 62% in linear perplexity); inert zero-blocks cost nothing. Every fixed readout operator in the seven families we test (gain rescaling, mass normalization, mixing, gradient-fitted per-territory gains) fails to repair it; we do not claim the space of input-independent operations is exhausted, but the pattern is consistent: a fixed operation cannot answer an input-dependent question. The correct operation in our measurements is input-dependent selection.
+**Readout mechanics (Section <a href="#sec:readout" data-reference-type="ref" data-reference="sec:readout">6</a>).** Why does joint serving degrade if storage is bit-exact? A random-expansion control answers: appending one random untrained block costs English $`4.1\times`$; random expansion to full width reproduces 83% of the real damage at the English-era checkpoint (log scale; 62% in linear perplexity), and the mechanism reproduces in six of seven eras while the fraction does not (range 0.60–1.47); inert zero-blocks cost nothing. Every fixed readout operator in the seven families we test (gain rescaling, mass normalization, mixing, gradient-fitted per-territory gains) fails to repair it; we do not claim the space of input-independent operations is exhausted, but the pattern is consistent: a fixed operation cannot answer an input-dependent question. The correct operation in our measurements is input-dependent selection.
 
 **Selection (Section <a href="#sec:selection" data-reference-type="ref" data-reference="sec:selection">7</a>).** A label-free self-NLL selector identifies the correct prefix for all 20 domains at every calibration budget from 4 KB to 1 MB. A byte 1–4-gram logistic addresser reproduces the likelihood router perfectly under a class-balanced fit, given $`\sim`$<!-- -->4–8 KB of calibration text per domain. But binary search over prefix widths collapses: the cumulative-prefix NLL surface is not unimodal, so selection is robust but not sublinear in territory count.
 
@@ -75,6 +75,22 @@ All experiments use byte-level <span class="smallcaps">bdh</span> on Europarl  
 
 Hardware: one RTX 4090 (24 GB) and one NVIDIA GB10 (gx10, 121 GB); scale is $`\sim`$<!-- -->100M parameters at the base width ($`\times`$<!-- -->128) and $`\sim`$<!-- -->579M at the final ladder width ($`\times`$<!-- -->736). Every number in this paper traces to a committed artifact in the project repository (reports, plans, data files, and pre-registration headers in the training scripts); the project’s internal message bus is the working coordination layer, and where a claim cites its provenance, this paper names the repository artifact.
 
+<div class="center">
+
+| setting | value |
+|:---|:---|
+| model | byte-level <span class="smallcaps">bdh</span>, $`d=512`$, $`n_h=8`$ ($`64`$ neurons per head per unit multiplier) |
+| training sequence | $`512`$ bytes, batch $`4`$ at width up to $`\times192`$, batch $`1`$ beyond |
+| optimizer | AdamW, $`\mathrm{lr}=10^{-3}`$, weight decay $`0.1`$, $`\beta=(0.9,0.95)`$, grad-clip $`1.0`$ |
+| schedule | warmup $`1000`$, cosine to $`\min\mathrm{lr}=10^{-4}`$ over $`10{,}000`$ iters |
+| phase budget | $`10{,}000`$ iters on a $`\sim`$<!-- -->30 MB byte stream per language |
+| growth | $`+32`$ neurons/head per phase from a $`\times128`$ base ($`+2048`$); $`\alpha=0.9`$; attention unfrozen |
+| training data | Europarl v7 byte streams; byte vocabulary $`256`$ |
+| evaluation | cold random crops, block $`512`$, $`40`$ crops, generator $`1234`$ |
+| matrix eval | `lang_eval.py` with eval batch pinned to $`1`$ (all $`400`$ cells) |
+
+</div>
+
 ## The decay confound, closed
 
 The original growth ladders carried a silent optimizer defect that we discovered and repaired mid-project; every pre-repair number in this paper carries its consequence, and we state the mechanism once, here.
@@ -95,7 +111,9 @@ p_{\text{exit}} = c\cdot p_{\text{entry}}
 
 # Theory: storage is exact; serving and addressing are not
 
-The theory of rev 3 carries over unchanged in its core; we restate the two load-bearing results and refer the proofs to Appendix <a href="#app:proofs" data-reference-type="ref" data-reference="app:proofs">13</a>. The new empirical sections then measure what the theory predicts: growth constructs exact storage, the readout breaks serving, and selection repairs it.
+The theory of rev 3 carries over unchanged in its core; we restate the two load-bearing results and refer the proofs to Appendix <a href="#app:proofs" data-reference-type="ref" data-reference="app:proofs">14</a>. The new empirical sections then measure what the theory predicts: growth constructs exact storage, the readout breaks serving, and selection repairs it.
+
+One clarification, because it is easy to misread the dissociation result: the construction of Theorem <a href="#thm:dissoc" data-reference-type="ref" data-reference="thm:dissoc">1</a> is realized *after* training, by a suffix whose parameters are non-zero. The zero-initialized suffix of the growth convention measures the *untrained* case—which is exactly why the A$`-`$C gap in the random-expansion control quantifies that convention’s protective value, rather than contradicting the theorem.
 
 <div id="thm:dissoc" class="theorem">
 
@@ -123,7 +141,7 @@ The theory of rev 3 carries over unchanged in its core; we restate the two load
 
 <div id="rem:readout" class="remark">
 
-*Remark 1* (readout arithmetic, measured). <span class="smallcaps">measured</span> (Section <a href="#sec:readout" data-reference-type="ref" data-reference="sec:readout">6</a>). With $`k`$\_sparse_ratio $`=0`$, the readout sums over all $`N`$ ReLU candidates, and growth adds terms to an existing sum with bit-frozen old weights. Theorem <a href="#thm:dissoc" data-reference-type="ref" data-reference="thm:dissoc">1</a> predicted this class of failure abstractly; the random-expansion control measures it: one random block costs $`4.1\times`$, and 83% (log scale; 62% in linear perplexity) of the real damage needs no learning at all.
+*Remark 1* (readout arithmetic, measured). <span class="smallcaps">measured</span> (Section <a href="#sec:readout" data-reference-type="ref" data-reference="sec:readout">6</a>). With $`k`$\_sparse_ratio $`=0`$, the readout sums over all $`N`$ ReLU candidates, and growth adds terms to an existing sum with bit-frozen old weights. Theorem <a href="#thm:dissoc" data-reference-type="ref" data-reference="thm:dissoc">1</a> predicted this class of failure abstractly; the random-expansion control measures it at the English-era checkpoint: one random block costs $`4.1\times`$, and 83% (log scale; 62% in linear perplexity) of the real damage needs no learning at all.
 
 </div>
 
@@ -197,22 +215,22 @@ Final-chain best-val perplexities span 2.25–5.99, and the spread that characte
 
 ## Routing: perfectly diagonal
 
-The 20-way routing diagnosis on the final chain (20 routes $`\times`$ 20 domains, 40 crops each) resolves **800/800 crops to the correct prefix**—every domain, every crop, its own training width. Under the leaky chain the same instrument showed 36/40 for fi (four crops lost to its Estonian neighbor) and family wanderings (cs/pl$`\to`$sk, Romance$`\to`$ro); none of that remains. The family structure that governs *error* modes (FCS oscillation, cross-script attraction) disappears when every territory exists: routing is exact.
+The 20-way routing diagnosis on the final chain scores every domain under all twenty prefix widths (40 crops each, 800 crop-width cells) and resolves **20/20 domains to their own prefix**—every domain, every crop, its own training width (the per-domain Wilson floor for a perfect 40/40 is $`[0.91,1.0]`$; crops within a domain are not independent, so the raw 800 should not be read as 800 independent trials). Under the leaky chain the same instrument showed 36/40 for fi (four crops lost to its Estonian neighbor) and family wanderings (cs/pl$`\to`$sk, Romance$`\to`$ro); none of that remains. The family structure that governs *error* modes (FCS oscillation, cross-script attraction) disappears when every territory exists: routing is exact.
 
 <figure id="fig:retention" data-latex-placement="t">
 <embed src="figures/f3_retention_bars.pdf" />
-<figcaption>RA2b final checkpoint: routed serving (blue) vs joint serving (orange) vs acquisition exit (black tick), per domain, log scale. Routed tracks acquisition for every domain (median ratio 1.09, range 1.02–1.13, within the window-vs-val instrument offset); joint serving erodes 1.0–37.8<span class="math inline">×</span> (median 11<span class="math inline">×</span>) — the interference term that survives the fix. Sources: <code>docs/reports/data/2026-09-10_ra2b_matrix.csv</code> (lt rows) and readout §B4.</figcaption>
+<figcaption>RA2b final checkpoint: routed serving (blue) vs joint serving (orange) vs acquisition exit (black tick), per domain, log scale. Routed tracks acquisition for every domain (median <span class="math inline">+4.3%</span> over the acquisition exit, range <span class="math inline">−0.8%</span> to <span class="math inline">+8.0%</span>, worst case hu); joint serving erodes 1.0–37.8<span class="math inline">×</span> (median 11<span class="math inline">×</span>) — the interference term that survives the fix. Sources: <code>docs/reports/data/a4_offset_band/</code> and readout §B4.</figcaption>
 </figure>
 
 ## Retention: equals acquisition
 
-The p19 and p20 routing diagnoses (before and after the final growth phase) are *bit-identical* on all 19 non-lt domains’ routed perplexities—zero drift across a full growth phase, against $`+88\%`$ (fi) and $`+21\%`$ (hu) in the leaky era. Cross-instrument ratios (routed/acquisition) span 1.02–1.13, consistent with the known instrument offset.
+The p19 and p20 routing diagnoses (before and after the final growth phase) are *bit-identical* on all 19 non-lt domains’ routed perplexities—zero drift across a full growth phase, against $`+88\%`$ (fi) and $`+21\%`$ (hu) in the leaky era. Across all twenty domains, routed perplexity at the final checkpoint exceeds each domain’s own acquisition exit by a median of $`+4.3\%`$, worst case $`+8.0\%`$ (hu): a measured quality difference, not instrumentation (Section <a href="#sec:open" data-reference-type="ref" data-reference="sec:open">12</a>). The instrument offset once invoked to excuse a wider spread does not exist at that size—sixteen of the twenty twenty-by-twenty matrix diagonal cells are, by construction, the logged acquisition exits themselves; the four measured under genuinely different instruments (pl, fr, es, en) agree to within $`1\%`$.
 
-**H-decay-1 PASS:** retention equals acquisition; the leaky-era “degradation” of fi/hu was entirely the decay artifact.
+**H-decay-1 PASS:** retention matches acquisition within the measured routed-cost band; the leaky-era “degradation” of fi/hu was entirely the decay artifact, and no domain pays more than an $`8\%`$ routed cost.
 
 ## Joint serving: recovered but not solved
 
-Joint full-width serving on the final chain recovers dramatically vs. the leaky era (bg 1649 $`\to`$ 230, el 891 $`\to`$ 64) *without any repair*—but non-lt domains still serve 1.0–37.8$`\times`$ above acquisition (median 11$`\times`$). The interference term is real and survives the decay fix; Section <a href="#sec:readout" data-reference-type="ref" data-reference="sec:readout">6</a> shows 83% of it is arithmetic (log scale; 62% in linear perplexity).
+Joint full-width serving on the final chain recovers dramatically vs. the leaky era (bg 1649 $`\to`$ 230, el 891 $`\to`$ 64) *without any repair*—but non-lt domains still serve 1.0–37.8$`\times`$ above acquisition (median 11$`\times`$). The interference term is real and survives the decay fix; Section <a href="#sec:readout" data-reference-type="ref" data-reference="sec:readout">6</a> shows 83% of it is arithmetic at the English-era checkpoint (log scale; 62% in linear perplexity); the mechanism reproduces across seven eras, the fraction does not.
 
 **H-decay-2 PASS:** joint recovery without splice confirms the decay component’s size; the residual is the readout problem.
 
@@ -226,10 +244,10 @@ Storage is bit-exact (Section <a href="#sec:ra2b" data-reference-type="ref" dat
 
 <figure id="fig:expansion" data-latex-placement="t">
 <embed src="figures/f6_expansion_control.pdf" style="width:60.0%" />
-<figcaption>Expansion control on the en base (one growth step; instrument gate reproduces matrix exit at 2.33 vs 2.31, PASS). Random Gaussian blocks cost <span class="math inline">4.1×</span>; inert zeros cost nothing — the zero-init convention is load-bearing; the real ladder’s joint damage is 83% arithmetic on the log scale (62% in linear perplexity).</figcaption>
+<figcaption>Expansion control on the en base (one growth step; instrument gate reproduces matrix exit at 2.33 vs 2.31, PASS). Random Gaussian blocks cost <span class="math inline">4.1×</span>; inert zeros cost nothing — the zero-init convention is load-bearing; the real ladder’s joint damage is 83% arithmetic on the log scale at the English-era checkpoint (62% in linear perplexity; six of seven eras reproduce the mechanism, fraction range 0.60–1.47).</figcaption>
 </figure>
 
-## The random-expansion control: mostly arithmetic (83% log-scale, 62% linear)
+## The random-expansion control: mostly arithmetic (83% log-scale, 62% linear at the en-era checkpoint)
 
 Take the English-era checkpoint of the fixed-regime chain and expand its latent width synthetically—no training, no new language, no gradient—under three arms: *A*: append a randomly initialized (matched-scale Gaussian) block; *B*: the real ladder’s next trained block; *C*: an inert block that cannot activate (zero weights). Then measure English free-width perplexity and prefix-masked perplexity.
 
@@ -246,6 +264,8 @@ Take the English-era checkpoint of the fixed-regime chain and expand its latent 
 </div>
 
 Three conclusions. First, **one random untrained block costs $`4.1\times`$**—no new language, no competition for knowledge, just 2048 extra positive terms summed into an existing readout. Second, **random expansion to full width reproduces 83% of the real damage** on the log scale ($`\Delta_{\log} = \ln(\mathrm{ppl}_{\mathrm{rand}}/\mathrm{ppl}_{\mathrm{base}}) / \ln(\mathrm{ppl}_{\mathrm{real}}/\mathrm{ppl}_{\mathrm{base}}) = 0.833`$; in linear perplexity units the same control yields 62%): learned competition is real but second-order ($`\sim\!17\%`$ on the log scale). Third, **inert blocks cost exactly nothing** (bit-identical at every width), which simultaneously validates the row-layout handling and proves the damage requires nonzero contributions. Masking back to 8192 restores 2.33 under every arm: even after synthetic expansion, the old skill is untouched—storage holds; only the addressing of the readout fails.
+
+Fourth, **the mechanism generalizes across eras; the fraction does not.** Repeating the control on seven frozen era checkpoints (phases 1, 5, 8, 11, 14, 17, 19, each expanded directly to final width, eval-only) reproduces the English result independently first ($`f_{\log}=0.832`$ against the published $`0.833`$; arm-A perplexity $`20.08`$ against $`20.16`$, $`-0.4\%`$), which is what licenses comparison with the number already in this paper. Own-era fractions then span $`0.599`$ (sl) to $`1.472`$ (el) around that single point estimate: a random block reproduces the majority of the log-scale damage in six of seven eras, so the mechanism is not an English artefact. The Greek era overshoots—a random block costs $`186.8`$ where the trained ladder costs $`63.7`$—the first case in these data where learned growth was protective relative to noise. That is a new measurement and is reported as one (Section <a href="#sec:open" data-reference-type="ref" data-reference="sec:open">12</a>); the 83 %/62 % headline above is specific to the English-era control.
 
 The zero-init discipline is itself load-bearing: arm C is “growth as shipped, untrained”—<span class="smallcaps">bdh</span>’s convention of initializing new capacity at zero is the better of the two random regimes, and the A$`-`$C gap measures that convention’s protective value.
 
@@ -361,13 +381,13 @@ Given that the correct operation is selection, we measure how well selection wor
 
 ## Label-free likelihood selection
 
-The likelihood router scores the early positions of a block under every prefix width and routes the late positions to the arg-min. No human task IDs, no external labels. On the fixed-regime chain: **20/20 domains route to their own prefix at every calibration budget from $`\sim`$<!-- -->4 KB (8 crops) to 1 MB**—selection is nearly data-free. Routed serving lands within $`\le 8\%`$ of acquisition exit quality across all domains (at the reference calibration setting).
+The likelihood router scores the early positions of a block under every prefix width and routes the late positions to the arg-min. No human task IDs, no external labels. On the fixed-regime chain: **20/20 domains route to their own prefix at every calibration budget from $`\sim`$<!-- -->4 KB (8 crops) to 1 MB**—selection is nearly data-free. Routed serving lands within $`8\%`$ of acquisition exit quality across all domains (median $`+4.3\%`$, worst case $`+8.0\%`$ at hu; the routed-cost band and its instrument are measured in Section <a href="#sec:ra2b" data-reference-type="ref" data-reference="sec:ra2b">5</a>).
 
 But selection is *robust, not sublinear*: binary search over prefix widths (the cheap alternative to scanning all widths) collapses to 4–6/20, because the cumulative-prefix NLL surface is **multimodal**—multiple widths can locally minimize the score, and only 4–6 of 20 languages recover their own territory by bisection; 14–16 land in a wrong local minimum. The failed assumption is the finding: selection scales linearly in territory count unless a cheaper addresser exists below it.
 
 ## Cheap addressing from byte geometry
 
-The chain’s address geometry is byte-statistical (Section <a href="#sec:xscript" data-reference-type="ref" data-reference="sec:xscript">8</a>); can a cheap input-side model reproduce the likelihood router’s decisions? A multinomial logistic regression on hashed byte 1–4-gram counts ($`2^{18}`$ buckets) predicts the arg-min route: under a **class-balanced fit**, agreement is 20/20 domains at 1.00 each (8 held-out crops per domain; the per-domain Wilson floor for a perfect 8/8 is $`[0.68, 1.0]`$—the crops within a domain are not independent, so the three-decimal iid band over all 160 would claim precision the design does not have), at $`\sim`$<!-- -->4–8 KB calibration text per domain. The cost is one counting pass plus a $`2^{18}\times 23`$ matvec—a $`\sim`$<!-- -->23$`\times`$ reduction in forward cost versus scanning all widths.
+The chain’s address geometry is byte-statistical (Section <a href="#sec:xscript" data-reference-type="ref" data-reference="sec:xscript">8</a>); can a cheap input-side model reproduce the likelihood router’s decisions? A multinomial logistic regression on hashed byte 1–4-gram counts ($`2^{18}`$ buckets) predicts the arg-min route: under a **class-balanced fit**, agreement is 20/20 domains at 1.00 each (8 held-out crops per domain; the per-domain Wilson floor for a perfect 8/8 is $`[0.68, 1.0]`$—the crops within a domain are not independent, so the three-decimal iid band over all 160 would claim precision the design does not have), at $`\sim`$<!-- -->4–8 KB calibration text per domain. The cost is one counting pass plus a $`2^{18}\times 23`$ matvec—a $`\sim`$<!-- -->23$`\times`$ reduction in forward cost versus scanning all widths. The $`23`$ classes are cumulative-prefix *territories*, not languages: English owns the four base sub-widths and the nineteen grown phases add one each, so the addresser predicts a prefix width rather than a language identity.
 
 Two design lessons from this result’s own history, stated for the record: the first fit (76% agreement, three Latin-neighbor domains at zero and one at two-thirds) was withdrawn by its author after he found a composition confound—giving four domains 96 training crops shifted every class’s share of a fixed-budget L2 fit; the balanced re-fit resolved the four domains to 1.00 and confirmed the failure was starvation, not geometry. And the density curve (8/16/32/64 crops, controls pinned) shows all domains at 1.00 by 8–16 crops. The withdrawal sequence is itself evidence for the process discipline this project runs on.
 
@@ -411,7 +431,7 @@ A fresh 100M <span class="smallcaps">bdh</span> (no Chinese exposure of any kind
 
 ## The cross-script growth cell: monotonic growth holds
 
-The final test: grow Chinese on top of English, then Hindi on top of Chinese, under the full masked-growth protocol. (i) *Acquisition*: Hindi on top of Chinese-growth reaches 2.78 best-val. (ii) *Routing*: perfectly diagonal on the two-territory stack—zh 40/40 to its own width, hi 40/40 to its grown width, no language ID. (iii)  *Retention*: zh routed 2.81 vs. its own acquisition 2.69 ($`+4.5\%`$, within the instrument offset); hi routed 2.79 vs. 2.78. Joint 23.92 gives a routing advantage of 8.5$`\times`$: deep in-support. (iv) *Storage*: the zh segment is bit-identical across Hindi growth in encoder, value-encoder, and decoder (first cross-script instance of the bit-exactness protocol); embedding and head unchanged; grown segments nonzero.
+The final test: grow Chinese on top of English, then Hindi on top of Chinese, under the full masked-growth protocol. (i) *Acquisition*: Hindi on top of Chinese-growth reaches 2.78 best-val. (ii) *Routing*: perfectly diagonal on the two-territory stack—zh 40/40 to its own width, hi 40/40 to its grown width, no language ID. (iii)  *Retention*: zh routed 2.81 vs. its own acquisition 2.69 ($`+4.5\%`$, within the measured routed-cost band); hi routed 2.79 vs. 2.78. Joint 23.92 gives a routing advantage of 8.5$`\times`$: deep in-support. (iv) *Storage*: the zh segment is bit-identical across Hindi growth in encoder, value-encoder, and decoder (first cross-script instance of the bit-exactness protocol); embedding and head unchanged; grown segments nonzero.
 
 Two maximally disjoint script universes, stored, grown, selected without IDs, and served at acquisition quality. Monotonic model growth holds across script families.
 
@@ -469,11 +489,25 @@ Standard CL benchmarks (e.g. Permuted MNIST, Split CIFAR) measure average accur
 
 # Limitations
 
-Single seed per run (measured seed floor 2–4%); one language ordering per ladder (order effects measured only implicitly, via the family structure); byte-level only (token-level vocabularies change the byte statistics that our addresser exploits); scales 100M–579M (byte tax $`\sim`$<!-- -->4$`\times`$ vs. BPE at equal text); two GPUs of one team; rejection thresholds empirical for this checkpoint and instrument, conformal freezing future work; the Inuktitut data reality (163 KB total public holding) bounds what any architecture could show there; all language domains are from parallel-corpus-adjacent registers, and the “domain” notion for chat-level continual learning (reasoning, world knowledge) is untested—the measured addresser relies on byte distinctness that open-domain abilities may not have. Growth-phase count is 20; unimodality, routing geometry, and rejection separation have not been measured beyond it.
+The measurement limits are: single seed per run (measured seed floor 2–4%); one language ordering per ladder, with order effects observed only implicitly through the family structure; byte-level models only, so the byte statistics our addresser exploits are those of this vocabulary (byte tax $`\sim`$<!-- -->4$`\times`$ vs. BPE at equal text); $`100`$M–$`579`$M parameters on two GPUs of one team; rejection thresholds empirical for this checkpoint and instrument, with conformal freezing future work; twenty growth phases; and the Inuktitut data reality (163 KB total public holding), which bounds what any architecture could show there. Two further boundaries—the parallel-corpus register of every domain, and the untested “domain” notion for chat-level continual learning—are carried with the other open items in Section <a href="#sec:open" data-reference-type="ref" data-reference="sec:open">12</a>, so that the limits we can measure and the questions we cannot yet answer are not read as the same list.
+
+# Open problems and further research
+
+We separate what this paper did not measure from what it measured and could not explain. The first list is scope; the second is results.
+
+**Results we did not explain.** (i) *The Greek-era overshoot.* Repeating the random-expansion control across seven era checkpoints (Section <a href="#sec:readout" data-reference-type="ref" data-reference="sec:readout">6</a>) finds every fraction except one below the English value: $`f_{\log}`$ spans $`0.599`$ (sl) to $`1.472`$ (el) around a median of $`0.880`$, and the Greek era is the only case where a *random* block costs more than the *trained* ladder ($`186.8`$ against $`63.7`$). Learned growth in that era was therefore protective relative to noise—the opposite of the pattern the control was built to expose. We report it as a measured anomaly with no mechanism attached. A dose-response sweep per era (one width target was measured here, not the phase-1 six-point curve) is a separate pre-registered experiment.
+
+(ii) *The residual joint-serving damage.* The decay repair removed the erosion component; the arithmetic control accounts for 83% of what remains at the English-era checkpoint; the rest is attributed to interference and to co-adaptation of jointly trained segments. We have not separated those two terms experimentally.
+
+(iii) *Why the cumulative-prefix NLL surface is multimodal.* This is the fact that blocks sublinear search, and it is measured rather than explained. The same byte geometry that organizes routing and family structure is the natural candidate—territories whose byte statistics are similar carry similar likelihoods, so the prefix score has local minima by construction—but that link is a hypothesis here, not a result.
+
+**Scope we did not cover.** Single seed per run (measured floor 2–4%); one language ordering per ladder; byte-level models only; $`100`$M–$`579`$M parameters; twenty growth phases; all domains from parallel-corpus-adjacent registers. The addressing results rest on byte distinctness, and nothing here measures whether the same address geometry survives in domains whose statistics are not separable at the byte level (reasoning, world knowledge, code-versus-prose).
+
+**What would settle each.** Held-out unseen-language validation with thresholds frozen before the test set is touched (conformal calibration); a multi-seed repetition of the headline retention and routing numbers; a multi-order ladder; and the two probes our measurements motivate—a domain-continual-learning probe on non-parallel registers, and an embedding-level addresser that would extend addressing past byte geometry. None of these is a correction to what is reported here; each extends it.
 
 # Conclusion
 
-A depth-recurrent language model with additive growth gives continual learning a shape the fixed-budget literature does not have: storage is exact by construction and verified at the bit level; serving degrades for reasons we measured to be 83% arithmetic (log scale; 62% in linear perplexity) and repairable by no fixed operator we could construct; selection—input-dependent, label-free, nearly data-free—repairs it exactly; out-of-support detection needs two measured axes; and the whole stack holds across script universes. What remains open is addressing at scale, and we have measured its shape: cheap where byte statistics distinct, escalate where they do not, and reject what is not in support. The substrate grows monotonically; the science grows with it.
+A depth-recurrent language model with additive growth gives continual learning a shape the fixed-budget literature does not have: storage is exact by construction and verified at the bit level; serving degrades for reasons we measured to be mostly arithmetic at the checkpoint where we controlled it—83% on the log scale (62% in linear perplexity), a mechanism that reproduces across seven eras while the fraction does not—and repairable by no fixed operator we could construct; selection—input-dependent, label-free, nearly data-free—repairs it exactly; out-of-support detection needs two measured axes; and the whole stack holds across script universes. What remains open is addressing at scale, and we have measured its shape: cheap where byte statistics distinct, escalate where they do not, and reject what is not in support. The substrate grows monotonically; the science grows with it.
 
 # AI participation
 
