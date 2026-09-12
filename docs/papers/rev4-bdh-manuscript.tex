@@ -29,7 +29,8 @@
 \maketitle
 
 \begin{abstract}
-We study continual learning in \BDH{}, a byte-level depth-recurrent language model whose additive growth rule appends zero-initialized neurons while leaving all existing computation bit-identical. Our central finding separates three concerns that the continual-learning literature usually conflates.
+We study continual learning in \BDH{}, a byte-level depth-recurrent language
+model~\cite{byte rnn} whose additive growth rule appends zero-initialized neurons while leaving all existing computation bit-identical. Our central finding separates three concerns that the continual-learning literature usually conflates.
 \emph{Storage} is solved: under gradient-masked growth, previously acquired computation remains bit-exact at the tensor level across every subsequent phase (verified four independent ways, including cross-script).
 \emph{Serving} splits into two measured regimes: joint serving degrades because the summation readout accumulates contributions from all neurons (83\% of the damage on the log scale, 62\% in perplexity units, is reproduced by appending a single random, untrained block), while prefix-masked serving reproduces acquisition quality exactly (retention equals acquisition, zero drift across a full growth phase, 800/800 routing accuracy).
 \emph{Addressing} is the open problem: label-free likelihood selection achieves 20/20 correct prefix identification at every calibration budget from 4\,KB to 1\,MB, and a byte-level $n$-gram addresser reproduces the likelihood router perfectly ($1.000$, Wilson $[0.977,1.000]$) given $\sim$4--8\,KB of calibration text per domain---but cumulative-prefix NLL is not unimodal, so selection is robust yet not sublinear in territory count. Out-of-support detection requires two axes (relative advantage and absolute perplexity): byte-adjacent unseen languages have ratio $\approx 1$ while cross-script inputs have catastrophic joint perplexity that inflates the ratio past the trained floor. Cross-script probes confirm that the address geometry is byte-statistical, not linguistic: Chinese, Japanese, Hindi, and Inuktitut route 37--40/40 to the only two territories with substantial multi-byte training exposure (Cyrillic and Greek: 82\% of characters are 2-byte-encoded, against 11.7\% for the next-highest territory, a factor of 7), with zero linguistic kinship. A 20-phase fixed-capacity baseline shows that without growth, forgetting is destruction (not access loss). The growth mechanism generalizes across script universes: a Chinese territory grown on an English base, then Devanagari grown on Chinese, retains all three bit-exactly, routes perfectly, and serves each at acquisition quality.
@@ -88,9 +89,9 @@ x \;\leftarrow\; \operatorname{LN}\Bigl(x+\operatorname{LN}\bigl((u\odot v)@D_c\
 \]
 where $a(\cdot)$ is per-neuron attention over positions of $x$: each latent neuron attends
 independently, there are no query/key/value projection matrices, and every operator above is
-coordinate-separable across neurons. The only cross-neuron coupling is LayerNorm's global
+coordinate-separable across neurons. The only cross-neuron coupling is LayerNorm's~\cite{layernorm} global
 statistics. One triple $(E,E_v,D_c)$ serves all $L$ levels. The attention block carries no
-trainable parameters (its only state is the RoPE frequency buffer), which matters throughout:
+trainable parameters (its only state is the RoPE~\cite{rope} frequency buffer), which matters throughout:
 all learning lives in $E$, $E_v$, $D_c$, the token embedding, and the output head.
 
 \textbf{Growth} appends zero-initialized neurons to the triple; existing neurons, the token
@@ -130,7 +131,7 @@ territory $b$ & the neurons appended by phase $b$ (a width interval) \\
 \subsection{Protocol}
 \label{sec:protocol}
 
-All experiments use byte-level \BDH{}: the vocabulary is the 256 byte values, sequences are
+All experiments use byte-level \BDH{} on Europarl~\cite{europarl} and the cross-script corpora below: the vocabulary is the 256 byte values, sequences are
 raw byte streams, and a phase is a $\sim$30\,MB byte stream. Growth phases initialize from
 the previous endpoint (weights only; fresh optimizer). Evaluation is per-domain held-out
 perplexity under a fixed cold random-crop protocol (block 512, 40 crops, generator 1234),
@@ -151,7 +152,7 @@ The original growth ladders carried a silent optimizer defect that we discovered
 repaired mid-project; every pre-repair number in this paper carries its consequence, and we
 state the mechanism once, here.
 
-\textbf{Mechanism (\textsc{derived}).} AdamW's decoupled weight decay multiplies every
+\textbf{Mechanism (\textsc{derived}).} AdamW's~\cite{adamw} decoupled weight decay multiplies every
 parameter that has a gradient by $(1-\mathrm{lr}_t\cdot\mathrm{wd})$ each step. A gradient
 mask that zeroes the frozen weights' gradients does \emph{not} stop this: a zero gradient
 still counts as a gradient, so masked weights shrink by the schedule product
@@ -182,7 +183,7 @@ numbers below (the RA2b chain, cross-script stages) run under this repair.
 
 \textbf{Precedent.} The same failure signature---routed-expert norms falling toward zero
 under AdamW+weight decay while evaluations stay normal---has been observed independently in
-production MoE training (Marin project tracker, thread 8818), suggesting a failure class,
+production MoE training (Marin project tracker, thread 8818)~\cite{marin}, suggesting a failure class,
 not an idiosyncrasy of our setup.
 
 \section{Theory: storage is exact; serving and addressing are not}
@@ -627,7 +628,7 @@ a proof across encodings.
 \subsection{Acquisition from scratch: script-agnostic}
 
 A fresh 100M \BDH{} (no Chinese exposure of any kind) trained on 30\,MB of Chinese
-(MultiUN): best-val perplexity \textbf{2.69} (test 2.48) at the same protocol as the
+(MultiUN~\cite{multiun}): best-val perplexity \textbf{2.69} (test 2.48) at the same protocol as the
 European fixed-capacity baseline, whose acquisition band is 1.54--2.29. The byte-level
 acquisition machinery is script-agnostic: what a cross-script language lacks in a trained
 \BDH{} is territory, not learnability.
@@ -715,7 +716,7 @@ addresser needs $\sim$4--8\,KB per domain of unlabeled text; and we measure the 
 modes their vision setting could not exhibit---out-of-support detection with a two-axis
 rule, and the non-unimodality that blocks sublinear search. \emph{Verdict:} nearest
 published analogue to our addressing stage; our contribution is the self-supervised label
-source plus the measured rejection geometry.
+source plus the measured rejection geometry. 	extbf{Learning to Prompt (L2P)}~\cite{l2p} addresses the same problem with a learned prompt pool: task-appropriate prompts are selected per input and conditioned into a frozen model---addressing without architectural growth. \emph{Agreement:} input-conditioned selection of stored capability is the shared idea. \emph{Divergence:} L2P's prompts compete for a fixed embedding budget, whereas our territories are append-only and bit-frozen; and L2P's selection is a learned attention head, whereas our label source is the model's own NLL. \emph{Verdict:} complementary rather than competing---L2P conditions a fixed model, we grow and address new capacity.
 
 \subsection{Consolidation and importance protection}
 \label{sec:prior:consolidation}
@@ -743,7 +744,7 @@ rewrites rather than protects---it re-exposes old data to keep old skills---whil
 growth never re-touches old weights at all; the two are alternative regimes, and our
 measurements say which costs what: replay pays data and compute, growth pays serving
 (addressing). \emph{Verdict:} orthogonal mechanisms; the paper's decomposition shows
-replay answers a question growth does not need to ask.
+replay answers a question growth does not need to ask. Episodic-memory approaches for lifelong language learning~\cite{multilingual-cl} apply sparse experience replay and local adaptation---the language-domain sibling of GEM's constraint, with the same rehearsal-buffer assumption our storage results aim to replace.
 
 \subsection{Sparse expert routing and its failure class}
 \label{sec:prior:moe}
@@ -782,7 +783,7 @@ needs in this architecture, and that one of them is not the obvious one.
 \subsection{Production-scale conditional memory}
 \label{sec:prior:engram}
 
-\textbf{DeepSeek-V4.1-Flash Engram} (2026;\ cite as vendor documentation until
+\textbf{DeepSeek-V4.1-Flash Engram}~\cite{engram} (2026;\ cite as vendor documentation until
 peer-reviewed) ships a 196B-parameter conditional memory accessed sparsely by
 token-based lookup, alongside a 552B MoE backbone. \emph{Agreement:} massive dormant
 capacity with input-gated sparse access is a validated production design---the same
@@ -889,9 +890,6 @@ Single Network to Multiple Tasks by Learning to Mask Weights.} ECCV (2018).
 \bibitem{supsup} M.~Wortsman, M.~C.~Riemer, G.~Ilharco. \emph{Superposition Enables
 Many-Task Learning (SupSup).} NeurIPS (2020).
 
-\bibitem{hsp} D.~K.~M.~Hernandez, J.~Schwartz, E.~G.~Mitchell. Related mask-allocation
-work (HSP). arXiv preprint (2021).
-
 \bibitem{expertgate} R.~Aljundi, P.~Chakravarty, T.~Tuytelaars. \emph{Expert Gate:
 Task- and Expert-Conditioned Routing Networks.} CVPR (2017).
 
@@ -943,20 +941,11 @@ Neural Computation 9(8) (1997); and successors applying byte/character-level mod
 e.g.\ A.~van~den~Oord, N.~Kalchbrenner, K.~Kavukcuoglu. \emph{Pixel RNN.} arXiv:1601.06759
 (2016).
 
-\bibitem{tinystories} E.~Eldan, Y.~Li. \emph{TinyStories: How Small Can Language Models Be
-and Still Speak Coherent English?} arXiv:2305.07759 (2023).
+\bibitem{multilingual-cl} C.~de~Masson~d'Autume, S.~Ruder, L.~Kong, D.~Yogatama. \emph{Episodic
+Memory in Lifelong Language Learning.} NeurIPS (2019).
 
-\bibitem{tinyladder} Y.~Li, et~al. \emph{TinyLlama: An Open-Source Small Language
-Model.} arXiv:2401.02395 (2024).
-
-\bibitem{multilingual-cl} M.~de~Masson~d'Autume, et~al. \emph{Continual Learning for
-Machine Translation.} arXiv preprint (2019); and related multilingual CL work.
-
-\bibitem{l2p} Z.~Feng, et~al. \emph{Continual Learning with Pre-trained Gradual
-Prompts (L2P).} ICLR (2023).
-
-\bibitem{twist} P.~Liu, et~al. \emph{TWIST: Self-Supervised Learning of Task-Specific
-Prefixes.} arXiv preprint (2023).
+\bibitem{l2p} Z.~Wang, Z.~Zhang, C.-Y.~Lee, H.~Zhang, R.~Sun, X.~Ren, G.~Su, V.~Perot,
+J.~Dy, T.~Pfister. \emph{Learning to Prompt for Continual Learning.} CVPR (2022).
 
 \bibitem{marin} D.~Hall, L.~Dial, et~al. (Marin community). \emph{Marin: An Open
 Laboratory for Foundation Models in JAX.} OpenXLA DevLab presentation (2025);
@@ -968,8 +957,8 @@ Compression.} Hugging Face model card and technical report (2026).
 \bibitem{europarl} P.~Koehn. \emph{Europarl: A Parallel Corpus for Statistical Machine
 Translation.} MT Summit (2005).
 
-\bibitem{multiun} A.~R.~A.~R.~T.~Chen. \emph{MultiUN: A Multilingual Corpus from
-United Nations Documents.} LREC (2012).
+\bibitem{multiun} Y.~Chen, A.~Eisele. \emph{MultiUN: A Multilingual Corpus from United
+Nations Documents.} LREC (2012).
 
 \end{thebibliography}
 

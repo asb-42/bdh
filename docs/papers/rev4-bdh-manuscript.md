@@ -50,7 +50,7 @@ Table <a href="#tab:notation" data-reference-type="ref" data-reference="tab:not
 v=\operatorname{relu}\bigl(\operatorname{LN}(a(u))@E_v\bigr),\qquad
 x \;\leftarrow\; \operatorname{LN}\Bigl(x+\operatorname{LN}\bigl((u\odot v)@D_c\bigr)\Bigr),
 ```
-where $`a(\cdot)`$ is per-neuron attention over positions of $`x`$: each latent neuron attends independently, there are no query/key/value projection matrices, and every operator above is coordinate-separable across neurons. The only cross-neuron coupling is LayerNorm’s global statistics. One triple $`(E,E_v,D_c)`$ serves all $`L`$ levels. The attention block carries no trainable parameters (its only state is the RoPE frequency buffer), which matters throughout: all learning lives in $`E`$, $`E_v`$, $`D_c`$, the token embedding, and the output head.
+where $`a(\cdot)`$ is per-neuron attention over positions of $`x`$: each latent neuron attends independently, there are no query/key/value projection matrices, and every operator above is coordinate-separable across neurons. The only cross-neuron coupling is LayerNorm’s  global statistics. One triple $`(E,E_v,D_c)`$ serves all $`L`$ levels. The attention block carries no trainable parameters (its only state is the RoPE  frequency buffer), which matters throughout: all learning lives in $`E`$, $`E_v`$, $`D_c`$, the token embedding, and the output head.
 
 **Growth** appends zero-initialized neurons to the triple; existing neurons, the token embedding, and the output head are frozen. RoPE frequencies carry the neuron count in their exponent, so naive growth would silently rewrite every surviving neuron’s phases; the growth path preserves the frequency prefix verbatim. During a growth phase, a gradient mask zeroes the gradients of all pre-existing neurons, so new-phase updates write only the new capacity; a step-end restore additionally guarantees bit-exactness of the frozen path against optimizer side effects (Section <a href="#sec:decay" data-reference-type="ref" data-reference="sec:decay">2.3</a>).
 
@@ -71,7 +71,7 @@ Notation used throughout. {#tab:notation}
 
 ## Protocol
 
-All experiments use byte-level <span class="smallcaps">bdh</span>: the vocabulary is the 256 byte values, sequences are raw byte streams, and a phase is a $`\sim`$<!-- -->30 MB byte stream. Growth phases initialize from the previous endpoint (weights only; fresh optimizer). Evaluation is per-domain held-out perplexity under a fixed cold random-crop protocol (block 512, 40 crops, generator 1234), always within-corpus. Where we compare joint and routed serving, the routed measurement uses the likelihood router of Section <a href="#sec:selection" data-reference-type="ref" data-reference="sec:selection">7</a> and the joint measurement uses the full width on the same crops.
+All experiments use byte-level <span class="smallcaps">bdh</span> on Europarl  and the cross-script corpora below: the vocabulary is the 256 byte values, sequences are raw byte streams, and a phase is a $`\sim`$<!-- -->30 MB byte stream. Growth phases initialize from the previous endpoint (weights only; fresh optimizer). Evaluation is per-domain held-out perplexity under a fixed cold random-crop protocol (block 512, 40 crops, generator 1234), always within-corpus. Where we compare joint and routed serving, the routed measurement uses the likelihood router of Section <a href="#sec:selection" data-reference-type="ref" data-reference="sec:selection">7</a> and the joint measurement uses the full width on the same crops.
 
 Hardware: one RTX 4090 (24 GB) and one NVIDIA GB10 (gx10, 121 GB); scale is $`\sim`$<!-- -->100M parameters at the base width ($`\times`$<!-- -->128) and $`\sim`$<!-- -->579M at the final ladder width ($`\times`$<!-- -->736). Every number in this paper traces to a committed artifact in the project repository (reports, plans, data files, and pre-registration headers in the training scripts); the project’s internal message bus is the working coordination layer, and where a claim cites its provenance, this paper names the repository artifact.
 
@@ -79,7 +79,7 @@ Hardware: one RTX 4090 (24 GB) and one NVIDIA GB10 (gx10, 121 GB); scale is
 
 The original growth ladders carried a silent optimizer defect that we discovered and repaired mid-project; every pre-repair number in this paper carries its consequence, and we state the mechanism once, here.
 
-**Mechanism (<span class="smallcaps">derived</span>).** AdamW’s decoupled weight decay multiplies every parameter that has a gradient by $`(1-\mathrm{lr}_t\cdot\mathrm{wd})`$ each step. A gradient mask that zeroes the frozen weights’ gradients does *not* stop this: a zero gradient still counts as a gradient, so masked weights shrink by the schedule product
+**Mechanism (<span class="smallcaps">derived</span>).** AdamW’s  decoupled weight decay multiplies every parameter that has a gradient by $`(1-\mathrm{lr}_t\cdot\mathrm{wd})`$ each step. A gradient mask that zeroes the frozen weights’ gradients does *not* stop this: a zero gradient still counts as a gradient, so masked weights shrink by the schedule product
 ``` math
 c \;=\; \prod_{t=1}^{T}\bigl(1-\mathrm{lr}_t\cdot\mathrm{wd}\bigr),
 \qquad
@@ -91,7 +91,7 @@ p_{\text{exit}} = c\cdot p_{\text{entry}}
 
 **Repair.** A step-end restore re-establishes bit-exactness of the masked path after every optimizer step. Four independent confirmations (two seats, two hosts, two scripts) verify old-segment bit-identity across growth phases, $`c=1.000000`$ exactly. All fixed-regime numbers below (the RA2b chain, cross-script stages) run under this repair.
 
-**Precedent.** The same failure signature—routed-expert norms falling toward zero under AdamW+weight decay while evaluations stay normal—has been observed independently in production MoE training (Marin project tracker, thread 8818), suggesting a failure class, not an idiosyncrasy of our setup.
+**Precedent.** The same failure signature—routed-expert norms falling toward zero under AdamW+weight decay while evaluations stay normal—has been observed independently in production MoE training (Marin project tracker, thread 8818) , suggesting a failure class, not an idiosyncrasy of our setup.
 
 # Theory: storage is exact; serving and addressing are not
 
@@ -407,7 +407,7 @@ We state this carefully, scoped to this checkpoint and instrument: the likelihoo
 
 ## Acquisition from scratch: script-agnostic
 
-A fresh 100M <span class="smallcaps">bdh</span> (no Chinese exposure of any kind) trained on 30 MB of Chinese (MultiUN): best-val perplexity **2.69** (test 2.48) at the same protocol as the European fixed-capacity baseline, whose acquisition band is 1.54–2.29. The byte-level acquisition machinery is script-agnostic: what a cross-script language lacks in a trained <span class="smallcaps">bdh</span> is territory, not learnability.
+A fresh 100M <span class="smallcaps">bdh</span> (no Chinese exposure of any kind) trained on 30 MB of Chinese (MultiUN ): best-val perplexity **2.69** (test 2.48) at the same protocol as the European fixed-capacity baseline, whose acquisition band is 1.54–2.29. The byte-level acquisition machinery is script-agnostic: what a cross-script language lacks in a trained <span class="smallcaps">bdh</span> is territory, not learnability.
 
 ## The cross-script growth cell: monotonic growth holds
 
@@ -433,7 +433,7 @@ We discuss prior work in the format the humanities use: what each line actually 
 
 ## Task and domain addressing
 
-**Expert Gate**  studied task addressing: train a per-task autoencoder and route each input to the expert whose autoencoder reconstructs it best, for lifelong vision tasks. *Agreement:* an input-gated address that selects stored experts is the right architecture; our likelihood router is the same idea in language-model space. *Divergence:* Expert Gate requires per-task labels and per-task auxiliary networks; our selector is label-free (arg-min NLL by the model itself) and our cheap addresser needs $`\sim`$<!-- -->4–8 KB per domain of unlabeled text; and we measure the failure modes their vision setting could not exhibit—out-of-support detection with a two-axis rule, and the non-unimodality that blocks sublinear search. *Verdict:* nearest published analogue to our addressing stage; our contribution is the self-supervised label source plus the measured rejection geometry.
+**Expert Gate**  studied task addressing: train a per-task autoencoder and route each input to the expert whose autoencoder reconstructs it best, for lifelong vision tasks. *Agreement:* an input-gated address that selects stored experts is the right architecture; our likelihood router is the same idea in language-model space. *Divergence:* Expert Gate requires per-task labels and per-task auxiliary networks; our selector is label-free (arg-min NLL by the model itself) and our cheap addresser needs $`\sim`$<!-- -->4–8 KB per domain of unlabeled text; and we measure the failure modes their vision setting could not exhibit—out-of-support detection with a two-axis rule, and the non-unimodality that blocks sublinear search. *Verdict:* nearest published analogue to our addressing stage; our contribution is the self-supervised label source plus the measured rejection geometry. extbfLearning to Prompt (L2P)  addresses the same problem with a learned prompt pool: task-appropriate prompts are selected per input and conditioned into a frozen model—addressing without architectural growth. *Agreement:* input-conditioned selection of stored capability is the shared idea. *Divergence:* L2P’s prompts compete for a fixed embedding budget, whereas our territories are append-only and bit-frozen; and L2P’s selection is a learned attention head, whereas our label source is the model’s own NLL. *Verdict:* complementary rather than competing—L2P conditions a fixed model, we grow and address new capacity.
 
 ## Consolidation and importance protection
 
@@ -441,7 +441,7 @@ We discuss prior work in the format the humanities use: what each line actually 
 
 ## Replay
 
-**GEM/A-GEM**  studied replay with constraint gradients: keep a memory of old-task examples and project updates to not increase old-task loss. *Agreement:* replay works; our own replay-in-training result (H1p) reached joint parity at $`+27\%`$ budget in the fixed-capacity regime, and our FCS matrix measured the *implicit* replay that family structure provides for free. *Divergence:* replay rewrites rather than protects—it re-exposes old data to keep old skills—while masked growth never re-touches old weights at all; the two are alternative regimes, and our measurements say which costs what: replay pays data and compute, growth pays serving (addressing). *Verdict:* orthogonal mechanisms; the paper’s decomposition shows replay answers a question growth does not need to ask.
+**GEM/A-GEM**  studied replay with constraint gradients: keep a memory of old-task examples and project updates to not increase old-task loss. *Agreement:* replay works; our own replay-in-training result (H1p) reached joint parity at $`+27\%`$ budget in the fixed-capacity regime, and our FCS matrix measured the *implicit* replay that family structure provides for free. *Divergence:* replay rewrites rather than protects—it re-exposes old data to keep old skills—while masked growth never re-touches old weights at all; the two are alternative regimes, and our measurements say which costs what: replay pays data and compute, growth pays serving (addressing). *Verdict:* orthogonal mechanisms; the paper’s decomposition shows replay answers a question growth does not need to ask. Episodic-memory approaches for lifelong language learning  apply sparse experience replay and local adaptation—the language-domain sibling of GEM’s constraint, with the same rehearsal-buffer assumption our storage results aim to replace.
 
 ## Sparse expert routing and its failure class
 
@@ -453,7 +453,7 @@ We discuss prior work in the format the humanities use: what each line actually 
 
 ## Production-scale conditional memory
 
-**DeepSeek-V4.1-Flash Engram** (2026; cite as vendor documentation until peer-reviewed) ships a 196B-parameter conditional memory accessed sparsely by token-based lookup, alongside a 552B MoE backbone. *Agreement:* massive dormant capacity with input-gated sparse access is a validated production design—the same design family as ours, at $`340\times`$ our parameter scale. *Divergence:* Engram’s lookup is trained end-to-end inside one pre-training recipe; our territories are written by sequential *post-hoc* phases with bit-exact preservation, which is the continual-learning question Engram does not address. *Verdict:* the closest public prior art at production scale; it validates the substrate idea and leaves the accumulation question—ours to answer.
+**DeepSeek-V4.1-Flash Engram**  (2026; cite as vendor documentation until peer-reviewed) ships a 196B-parameter conditional memory accessed sparsely by token-based lookup, alongside a 552B MoE backbone. *Agreement:* massive dormant capacity with input-gated sparse access is a validated production design—the same design family as ours, at $`340\times`$ our parameter scale. *Divergence:* Engram’s lookup is trained end-to-end inside one pre-training recipe; our territories are written by sequential *post-hoc* phases with bit-exact preservation, which is the continual-learning question Engram does not address. *Verdict:* the closest public prior art at production scale; it validates the substrate idea and leaves the accumulation question—ours to answer.
 
 ## Continual-learning evaluation methodology
 
@@ -493,8 +493,6 @@ A. Mallya, D. Davis, S. Lazebnik. *Piggyback: Adapting a Single Network to Mu
 
 M. Wortsman, M. C. Riemer, G. Ilharco. *Superposition Enables Many-Task Learning (SupSup).* NeurIPS (2020).
 
-D. K. M. Hernandez, J. Schwartz, E. G. Mitchell. Related mask-allocation work (HSP). arXiv preprint (2021).
-
 R. Aljundi, P. Chakravarty, T. Tuytelaars. *Expert Gate: Task- and Expert-Conditioned Routing Networks.* CVPR (2017).
 
 J. Kirkpatrick, R. Pascanu, N. Rabinowitz, J. Veness, M. Desjardins, A. A. Rusu, K. Kilan, R. Google-DeepMind, et al. *Overcoming Catastrophic Forgetting in Neural Networks.* PNAS 114(13) (2017).
@@ -525,15 +523,9 @@ J. Su, Y. Lu, S. Pan, A. Murtadha, B. Wen, Y. Liu. *RoFormer: Enhanced Tra
 
 S. Hochreiter, J. Schmidhuber. *Long Short-Term Memory.* Neural Computation 9(8) (1997); and successors applying byte/character-level models, e.g. A. van den Oord, N. Kalchbrenner, K. Kavukcuoglu. *Pixel RNN.* arXiv:1601.06759 (2016).
 
-E. Eldan, Y. Li. *TinyStories: How Small Can Language Models Be and Still Speak Coherent English?* arXiv:2305.07759 (2023).
+C. de Masson d’Autume, S. Ruder, L. Kong, D. Yogatama. *Episodic Memory in Lifelong Language Learning.* NeurIPS (2019).
 
-Y. Li, et al. *TinyLlama: An Open-Source Small Language Model.* arXiv:2401.02395 (2024).
-
-M. de Masson d’Autume, et al. *Continual Learning for Machine Translation.* arXiv preprint (2019); and related multilingual CL work.
-
-Z. Feng, et al. *Continual Learning with Pre-trained Gradual Prompts (L2P).* ICLR (2023).
-
-P. Liu, et al. *TWIST: Self-Supervised Learning of Task-Specific Prefixes.* arXiv preprint (2023).
+Z. Wang, Z. Zhang, C.-Y. Lee, H. Zhang, R. Sun, X. Ren, G. Su, V. Perot, J. Dy, T. Pfister. *Learning to Prompt for Continual Learning.* CVPR (2022).
 
 D. Hall, L. Dial, et al. (Marin community). *Marin: An Open Laboratory for Foundation Models in JAX.* OpenXLA DevLab presentation (2025); project tracker, thread 8818 (silent expert death observation).
 
@@ -541,7 +533,7 @@ DeepSeek. *DeepSeek-V4.1-Flash: Pushing the Limits of KV Cache Compression.* Hug
 
 P. Koehn. *Europarl: A Parallel Corpus for Statistical Machine Translation.* MT Summit (2005).
 
-A. R. A. R. T. Chen. *MultiUN: A Multilingual Corpus from United Nations Documents.* LREC (2012).
+Y. Chen, A. Eisele. *MultiUN: A Multilingual Corpus from United Nations Documents.* LREC (2012).
 
 </div>
 
