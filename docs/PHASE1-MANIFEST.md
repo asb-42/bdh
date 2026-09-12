@@ -89,7 +89,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `docs/reports/data/ra2b_matrix_raw/raw_sl.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,075 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
 | `docs/reports/data/ra2b_matrix_raw/raw_sv.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,075 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
 
-## reviews/  (20 files)
+## reviews/  (21 files)
 
 | path | last | author | date | bytes | title / status |
 |---|---|---|---|---|---|
@@ -112,6 +112,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `docs/reviews/2026-09-03_pi-50_f-v7-null-contrast-correction-scope.md` | `903332c` | pi-50 | 2026-09-03 | 4,671 | Correction scope: the frozen-attention narrative (F-V7 null-contrast i<br>*unclassified* |
 | `docs/reviews/2026-09-04_pi-50_marin-hero-run-pointers.md` | `dd40e3a` | pi-50 | 2026-09-10 | 12,987 | Marin 535B-A23B hero run — pointers for BDH, and one finding it trigge<br>*unclassified* |
 | `docs/reviews/2026-09-10_pi-50_prior-art-monotonic-growth.md` | `0b68b4d` | pi-50 | 2026-09-10 | 5,526 | Prior art for monotonic growth with submodel selection — what BDH may <br>*PARTIAL - six works verified at title/abstract level; HSP and PCANets explicitly unverified in-file* |
+| `docs/reviews/2026-09-12_pi-50_external-review-assessment.md` | `af2fbef` | pi-50 | 2026-09-12 | 9,842 | Assessment of the first external review (Qwen3.7-Plus, relayed at bus <br>*CITABLE - review-of-the-review; source of the 83%-qualifier finding* |
 | `docs/reviews/2026-09-12_pi-50_rev4-adversarial-pass.md` | `32c8c3a` | pi-50 | 2026-09-12 | 10,526 | Adversarial pass — rev-4 manuscript (`docs/papers/rev4-bdh-manuscript.<br>*CITABLE - second-seat review of rev-4 with artifact-anchored objections* |
 
 ## plans/  (16 files)
@@ -219,7 +220,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `scripts/pi50/exp4b_budget.py` | `045a61c` | pi-50 | 2026-09-11 | 4,163 | """A2 follow-ups: how much calibration does likelihood selection actua<br>*TOOLING* |
 | `scripts/pi50/matrix_eval.sh` | `dd40e3a` | pi-50 | 2026-09-10 | 7,423 | !/usr/bin/env bash<br>*TOOLING - reusable serving-matrix runner, guards ALLOW_EVAL+ANNOUNCED* |
 | `scripts/pi50/ood_script_census.py` | `15e55ad` | pi-50 | 2026-09-12 | 1,344 | import re<br>*TOOLING - script-composition census that established the iu contamination (bus 188)* |
-| `scripts/pi50/phase1_manifest.py` | `32c8c3a` | pi-50 | 2026-09-12 | 8,116 | """Generate docs/PHASE1-MANIFEST.md - a living index of the phase-1 ev<br>*TOOLING - generates this file* |
+| `scripts/pi50/phase1_manifest.py` | `af2fbef` | pi-50 | 2026-09-12 | 8,227 | """Generate docs/PHASE1-MANIFEST.md - a living index of the phase-1 ev<br>*TOOLING - generates this file* |
 | `scripts/pi50/protocol_4090.sh` | `dd40e3a` | pi-50 | 2026-09-10 | 9,388 | !/usr/bin/env bash<br>*TOOLING - preflight guard, refuses during live jobs* |
 | `scripts/pi50/r1_readout_operators.py` | `0f1763b` | pi-50 | 2026-09-11 | 6,082 | """P-R1 READOUT WIDTH-INVARIANCE (pre-registered bus #165).<br>*TOOLING* |
 | `scripts/pi50/r1b_relative_reweight.py` | `5d47c9e` | pi-50 | 2026-09-11 | 6,924 | """P-R1b RELATIVE TERRITORY REWEIGHTING (pre-registered bus #175).<br>*TOOLING* |
@@ -234,7 +235,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 
 ## Gaps this manifest exposes
 
-- **147 of 175 files carry no declared status.** Those are the ones most likely to be
+- **147 of 176 files carry no declared status.** Those are the ones most likely to be
   mis-cited during a revision: something is either citable or it is not, and 'nobody wrote it down'
   reads as permission.
 - The prior-art note still labels HSP and PCANets unverified in-file; that must be closed or
@@ -243,4 +244,4 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
   `~/bdh-review/reports/` on gx10 are ephemeral; anything quoted in the manuscript must have its
   generating log inside the repo.
 
-_Generated 2026-09-12 04:46:11 +0200 from HEAD `7a8ba99`._
+_Generated 2026-09-12 05:01:56 +0200 from HEAD `af2fbef`._

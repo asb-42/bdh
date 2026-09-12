@@ -40,6 +40,7 @@ STATUS = {
     "r3d_fit_ablation.py": "CITABLE - arms A/B/C 0.681/1.000/0.988 settle starvation vs geometry",
     "r3e_margins.py": "CITABLE - Sonde C stage-1 margin floor 0.0139 from n=160 in-support crops (optimistic, see report 9.5)",
     "r3f_hull_geometry.py": "CITABLE - hull hypothesis test; LOO nearest-centroid gate 640/640; max-cosine second trigger signal",
+    "2026-09-12_pi-50_restore-overhead": "CITABLE - measured restore overhead + candidate F-V9 guard request",
     "2026-09-12_pi-50_external-review-assessment": "CITABLE - review-of-the-review; source of the 83%-qualifier finding",
     "2026-09-12_pi-50_rev4-adversarial-pass": "CITABLE - second-seat review of rev-4 with artifact-anchored objections",
     "territory_byte_census.py": "CITABLE - per-territory multi-byte exposure on exact training slices (bus 204 ask); gates assert typographic-residue handling",
