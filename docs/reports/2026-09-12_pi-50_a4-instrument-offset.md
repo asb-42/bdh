@@ -63,6 +63,10 @@ that found this. State median and max with the domain names, and name the instru
 
 ## Recommended replacement text (TeX-ready, for whoever owns the prose)
 
+**STOP — read the addendum below before using any sentence in this section.** The D1 numbers are correct as
+arithmetic but do not measure what this note says they measure. The TeX-ready text involving "the window-vs-val
+offset is $\approx$1\%" is WITHDRAWN; the D2-based sentences remain valid.
+
 Line 380 caption:
 
 ```latex
@@ -121,3 +125,50 @@ One methodological note on his rule 5 ("nothing is accepted that the pre-registr
 quantities (D1 instrument offset, D2 routed cost) where he anticipated one (retention band). D1 is what dissolved the
 dispute, and it was *not* in his protocol because nobody had thought to measure the offset itself. The right reading of
 a pre-registration is a floor on post-hoc choice, not a ceiling on what may be computed from landed data.
+
+---
+
+## Addendum 2026-09-13 — D1 RETRACTED: I never compared window against val (Quinn's correction went further than he wrote)
+
+Quinn's verification review (`docs/reviews/2026-09-12_quinn_a4-a7-verification.md`, "Correction owed to A4") pointed
+out that sixteen of twenty diagonal cells are bit-identical to the logged exits, so D1 "divides a number by itself"
+and rests on four informative observations rather than twenty. That is fair, and the follow-on question is worse for
+me: *why* do they agree so tightly? Checked in code rather than assumed —
+
+    pipeline/train.py:36   if cfg.stateful_eval:  # stream-carrying eval, sequential continuations
+    pipeline/train.py:47   else: data.get_batch(split, ...)  -> RANDOM CROPS
+    scripts/lang_eval.py:32  "random-crop cold eval (protocol-congruent)"
+    checkpoint cfg of out/bdh_europarl_ladRA2b-en_last.pt: {'eval_iters': 20, 'carry_state': False, 'stateful_eval': False}
+
+Every RA2b phase recorded `stateful_eval: False`. So the logged acquisition exit and the matrix diagonal are **the
+same instrument family** — random crops from the same val/test byte stream at the same block size — differing only in
+implementation and crop seeding (and batch size, which is its own documented confound). D1 therefore measures
+cross-implementation consistency, not a window-versus-val offset. There is no window-vs-val comparison anywhere in
+the artifacts I used.
+
+**What this destroys.** The headline of this note — "the +5–9 % window-vs-val instrument offset does not exist on
+RA2b; measured ≈1 %" — is unsupported. I asserted a measurement of a quantity I did not measure. The tight agreement
+of the 16 cells is exactly what identical-protocol pipelines produce, and it says nothing about whether a window-vs-val
+offset exists or how big it is.
+
+**What this does not touch.**
+- **D2 stands**, and it is the cleaner comparison precisely *because* routed and exit come from the same instrument
+  family: median 1.0429, min 0.9918 (fr), max 1.0799 (hu), zero domains above 1.08.
+- **The 1.02–1.13 range still fails to reproduce** under every pairing tried, including the phase-mixing route that
+  could have generated it.
+- **§5's "≤ 8 %" still holds at the last decimal**, and should still be restated as median +4.3 % / worst hu +8.0 %.
+
+**Corrected guidance for the manuscript edit.** Kill the offset clause at tex lines 380, 508 and 647 — but justify it
+by *provenance*, not by my fake measurement: the "+5–9 %" figure traces to a single RA2-era lt control, has never been
+measured across RA2b domains, and therefore cannot excuse any ratio in a sentence that also claims a bound. If we want
+to keep an offset argument at all, someone must actually run the comparison (stream-carrying eval versus random-crop
+cold eval on the same checkpoints — cheap, eval-only, and currently absent from the artifact set). Until then the
+honest sentence is the D2 one: routed serving costs a measured +4.3 % median, +8.0 % worst case, relative to
+acquisition, and we make no claim about instrumentation because we have not made that measurement.
+
+Self-assessment, because the pattern matters more than the instance: I built D1 believing "diagonal = val stream" and
+"exit = window crop" from the phrasing of earlier notes, tested reproducibility of the *values*, and never opened the
+code path that produced them. A gate that checks whether numbers match other numbers cannot detect that both numbers
+answer the same question. New rule for comparative claims: **first verify that the two columns are different
+measurements** — read the branch that emitted each one — before interpreting their ratio. This is [[verify-raw-output]]
+again, aimed at my own reasoning instead of a shell tool.
