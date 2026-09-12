@@ -65,11 +65,18 @@ on the RA2b ladder; nothing here trains anything. Index of what each artifact *e
   sizes and checksums, and the script-composition census (the bytes themselves are deliberately **not** in
   the repo: licensed corpus text, and 10 MB of it would make the docs tree heavier than the code).
 
-### Manifest provenance is inherently a two-step commit
+### Manifest `--check`: what staleness actually means (corrected same day)
 
-`phase1_manifest.py` records, per artifact, the short SHA of the commit that last touched it. Regenerating *before*
-committing therefore stamps the previous HEAD, and `--check` goes stale again the moment the content commit lands.
-Expected sequence, not a bug to debug: land all content (including any prose or README edits) -> regenerate -> land ONE
-final commit whose only file is `docs/PHASE1-MANIFEST.md`. That converges because the manifest does not index itself; a
-refresh commit that also touches an indexed path just moves that row's SHA and leaves `--check` stale again. If `--check`
-reports stale while the tree is clean, re-run and check whether the last commit touched anything indexed.
+The first version of this note blamed the two-step commit pattern. That was a misdiagnosis, and I chased it across
+three commits before reading my own checker. The real defect: `--check` compared an md5 of the **whole** file, whose
+last line embeds a timestamp and the HEAD sha at generation time -- so *any* new commit made it report stale, forever,
+and the docstring's "CI-able" claim had been false since it was written. Fixed by excluding the generation stamp and
+comparing the table only.
+
+Residual, legitimate behaviour: the table records the commit that last touched each artifact, so a commit that modifies
+an indexed path leaves the manifest one behind. Land content, then make **one** final commit containing nothing but
+`docs/PHASE1-MANIFEST.md` (the manifest does not index itself). That converges and stays green until the next content
+change.
+
+Process note kept deliberately: three guesses at a symptom I could have read in ten seconds. Same failure family as
+[[verify-raw-output]] -- treating a tool's output as a fact about the world rather than as a program's behavior.

@@ -10,7 +10,8 @@ Scope: phase 1 = everything up to the RA2b mechanism/selection results and the P
 the manuscript revision drafts from. Phase 2 (Sonde B/C, semantic addresser) starts after.
 
 Usage:  .venv/bin/python scripts/pi50/phase1_manifest.py [--check]
-        --check exits non-zero if the committed manifest differs from regenerated output (CI-able later).
+        --check exits non-zero if the committed manifest's TABLE differs from regenerated output (the generation
+        stamp is excluded; see _stable()). CI-able as of 2026-09-13 -- before that it was not, despite the claim.
 """
 import subprocess, os, sys, hashlib, collections
 
@@ -141,9 +142,17 @@ body.append("")
 body.append(f"_Generated {git('log','-1','--format=%ad','--date=iso').strip()} from HEAD `{git('rev-parse','--short','HEAD').strip()}`._")
 
 text = "\n".join(body) + "\n"
+def _stable(x):
+    """Drop the generation stamp. The footer embeds a timestamp and the HEAD sha AT GENERATION TIME, so comparing
+    it makes --check permanently stale-by-one-commit: every commit changes HEAD, and HEAD appears in the footer.
+    Real drift is the table above it (added/removed artifacts, changed size/date/provenance-sha), so the check
+    compares everything except lines starting '_Generated '. Found 2026-09-13 by chasing a 'stale' report three
+    times and assuming my own two-step theory; the docstring's 'CI-able' claim had been false since writing."""
+    return "\n".join(l for l in x.splitlines() if not l.startswith("_Generated "))
+
 if "--check" in sys.argv:
     old = open(OUT).read() if os.path.exists(OUT) else ""
-    same = hashlib.md5(old.encode()).hexdigest() == hashlib.md5(text.encode()).hexdigest()
+    same = hashlib.md5(_stable(old).encode()).hexdigest() == hashlib.md5(_stable(text).encode()).hexdigest()
     print("manifest up to date" if same else "MANIFEST STALE - regenerate")
     sys.exit(0 if same else 1)
 open(OUT, "w").write(text)
