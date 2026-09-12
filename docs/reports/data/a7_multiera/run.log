@@ -15,3 +15,61 @@ eras=[(1, 'en'), (5, 'de'), (8, 'pt'), (11, 'bg'), (14, 'el'), (17, 'ro'), (19, 
   arm C [de] ppl        2.74
   arm C [en] ppl       11.19
   era de done in 598s
+
+=== era p8 (pt), latent N0=22528 (mult 352) -> 47104 [+12 blocks] ===
+  base[en]     13.26   (era pt logged exit 2.66)  G1[en]=n/a
+  base[pt]      2.72   (era pt logged exit 2.66)  G1[pt]=OK
+  arm A [en] ppl       21.94   masked@22528     13.26
+  arm A [pt] ppl       20.78   masked@22528      2.72
+  arm C [en] ppl       13.26
+  arm C [pt] ppl        2.72
+  era pt done in 618s
+
+=== era p11 (bg), latent N0=28672 (mult 448) -> 47104 [+9 blocks] ===
+  base[bg]      6.14   (era bg logged exit 6.09)  G1[bg]=OK
+  base[en]     22.16   (era bg logged exit 6.09)  G1[en]=n/a
+  arm A [bg] ppl      149.30   masked@28672      6.14
+  arm A [en] ppl       25.26   masked@28672     22.16
+  arm C [bg] ppl        6.14
+  arm C [en] ppl       22.16
+  era bg done in 634s
+
+=== era p14 (el), latent N0=34816 (mult 544) -> 47104 [+6 blocks] ===
+  base[el]      6.52   (era el logged exit 6.36)  G1[el]=OK
+  base[en]     20.69   (era el logged exit 6.36)  G1[en]=n/a
+  arm A [el] ppl      186.76   masked@34816      6.52
+  arm A [en] ppl       27.61   masked@34816     20.69
+  arm C [el] ppl        6.52
+  arm C [en] ppl       20.69
+  era el done in 661s
+
+=== era p17 (ro), latent N0=40960 (mult 640) -> 47104 [+3 blocks] ===
+  base[en]     21.53   (era ro logged exit 3.26)  G1[en]=n/a
+  base[ro]      3.28   (era ro logged exit 3.26)  G1[ro]=OK
+  arm A [en] ppl       25.36   masked@40960     21.53
+  arm A [ro] ppl       19.18   masked@40960      3.28
+  arm C [en] ppl       21.53
+  arm C [ro] ppl        3.28
+  era ro done in 681s
+
+=== era p19 (sl), latent N0=45056 (mult 704) -> 47104 [+1 blocks] ===
+  base[en]     27.17   (era sl logged exit 3.50)  G1[en]=n/a
+  base[sl]      3.39   (era sl logged exit 3.50)  G1[sl]=OK
+  arm A [en] ppl       29.28   masked@45056     27.17
+  arm A [sl] ppl        9.93   masked@45056      3.39
+  arm C [en] ppl       27.17
+  arm C [sl] ppl        3.39
+  era sl done in 696s
+
+=== SUMMARY ===
+  en  -> en   real damage  13.38x   f_log 0.832   f_lin 0.618
+  de  -> de   real damage  12.66x   f_log 0.803   f_lin 0.573
+  de  -> en   real damage   2.77x   f_log 0.729   f_lin 0.622
+  pt  -> en   real damage   2.34x   f_log 0.592   f_lin 0.487
+  pt  -> pt   real damage   9.91x   f_log 0.887   f_lin 0.746
+  bg  -> bg   real damage  37.47x   f_log 0.880   f_lin 0.639
+  el  -> el   real damage   9.77x   f_log 1.472   f_lin 3.154
+  ro  -> ro   real damage   6.93x   f_log 0.911   f_lin 0.815
+  sl  -> sl   real damage   6.02x   f_log 0.599   f_lin 0.385
+  f_log: median 0.832 range 0.592-1.472 (manuscript general claim 0.833)
+  f_lin: median 0.622 range 0.385-3.154

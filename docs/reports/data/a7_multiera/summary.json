@@ -1,24 +1,80 @@
 {
- "n_eras_run": 1,
- "n_fraction_pairs": 1,
- "f_log_min": 0.875,
- "f_log_median": 0.875,
- "f_log_max": 0.875,
- "f_linear_min": 0.626,
- "f_linear_median": 0.626,
- "f_linear_max": 0.626,
+ "n_eras_run": 7,
+ "n_fraction_pairs": 9,
+ "f_log_min": 0.5915,
+ "f_log_median": 0.8317,
+ "f_log_max": 1.4722,
+ "f_linear_min": 0.385,
+ "f_linear_median": 0.6224,
+ "f_linear_max": 3.1542,
  "prediction_manuscript_f_log": 0.833,
- "iters": 3,
+ "iters": 25,
  "batch": 8,
  "target_width": 47104,
  "protocol_source": "scripts/pi50/r2_expansion_control.py (phase-1 frozen instrument)",
  "per_pair": [
   {
+   "era": "en",
+   "domain": "en",
+   "f_log": 0.8317,
+   "f_linear": 0.6177,
+   "real_damage_x": 13.38
+  },
+  {
+   "era": "de",
+   "domain": "de",
+   "f_log": 0.8032,
+   "f_linear": 0.573,
+   "real_damage_x": 12.661
+  },
+  {
+   "era": "de",
+   "domain": "en",
+   "f_log": 0.7292,
+   "f_linear": 0.6224,
+   "real_damage_x": 2.775
+  },
+  {
+   "era": "pt",
+   "domain": "en",
+   "f_log": 0.5915,
+   "f_linear": 0.4875,
+   "real_damage_x": 2.343
+  },
+  {
+   "era": "pt",
+   "domain": "pt",
+   "f_log": 0.887,
+   "f_linear": 0.7461,
+   "real_damage_x": 9.909
+  },
+  {
    "era": "bg",
    "domain": "bg",
-   "f_log": 0.875,
-   "f_linear": 0.626,
-   "real_damage_x": 37.395
+   "f_log": 0.8805,
+   "f_linear": 0.6389,
+   "real_damage_x": 37.469
+  },
+  {
+   "era": "el",
+   "domain": "el",
+   "f_log": 1.4722,
+   "f_linear": 3.1542,
+   "real_damage_x": 9.767
+  },
+  {
+   "era": "ro",
+   "domain": "ro",
+   "f_log": 0.9112,
+   "f_linear": 0.8154,
+   "real_damage_x": 6.935
+  },
+  {
+   "era": "sl",
+   "domain": "sl",
+   "f_log": 0.5994,
+   "f_linear": 0.385,
+   "real_damage_x": 6.02
   }
  ]
 }
