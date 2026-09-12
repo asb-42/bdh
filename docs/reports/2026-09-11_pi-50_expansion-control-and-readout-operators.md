@@ -181,6 +181,8 @@ Multinomial logistic regression on hashed byte 1-4-gram counts (2^18 buckets, L2
 (train 240 / test 80), no human task IDs:
 
 * **top-1 agreement with the likelihood router: 0.762, Wilson 95% [0.659, 0.842]**, majority-class baseline 0.087.
+  *(band later found optimistic under domain clustering — §9.7; this figure was withdrawn anyway for the
+  composition confound, §9.1.)*
 * Bimodal by domain: **16 of 20 at 1.00**; the misses are exactly **es 0.00, pl 0.00, sk 0.00, et 0.67**.
 * My pre-registered prediction - Latin easy, Cyrillic/Greek hard - is WRONG in direction: **bg 1.00, el 1.00**,
   and every systematic failure is a Latin-script neighbour of an early territory.
@@ -255,6 +257,9 @@ Same 160 held-out crops, same features, three fitting designs:
 | A reproduce r3b (unweighted softmax, 200 ep, L2 1e-4) | 0.681 [0.606, 0.748] | **0.125** | es ×33, sk ×9, et ×8 |
 | B class-balanced softmax (inverse-freq weights, 600 ep, L2 1e-5) | **1.000 [0.977, 1.000]** | 1.000 | none |
 | C one-vs-rest logistic per territory, margin abstention | 0.988 [0.956, 0.997] | 0.938 | sk ×2 |
+
+> **⚠ intervals in this table are optimistic — see §9.7.** The Wilson bands treat the 160 crops as iid, but they
+> are 8 crops × 20 domains, i.e. clustered by domain. Point estimates (1.000, 0.988, 0.681) are unaffected.
 
 Arm A's control-domain mean of 0.125 is the smoking gun: the starved classes were not merely degraded, they
 were collapsed onto the majority classes. F-3 therefore **dissolves** — no disagreement confusion table is
@@ -412,3 +417,33 @@ Contamination corroboration arrives a third way here: `iu_ascii` scores 0.854 ag
 centroid, higher than any other input-to-territory similarity in the table, from a distance measure that
 never saw a label or a fit. Combined with the fitted predictor's en(base) ×40 (#199) and my line census
 (#188), the reading of those 333 lines as English prose is about as well-supported as anything in this set.
+
+### 9.7 Self-correction (2026-09-12): every Wilson band in this report is optimistic — the crops are clustered, not iid
+
+Found while assessing the third external review (#223), which observed only that "independence assumptions … are
+not discussed". It did not name the concrete defect; the concrete defect is mine.
+
+The addresser evaluations use **160 held-out crops = 8 crops × 20 domains**. A Wilson interval computed on n=160
+assumes 160 independent trials. They are not independent: eight crops drawn from one domain's text share
+register, length distribution and byte profile, so a per-crop agreement rate understates between-domain variance.
+Concretely, §9.2's arm-B band **[0.977, 1.000]** reads like an n=160 measurement of a proportion; it is really
+20 clusters, each scoring 8/8.
+
+What survives unchanged: **all point estimates** (1.000, 0.988, 0.681, 0.762) — clustering biases intervals, not
+means. What must be restated: the precision. The defensible forms are
+
+- **domain-level**: 20/20 domains at agreement 1.00, 8 crops each (arm B); arm C 20/20 with per-domain minimum
+  0.875 (sk ×2 misses concentrate in one domain); arm A fails on 4 domains.
+- **per-domain interval**: a perfect 8/8 has 95% Wilson **[0.68, 1.00]** — six times wider than the crop-level
+  band, because n=8 is what actually carries the domain-level claim.
+- **cluster bootstrap over domains**: degenerate at [1.000, 1.000] when no cluster misses, which is itself the
+  honest signal that the design cannot bound the error bar below 1.00 without *more domains*, not more crops per
+  domain.
+
+Rule for the rest of this project, and it applies to the FCS/matrix numbers too: **collapse pseudo-replicates
+before quoting an interval, not just before correlating.** I applied that rule to correlations after #159 and
+forgot it for confidence intervals on the same data. Adding crops buys resolution on within-domain variance;
+only adding domains buys the between-domain claim the manuscript actually makes.
+
+No experiment needed to fix this — it is a reporting change. The manuscript's two occurrences of "[0.977, 1.000]"
+should become the domain-level statement plus the note that crop-level iid bands are optimistic.
