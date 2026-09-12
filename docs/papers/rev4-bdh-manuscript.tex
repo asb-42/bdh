@@ -30,7 +30,7 @@
 
 \begin{abstract}
 We study continual learning in \BDH{}, a byte-level depth-recurrent language
-model~\cite{byte rnn} whose additive growth rule appends zero-initialized neurons while leaving all existing computation bit-identical. Our central finding separates three concerns that the continual-learning literature usually conflates.
+model~\cite{bdh} whose additive growth rule appends zero-initialized neurons while leaving all existing computation bit-identical. Our central finding separates three concerns that the continual-learning literature usually conflates.
 \emph{Storage} is solved: under gradient-masked growth, previously acquired computation remains bit-exact at the tensor level across every subsequent phase (verified four independent ways, including cross-script).
 \emph{Serving} splits into two measured regimes: joint serving degrades because the summation readout accumulates contributions from all neurons (83\% of the damage on the log scale, 62\% in perplexity units, is reproduced by appending a single random, untrained block), while prefix-masked serving reproduces acquisition quality exactly (retention equals acquisition, zero drift across a full growth phase, 800/800 routing accuracy).
 \emph{Addressing} is the open problem: label-free likelihood selection achieves 20/20 correct prefix identification at every calibration budget from 4\,KB to 1\,MB, and a byte-level $n$-gram addresser reproduces the likelihood router on all 20 domains (8/8 held-out crops each; per-domain Wilson floor $[0.68, 1.0]$ for a perfect 8/8) given $\sim$4--8\,KB of calibration text per domain---but cumulative-prefix NLL is not unimodal, so selection is robust yet not sublinear in territory count. Out-of-support detection requires two axes (relative advantage and absolute perplexity): byte-adjacent unseen languages have ratio $\approx 1$ while cross-script inputs have catastrophic joint perplexity that inflates the ratio past the trained floor. Cross-script probes confirm that the address geometry is byte-statistical, not linguistic: Chinese, Japanese, Hindi, and Inuktitut route 37--40/40 to the only two territories with substantial multi-byte training exposure (Cyrillic and Greek: 82\% of characters are 2-byte-encoded, against 11.7\% for the next-highest territory, a factor of 7), with zero linguistic kinship. A 20-phase fixed-capacity baseline shows that without growth, forgetting is destruction (not access loss). The growth mechanism generalizes across the three script universes tested (Latin, Han, Devanagari): a Chinese territory grown on an English base, then Devanagari grown on Chinese, retains all three bit-exactly, routes perfectly, and serves each at acquisition quality.
@@ -368,7 +368,7 @@ routing is exact.
 \begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/f3_retention_bars.pdf}
-\caption{RA2b final checkpoint: routed serving (blue) vs joint serving (orange) vs acquisition exit (black tick), per domain, log scale. Routed tracks acquisition for every domain (median ratio 1.09, range 1.02--1.13, within the window-vs-val instrument offset); joint serving erodes 1.0--37.8$\times$ (median 11$\times$) --- the interference term that survives the fix. Sources: 	exttt{docs/reports/data/2026-09-10\_ra2b\_matrix.csv} (lt rows) and readout \S B4.}
+\caption{RA2b final checkpoint: routed serving (blue) vs joint serving (orange) vs acquisition exit (black tick), per domain, log scale. Routed tracks acquisition for every domain (median ratio 1.09, range 1.02--1.13, within the window-vs-val instrument offset); joint serving erodes 1.0--37.8$\times$ (median 11$\times$) --- the interference term that survives the fix. Sources: \texttt{docs/reports/data/2026-09-10\_ra2b\_matrix.csv} (lt rows) and readout \S B4.}
 \label{fig:retention}
 \end{figure}
 
@@ -720,7 +720,7 @@ addresser needs $\sim$4--8\,KB per domain of unlabeled text; and we measure the 
 modes their vision setting could not exhibit---out-of-support detection with a two-axis
 rule, and the non-unimodality that blocks sublinear search. \emph{Verdict:} nearest
 published analogue to our addressing stage; our contribution is the self-supervised label
-source plus the measured rejection geometry. 	extbf{Learning to Prompt (L2P)}~\cite{l2p} addresses the same problem with a learned prompt pool: task-appropriate prompts are selected per input and conditioned into a frozen model---addressing without architectural growth. \emph{Agreement:} input-conditioned selection of stored capability is the shared idea. \emph{Divergence:} L2P's prompts compete for a fixed embedding budget, whereas our territories are append-only and bit-frozen; and L2P's selection is a learned attention head, whereas our label source is the model's own NLL. \emph{Verdict:} complementary rather than competing---L2P conditions a fixed model, we grow and address new capacity.
+source plus the measured rejection geometry. \textbf{Learning to Prompt (L2P)}~\cite{l2p} addresses the same problem with a learned prompt pool: task-appropriate prompts are selected per input and conditioned into a frozen model---addressing without architectural growth. \emph{Agreement:} input-conditioned selection of stored capability is the shared idea. \emph{Divergence:} L2P's prompts compete for a fixed embedding budget, whereas our territories are append-only and bit-frozen; and L2P's selection is a learned attention head, whereas our label source is the model's own NLL. \emph{Verdict:} complementary rather than competing---L2P conditions a fixed model, we grow and address new capacity.
 
 \subsection{Consolidation and importance protection}
 \label{sec:prior:consolidation}
@@ -889,50 +889,42 @@ S.~Hadsell. \emph{Progressive Neural Networks.} arXiv:1606.04671 (2016).
 Single Network by Iterative Pruning.} CVPR (2018).
 
 \bibitem{piggyback} A.~Mallya, D.~Davis, S.~Lazebnik. \emph{Piggyback: Adapting a
-Single Network to Multiple Tasks by Learning to Mask Weights.} ECCV (2018).
+Single Network to Multiple Tasks by Learning to Mask Weights.} ECCV (2018); arXiv:1801.06519.
 
-\bibitem{supsup} M.~Wortsman, M.~C.~Riemer, G.~Ilharco. \emph{Superposition Enables
-Many-Task Learning (SupSup).} NeurIPS (2020).
+\bibitem{supsup} M.~Wortsman, V.~Ramanujan, R.~Liu, A.~Kembhavi, M.~Rastegari, J.~Yosinski, A.~Farhadi. \emph{Supermasks in Superposition.} NeurIPS (2020); arXiv:2006.14769.
 
-\bibitem{expertgate} R.~Aljundi, P.~Chakravarty, T.~Tuytelaars. \emph{Expert Gate:
-Task- and Expert-Conditioned Routing Networks.} CVPR (2017).
+\bibitem{expertgate} R.~Aljundi, P.~Chakravarty, T.~Tuytelaars. \emph{Expert Gate: Lifelong Learning with a Network of Experts.} CVPR (2017); arXiv:1611.06194.
 
-\bibitem{ewc} J.~Kirkpatrick, R.~Pascanu, N.~Rabinowitz, J.~Veness, M.~Desjardins,
-A.~A.~Rusu, K.~Kilan, R.~Google-DeepMind, et~al. \emph{Overcoming Catastrophic
-Forgetting in Neural Networks.} PNAS 114(13) (2017).
+\bibitem{ewc} J. Kirkpatrick, R. Pascanu, N. Rabinowitz, J. Veness, G. Desjardins, A.A. Rusu, et~al. \emph{Overcoming catastrophic forgetting in neural networks.} PNAS 114(13) (2017); arXiv:1612.00796.
 
 \bibitem{si} F.~Zenke, B.~Poole, S.~Ganguli. \emph{Continual Learning Through Synaptic
-Intelligence.} ICML (2017).
+Intelligence.} ICML (2017); arXiv:1703.04200.
 
-\bibitem{mas} R.~Aljundi, M.~B.~French, B.~S.~Chakravarty, M.~Tuytelaars. \emph{Memory Aware
-Synapses: Learning What (Not) to Forget.} ECCV (2018).
+\bibitem{mas} R.~Aljundi, F.~Babiloni, M.~Elhoseiny, M.~Rohrbach, T.~Tuytelaars. \emph{Memory Aware Synapses: Learning what (not to) forget.} ECCV (2018), pp.~139--154.
 
 \bibitem{gem} D.~Lopez-Paz, M.~Ranzato. \emph{Gradient Episodic Memory for
-Continual Learning.} NeurIPS (2017).
+Continual Learning.} NeurIPS (2017); arXiv:1706.08840.
 
 \bibitem{agem} A.~Chaudhry, M.~Ranzato, A.~Rohrbach, M.~Elhoseiny. \emph{Efficient
-Lifelong Learning with A-GEM.} ICLR (2019).
+Lifelong Learning with A-GEM.} ICLR (2019); arXiv:1812.00420.
 
 \bibitem{shazeer} N.~Shazeer, A.~Mirhoseini, K.~Maziarz, A.~Davis, Q.~Le, G.~Hinton,
 J.~Dean. \emph{Outrageously Large Neural Networks: The Sparsely-Gated
-Mixture-of-Experts Layer.} ICLR (2017).
+Mixture-of-Experts Layer.} ICLR (2017); arXiv:1701.06538.
 
 \bibitem{switch} W.~Fedus, B.~Zoph, N.~Shazeer. \emph{Switch Transformers: Scaling to
-Trillion Parameter Models with Simple and Efficient Sparsity.} JMLR 21 (2021).
+Trillion Parameter Models with Simple and Efficient Sparsity.} JMLR 21 (2021); arXiv:2101.03961.
 
-\bibitem{gshard} D.~Lepikhin, H.~Lee, Y.~Xu, G.~G.~Chen, H.~Zhang, M.~Firus,
-R.~Anil, A.~Pang. \emph{GShard: Scaling Giant Models with Conditional Computation and
-Automatic Sharding.} ICLR (2021).
+\bibitem{gshard} D. Lepikhin, H. Lee, Y. Xu, D. Chen, et~al. \emph{GShard: Scaling Giant Models with Conditional Computation and Automatic Sharding.} ICLR (2021); arXiv:2006.16668.
 
-\bibitem{chow} C.~K.~Chow. \emph{On Optimum Recognition Error and Reject Tradeoff for
-Nonparametric Detection System.} IEEE Trans.\ Inf.\ Theory 16(1) (1970).
+\bibitem{chow} C.~K.~Chow. \emph{On optimum recognition error and reject tradeoff.} IEEE Trans.\ Inf.\ Theory 16(1) (1970); DOI 10.1109/TIT.1970.1054406.
 
 \bibitem{conformal} V.~Vovk, A.~Gammerman, G.~Shafer. \emph{Algorithmic Learning in
 a Random World.} Springer (2005); A.~N.~Angelopoulos, S.~Bates. \emph{A Gentle
 Introduction to Conformal Prediction.} arXiv:2107.07511 (2021).
 
 \bibitem{adamw} I.~Loshchilov, F.~Hutter. \emph{Decoupled Weight Decay
-Regularization.} ICLR (2019).
+Regularization.} ICLR (2019); arXiv:1711.05101.
 
 \bibitem{layernorm} J.~L.~Ba, J.~R.~Kiros, G.~E.~Hinton. \emph{Layer
 Normalization.} arXiv:1607.06450 (2016).
@@ -940,16 +932,11 @@ Normalization.} arXiv:1607.06450 (2016).
 \bibitem{rope} J.~Su, Y.~Lu, S.~Pan, A.~Murtadha, B.~Wen, Y.~Liu. \emph{RoFormer:
 Enhanced Transformer with Rotary Position Embedding.} arXiv:2104.09864 (2021).
 
-\bibitem{byte rnn} S.~Hochreiter, J.~Schmidhuber. \emph{Long Short-Term Memory.}
-Neural Computation 9(8) (1997); and successors applying byte/character-level models,
-e.g.\ A.~van~den~Oord, N.~Kalchbrenner, K.~Kavukcuoglu. \emph{Pixel RNN.} arXiv:1601.06759
-(2016).
-
 \bibitem{multilingual-cl} C.~de~Masson~d'Autume, S.~Ruder, L.~Kong, D.~Yogatama. \emph{Episodic
-Memory in Lifelong Language Learning.} NeurIPS (2019).
+Memory in Lifelong Language Learning.} NeurIPS (2019); arXiv:1906.01076.
 
 \bibitem{l2p} Z.~Wang, Z.~Zhang, C.-Y.~Lee, H.~Zhang, R.~Sun, X.~Ren, G.~Su, V.~Perot,
-J.~Dy, T.~Pfister. \emph{Learning to Prompt for Continual Learning.} CVPR (2022).
+J.~Dy, T.~Pfister. \emph{Learning to Prompt for Continual Learning.} CVPR (2022); arXiv:2112.08654.
 
 \bibitem{marin} D.~Hall, L.~Dial, et~al. (Marin community). \emph{Marin: An Open
 Laboratory for Foundation Models in JAX.} OpenXLA DevLab presentation (2025);

@@ -1,0 +1,777 @@
+[
+ {
+  "key": "bdh",
+  "title": "The Dragon Hatchling: The Missing Link between the Transformer and Models of the Brain.",
+  "authors_raw": [
+   "A.~Kosowski",
+   " P.~Uzna\\'nski",
+   " J.~Chorowski",
+   " Z.~Stamirowska",
+   " M.~Bartoszkiewicz."
+  ],
+  "year": "2025",
+  "venue_raw": "arXiv:2509.26507",
+  "match_sim": 1.0,
+  "canonical": {
+   "title": "The Dragon Hatchling: The Missing Link between the Transformer and Models of the Brain",
+   "year": "2025",
+   "comment": "Code available at: https://github.com/pathwaycom/bdh Accompanying blog: https://pathway.com/research/bdh",
+   "url": "http://arxiv.org/abs/2509.26507v1",
+   "authors": [
+    "Adrian Kosowski",
+    "Przemys\u0142aw Uzna\u0144ski",
+    "Jan Chorowski",
+    "Zuzanna Stamirowska",
+    "Micha\u0142 Bartoszkiewicz"
+   ]
+  },
+  "query": "ti:\"The Dragon Hatchling The Missing Link\"",
+  "verdict": [
+   "OK"
+  ],
+  "notes": [
+   "canonical note: Code available at: https://github.com/pathwaycom/bdh Accompanying blog: https://pathway.com/research/bdh"
+  ]
+ },
+ {
+  "key": "pgn",
+  "title": "Progressive Neural Networks.",
+  "authors_raw": [
+   "A.~Rusu",
+   " N.~Rabinowitz",
+   " Y.~Guo",
+   " K.~Jayaraman",
+   " S.~O'Hara",
+   " O.~Vinyals",
+   " S.~Hadsell."
+  ],
+  "year": "2016",
+  "venue_raw": "arXiv:1606.04671",
+  "match_sim": 1.0,
+  "canonical": {
+   "title": "Progressive Neural Networks",
+   "year": "2016",
+   "comment": "",
+   "url": "http://arxiv.org/abs/1606.04671v4",
+   "authors": [
+    "Andrei A. Rusu",
+    "Neil C. Rabinowitz",
+    "Guillaume Desjardins",
+    "Hubert Soyer",
+    "James Kirkpatrick",
+    "Koray Kavukcuoglu",
+    "Razvan Pascanu",
+    "Raia Hadsell"
+   ]
+  },
+  "query": "ti:\"Progressive Neural Networks\"",
+  "verdict": [
+   "OK"
+  ],
+  "notes": [
+   "author count ours~7 canonical=8"
+  ]
+ },
+ {
+  "key": "packnet",
+  "title": "PackNet: Adding Multiple Tasks to a Single Network by Iterative Pruning.",
+  "authors_raw": [
+   "A.~Mallya",
+   " S.~Lazebnik."
+  ],
+  "year": "2018",
+  "venue_raw": "CVPR",
+  "match_sim": 1.0,
+  "canonical": {
+   "title": "PackNet: Adding Multiple Tasks to a Single Network by Iterative Pruning",
+   "year": "2017",
+   "comment": "",
+   "url": "http://arxiv.org/abs/1711.05769v2",
+   "authors": [
+    "Arun Mallya",
+    "Svetlana Lazebnik"
+   ]
+  },
+  "query": "ti:\"PackNet Adding Multiple Tasks to a\"",
+  "verdict": [
+   "YEAR-MISMATCH"
+  ],
+  "notes": [
+   "year ours=2018 canonical(arXiv v1)=2017"
+  ]
+ },
+ {
+  "key": "piggyback",
+  "title": "Piggyback: Adapting a Single Network to Multiple Tasks by Learning to Mask Weights.",
+  "authors_raw": [
+   "A.~Mallya",
+   " D.~Davis",
+   " S.~Lazebnik."
+  ],
+  "year": "2018",
+  "venue_raw": "ECCV",
+  "match_sim": 1.0,
+  "canonical": {
+   "title": "Piggyback: Adapting a Single Network to Multiple Tasks by Learning to Mask Weights",
+   "year": "2018",
+   "comment": "",
+   "url": "http://arxiv.org/abs/1801.06519v2",
+   "authors": [
+    "Arun Mallya",
+    "Dillon Davis",
+    "Svetlana Lazebnik"
+   ]
+  },
+  "query": "ti:\"Piggyback Adapting a Single Network to\"",
+  "verdict": [
+   "OK"
+  ],
+  "notes": []
+ },
+ {
+  "key": "supsup",
+  "title": "Supermasks in Superposition.",
+  "authors_raw": [
+   "M.~Wortsman",
+   " V.~Ramanujan",
+   " R.~Liu",
+   " A.~Kembhavi",
+   " M.~Rastegari",
+   " J.~Yosinski",
+   " A.~Farhadi."
+  ],
+  "year": "2020",
+  "venue_raw": "NeurIPS",
+  "match_sim": 1.0,
+  "canonical": {
+   "title": "Supermasks in Superposition",
+   "year": "2020",
+   "comment": "NeurIPS 2020 Camera Ready",
+   "url": "http://arxiv.org/abs/2006.14769v3",
+   "authors": [
+    "Mitchell Wortsman",
+    "Vivek Ramanujan",
+    "Rosanne Liu",
+    "Aniruddha Kembhavi",
+    "Mohammad Rastegari",
+    "Jason Yosinski",
+    "Ali Farhadi"
+   ]
+  },
+  "query": "id_list=2006.14769",
+  "verdict": [
+   "OK"
+  ],
+  "notes": [
+   "canonical note: NeurIPS 2020 Camera Ready"
+  ]
+ },
+ {
+  "key": "expertgate",
+  "title": "Expert Gate: Lifelong Learning with a Network of Experts.",
+  "authors_raw": [
+   "R.~Aljundi",
+   " P.~Chakravarty",
+   " T.~Tuytelaars."
+  ],
+  "year": "2017",
+  "venue_raw": "CVPR",
+  "match_sim": 1.0,
+  "canonical": {
+   "title": "Expert Gate: Lifelong Learning with a Network of Experts",
+   "year": "2016",
+   "comment": "CVPR 2017 paper",
+   "url": "http://arxiv.org/abs/1611.06194v2",
+   "authors": [
+    "Rahaf Aljundi",
+    "Punarjay Chakravarty",
+    "Tinne Tuytelaars"
+   ]
+  },
+  "query": "id_list=1611.06194",
+  "verdict": [
+   "OK"
+  ],
+  "notes": [
+   "year OK via canonical note (CVPR 2017); arXiv v1 is 2016",
+   "canonical note: CVPR 2017 paper"
+  ]
+ },
+ {
+  "key": "ewc",
+  "title": "Overcoming Catastrophic Forgetting in Neural Networks.",
+  "authors_raw": [
+   "J.~Kirkpatrick",
+   " R.~Pascanu",
+   " N.~Rabinowitz",
+   " J.~Veness",
+   " M.~Desjardins",
+   " A.~A.~Rusu",
+   " K.~Kilan",
+   " R.~Google-DeepMind",
+   " et~al."
+  ],
+  "year": "2017",
+  "venue_raw": "PNAS 114(13)",
+  "match_sim": 1.0,
+  "canonical": {
+   "title": "Overcoming catastrophic forgetting in neural networks",
+   "year": "2016",
+   "comment": "",
+   "url": "http://arxiv.org/abs/1612.00796v2",
+   "authors": [
+    "James Kirkpatrick",
+    "Razvan Pascanu",
+    "Neil Rabinowitz",
+    "Joel Veness",
+    "Guillaume Desjardins",
+    "Andrei A. Rusu",
+    "Kieran Milan",
+    "John Quan",
+    "Tiago Ramalho",
+    "Agnieszka Grabska-Barwinska",
+    "Demis Hassabis",
+    "Claudia Clopath",
+    "Dharshan Kumaran",
+    "Raia Hadsell"
+   ]
+  },
+  "query": "id_list=1612.00796",
+  "verdict": [
+   "YEAR-MISMATCH"
+  ],
+  "notes": [
+   "author count ours~9 canonical=14",
+   "year ours=2017 canonical(arXiv v1)=2016"
+  ]
+ },
+ {
+  "key": "si",
+  "title": "Continual Learning Through Synaptic Intelligence.",
+  "authors_raw": [
+   "F.~Zenke",
+   " B.~Poole",
+   " S.~Ganguli."
+  ],
+  "year": "2017",
+  "venue_raw": "ICML",
+  "match_sim": 1.0,
+  "canonical": {
+   "title": "Continual Learning Through Synaptic Intelligence",
+   "year": "2017",
+   "comment": "ICML 2017",
+   "url": "http://arxiv.org/abs/1703.04200v3",
+   "authors": [
+    "Friedemann Zenke",
+    "Ben Poole",
+    "Surya Ganguli"
+   ]
+  },
+  "query": "ti:\"Continual Learning Through Synaptic Intelligence\"",
+  "verdict": [
+   "OK"
+  ],
+  "notes": [
+   "canonical note: ICML 2017"
+  ]
+ },
+ {
+  "key": "mas",
+  "title": "Memory Aware Synapses: Learning what (not to) forget.",
+  "authors_raw": [
+   "R.~Aljundi",
+   " F.~Babiloni",
+   " M.~Elhoseiny",
+   " M.~Rohrbach",
+   " T.~Tuytelaars."
+  ],
+  "year": "2018",
+  "venue_raw": "ECCV",
+  "pointer": "https://openaccess.thecvf.com/content_ECCV_2018/html/Rahaf_Aljundi_Memory_Aware_Synapses_ECCV_2018_paper.html",
+  "verdict": [
+   "OK"
+  ],
+  "notes": [
+   "expected-canonical(table): canonical note: ECCV 2018, pp. 139-154",
+   "against https://openaccess.thecvf.com/content_ECCV_2018/html/Rahaf_Aljundi_Memory_Aware_Synapses_ECCV_2018_paper.html"
+  ],
+  "canonical": {
+   "title": "Memory Aware Synapses: Learning what (not to) forget",
+   "authors": [
+    "Rahaf Aljundi",
+    "Francesca Babiloni",
+    "Mohamed Elhoseiny",
+    "Marcus Rohrbach",
+    "Tinne Tuytelaars"
+   ],
+   "year": "2018",
+   "venue": "ECCV 2018, pp. 139-154"
+  }
+ },
+ {
+  "key": "gem",
+  "title": "Gradient Episodic Memory for Continual Learning.",
+  "authors_raw": [
+   "D.~Lopez-Paz",
+   " M.~Ranzato."
+  ],
+  "year": "2017",
+  "venue_raw": "NeurIPS",
+  "match_sim": 1.0,
+  "canonical": {
+   "title": "Gradient Episodic Memory for Continual Learning",
+   "year": "2017",
+   "comment": "Published at NIPS 2017",
+   "url": "http://arxiv.org/abs/1706.08840v6",
+   "authors": [
+    "David Lopez-Paz",
+    "Marc'Aurelio Ranzato"
+   ]
+  },
+  "query": "id_list=1706.08840",
+  "verdict": [
+   "OK"
+  ],
+  "notes": [
+   "canonical note: Published at NIPS 2017"
+  ]
+ },
+ {
+  "key": "agem",
+  "title": "Efficient Lifelong Learning with A-GEM.",
+  "authors_raw": [
+   "A.~Chaudhry",
+   " M.~Ranzato",
+   " A.~Rohrbach",
+   " M.~Elhoseiny."
+  ],
+  "year": "2019",
+  "venue_raw": "ICLR",
+  "match_sim": 1.0,
+  "canonical": {
+   "title": "Efficient Lifelong Learning with A-GEM",
+   "year": "2018",
+   "comment": "Published as a conference paper at ICLR 2019",
+   "url": "http://arxiv.org/abs/1812.00420v2",
+   "authors": [
+    "Arslan Chaudhry",
+    "Marc'Aurelio Ranzato",
+    "Marcus Rohrbach",
+    "Mohamed Elhoseiny"
+   ]
+  },
+  "query": "id_list=1812.00420",
+  "verdict": [
+   "OK"
+  ],
+  "notes": [
+   "year OK via canonical note (ICLR 2019); arXiv v1 is 2018",
+   "canonical note: Published as a conference paper at ICLR 2019"
+  ]
+ },
+ {
+  "key": "shazeer",
+  "title": "Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer.",
+  "authors_raw": [
+   "N.~Shazeer",
+   " A.~Mirhoseini",
+   " K.~Maziarz",
+   " A.~Davis",
+   " Q.~Le",
+   " G.~Hinton",
+   " J.~Dean."
+  ],
+  "year": "2017",
+  "venue_raw": "ICLR",
+  "match_sim": 1.0,
+  "canonical": {
+   "title": "Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer",
+   "year": "2017",
+   "comment": "",
+   "url": "http://arxiv.org/abs/1701.06538v1",
+   "authors": [
+    "Noam Shazeer",
+    "Azalia Mirhoseini",
+    "Krzysztof Maziarz",
+    "Andy Davis",
+    "Quoc Le",
+    "Geoffrey Hinton",
+    "Jeff Dean"
+   ]
+  },
+  "query": "id_list=1701.06538",
+  "verdict": [
+   "OK"
+  ],
+  "notes": []
+ },
+ {
+  "key": "switch",
+  "title": "Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity.",
+  "authors_raw": [
+   "W.~Fedus",
+   " B.~Zoph",
+   " N.~Shazeer."
+  ],
+  "year": "2021",
+  "venue_raw": "JMLR 21",
+  "match_sim": 1.0,
+  "canonical": {
+   "title": "Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity",
+   "year": "2021",
+   "comment": "JMLR",
+   "url": "http://arxiv.org/abs/2101.03961v3",
+   "authors": [
+    "William Fedus",
+    "Barret Zoph",
+    "Noam Shazeer"
+   ]
+  },
+  "query": "id_list=2101.03961",
+  "verdict": [
+   "OK"
+  ],
+  "notes": [
+   "canonical note: JMLR"
+  ]
+ },
+ {
+  "key": "gshard",
+  "title": "GShard: Scaling Giant Models with Conditional Computation and Automatic Sharding.",
+  "authors_raw": [
+   "D.~Lepikhin",
+   " H.~Lee",
+   " Y.~Xu",
+   " G.~G.~Chen",
+   " H.~Zhang",
+   " M.~Firus",
+   " R.~Anil",
+   " A.~Pang."
+  ],
+  "year": "2021",
+  "venue_raw": "ICLR",
+  "match_sim": 1.0,
+  "canonical": {
+   "title": "GShard: Scaling Giant Models with Conditional Computation and Automatic Sharding",
+   "year": "2020",
+   "comment": "",
+   "url": "http://arxiv.org/abs/2006.16668v1",
+   "authors": [
+    "Dmitry Lepikhin",
+    "HyoukJoong Lee",
+    "Yuanzhong Xu",
+    "Dehao Chen",
+    "Orhan Firat",
+    "Yanping Huang",
+    "Maxim Krikun",
+    "Noam Shazeer",
+    "Zhifeng Chen"
+   ]
+  },
+  "query": "id_list=2006.16668",
+  "verdict": [
+   "YEAR-MISMATCH"
+  ],
+  "notes": [
+   "author count ours~8 canonical=9",
+   "year ours=2021 canonical(arXiv v1)=2020"
+  ]
+ },
+ {
+  "key": "chow",
+  "title": "On optimum recognition error and reject tradeoff.",
+  "authors_raw": [
+   "C.~K.~Chow."
+  ],
+  "year": "1970",
+  "venue_raw": "IEEE Trans.\\ Inf.\\ Theory 16(1)",
+  "pointer": "https://doi.org/10.1109/TIT.1970.1054406",
+  "verdict": [
+   "OK"
+  ],
+  "notes": [
+   "expected-canonical(table): canonical note: IEEE Trans. Inf. Theory 16(1)",
+   "against https://doi.org/10.1109/TIT.1970.1054406"
+  ],
+  "canonical": {
+   "title": "On optimum recognition error and reject tradeoff",
+   "authors": [
+    "C. K. Chow"
+   ],
+   "year": "1970",
+   "venue": "IEEE Trans. Inf. Theory 16(1)"
+  }
+ },
+ {
+  "key": "conformal",
+  "title": "Algorithmic Learning in a Random World.",
+  "authors_raw": [
+   "V.~Vovk",
+   " A.~Gammerman",
+   " G.~Shafer."
+  ],
+  "year": "2005",
+  "venue_raw": "Springer",
+  "pointer": "https://link.springer.com/book/10.1007/b105983 (Algorithmic Learning in a Random World)",
+  "verdict": [
+   "OK"
+  ],
+  "notes": [
+   "expected-canonical(table): canonical note: Springer",
+   "against https://link.springer.com/book/10.1007/b105983 (Algorithmic Learning in a Random World)"
+  ],
+  "canonical": {
+   "title": "Algorithmic Learning in a Random World",
+   "authors": [
+    "V. Vovk",
+    "A. Gammerman",
+    "G. Shafer"
+   ],
+   "year": "2005",
+   "venue": "Springer"
+  }
+ },
+ {
+  "key": "adamw",
+  "title": "Decoupled Weight Decay Regularization.",
+  "authors_raw": [
+   "I.~Loshchilov",
+   " F.~Hutter."
+  ],
+  "year": "2019",
+  "venue_raw": "ICLR",
+  "match_sim": 1.0,
+  "canonical": {
+   "title": "Decoupled Weight Decay Regularization",
+   "year": "2017",
+   "comment": "Published as a conference paper at ICLR 2019",
+   "url": "http://arxiv.org/abs/1711.05101v3",
+   "authors": [
+    "Ilya Loshchilov",
+    "Frank Hutter"
+   ]
+  },
+  "query": "id_list=1711.05101",
+  "verdict": [
+   "OK"
+  ],
+  "notes": [
+   "year OK via canonical note (ICLR 2019); arXiv v1 is 2017",
+   "canonical note: Published as a conference paper at ICLR 2019"
+  ]
+ },
+ {
+  "key": "layernorm",
+  "title": "Layer Normalization.",
+  "authors_raw": [
+   "J.~L.~Ba",
+   " J.~R.~Kiros",
+   " G.~E.~Hinton."
+  ],
+  "year": "2016",
+  "venue_raw": "arXiv:1607.06450",
+  "match_sim": 1.0,
+  "canonical": {
+   "title": "Layer Normalization",
+   "year": "2016",
+   "comment": "",
+   "url": "http://arxiv.org/abs/1607.06450v1",
+   "authors": [
+    "Jimmy Lei Ba",
+    "Jamie Ryan Kiros",
+    "Geoffrey E. Hinton"
+   ]
+  },
+  "query": "id_list=1607.06450",
+  "verdict": [
+   "OK"
+  ],
+  "notes": []
+ },
+ {
+  "key": "rope",
+  "title": "RoFormer: Enhanced Transformer with Rotary Position Embedding.",
+  "authors_raw": [
+   "J.~Su",
+   " Y.~Lu",
+   " S.~Pan",
+   " A.~Murtadha",
+   " B.~Wen",
+   " Y.~Liu."
+  ],
+  "year": "2021",
+  "venue_raw": "arXiv:2104.09864",
+  "match_sim": 1.0,
+  "canonical": {
+   "title": "RoFormer: Enhanced Transformer with Rotary Position Embedding",
+   "year": "2021",
+   "comment": "fixed some typos",
+   "url": "http://arxiv.org/abs/2104.09864v5",
+   "authors": [
+    "Jianlin Su",
+    "Yu Lu",
+    "Shengfeng Pan",
+    "Ahmed Murtadha",
+    "Bo Wen",
+    "Yunfeng Liu"
+   ]
+  },
+  "query": "ti:\"RoFormer Enhanced Transformer with Rotary Position\"",
+  "verdict": [
+   "OK"
+  ],
+  "notes": [
+   "canonical note: fixed some typos"
+  ]
+ },
+ {
+  "key": "multilingual-cl",
+  "title": "Episodic Memory in Lifelong Language Learning.",
+  "authors_raw": [
+   "C.~de~Masson~d'Autume",
+   " S.~Ruder",
+   " L.~Kong",
+   " D.~Yogatama."
+  ],
+  "year": "2019",
+  "venue_raw": "NeurIPS",
+  "match_sim": 1.0,
+  "canonical": {
+   "title": "Episodic Memory in Lifelong Language Learning",
+   "year": "2019",
+   "comment": "Proceedings of NeurIPS 2019",
+   "url": "http://arxiv.org/abs/1906.01076v3",
+   "authors": [
+    "Cyprien de Masson d'Autume",
+    "Sebastian Ruder",
+    "Lingpeng Kong",
+    "Dani Yogatama"
+   ]
+  },
+  "query": "ti:\"Episodic Memory in Lifelong Language Learning\"",
+  "verdict": [
+   "OK"
+  ],
+  "notes": [
+   "canonical note: Proceedings of NeurIPS 2019"
+  ]
+ },
+ {
+  "key": "l2p",
+  "title": "Learning to Prompt for Continual Learning.",
+  "authors_raw": [
+   "Z.~Wang",
+   " Z.~Zhang",
+   " C.-Y.~Lee",
+   " H.~Zhang",
+   " R.~Sun",
+   " X.~Ren",
+   " G.~Su",
+   " V.~Perot",
+   " J.~Dy",
+   " T.~Pfister."
+  ],
+  "year": "2022",
+  "venue_raw": "CVPR",
+  "match_sim": 1.0,
+  "canonical": {
+   "title": "Learning to Prompt for Continual Learning",
+   "year": "2021",
+   "comment": "Published at CVPR 2022 as a conference paper",
+   "url": "http://arxiv.org/abs/2112.08654v2",
+   "authors": [
+    "Zifeng Wang",
+    "Zizhao Zhang",
+    "Chen-Yu Lee",
+    "Han Zhang",
+    "Ruoxi Sun",
+    "Xiaoqi Ren",
+    "Guolong Su",
+    "Vincent Perot",
+    "Jennifer Dy",
+    "Tomas Pfister"
+   ]
+  },
+  "query": "id_list=2112.08654",
+  "verdict": [
+   "OK"
+  ],
+  "notes": [
+   "year OK via canonical note (CVPR 2022); arXiv v1 is 2021",
+   "canonical note: Published at CVPR 2022 as a conference paper"
+  ]
+ },
+ {
+  "key": "marin",
+  "title": "Marin: An Open Laboratory for Foundation Models in JAX.",
+  "authors_raw": [
+   "D.~Hall",
+   " L.~Dial",
+   " et~al. (Marin community)."
+  ],
+  "year": "2025",
+  "venue_raw": "OpenXLA DevLab presentation",
+  "verdict": [
+   "NO-CANONICAL"
+  ],
+  "notes": [
+   "no automated hit for ti:\"Marin An Open Laboratory for Foundation\"; needs publisher-page check"
+  ]
+ },
+ {
+  "key": "engram",
+  "title": "DeepSeek-V4.1-Flash.",
+  "authors_raw": [
+   "DeepSeek."
+  ],
+  "year": "",
+  "venue_raw": "",
+  "verdict": [
+   "NO-CANONICAL"
+  ],
+  "notes": [
+   "no automated hit for ti:\"DeepSeek V4 1 Flash\"; needs publisher-page check"
+  ]
+ },
+ {
+  "key": "europarl",
+  "title": "Europarl: A Parallel Corpus for Statistical Machine Translation.",
+  "authors_raw": [
+   "P.~Koehn."
+  ],
+  "year": "2005",
+  "venue_raw": "MT Summit",
+  "pointer": "https://www.mt-archive.info/MTS-2005-Koehn.pdf",
+  "verdict": [
+   "OK"
+  ],
+  "notes": [
+   "expected-canonical(table): canonical note: MT Summit",
+   "against https://www.mt-archive.info/MTS-2005-Koehn.pdf"
+  ],
+  "canonical": {
+   "title": "Europarl: A Parallel Corpus for Statistical Machine Translation",
+   "authors": [
+    "P. Koehn"
+   ],
+   "year": "2005",
+   "venue": "MT Summit"
+  }
+ },
+ {
+  "key": "multiun",
+  "title": "MultiUN v2: UN Documents with Multilingual Alignments.",
+  "authors_raw": [
+   "Y.~Chen",
+   " A.~Eisele."
+  ],
+  "year": "2012",
+  "venue_raw": "LREC",
+  "verdict": [
+   "NO-CANONICAL"
+  ],
+  "notes": [
+   "no automated hit for ti:\"MultiUN v2 UN Documents with Multilingual\"; needs publisher-page check"
+  ]
+ }
+]

@@ -90,7 +90,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `docs/reports/data/ra2b_matrix_raw/raw_sl.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,075 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
 | `docs/reports/data/ra2b_matrix_raw/raw_sv.txt` | `32c8c3a` | pi-50 | 2026-09-12 | 2,075 | europarl en: train 30,000,000 B | val 1,000,000 B | test 1,000,000 B<br>*unclassified* |
 
-## reviews/  (22 files)
+## reviews/  (23 files)
 
 | path | last | author | date | bytes | title / status |
 |---|---|---|---|---|---|
@@ -114,6 +114,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `docs/reviews/2026-09-04_pi-50_marin-hero-run-pointers.md` | `dd40e3a` | pi-50 | 2026-09-10 | 12,987 | Marin 535B-A23B hero run — pointers for BDH, and one finding it trigge<br>*unclassified* |
 | `docs/reviews/2026-09-10_pi-50_prior-art-monotonic-growth.md` | `0b68b4d` | pi-50 | 2026-09-10 | 5,526 | Prior art for monotonic growth with submodel selection — what BDH may <br>*PARTIAL - six works verified at title/abstract level; HSP and PCANets explicitly unverified in-file* |
 | `docs/reviews/2026-09-12_pi-50_external-review-3-assessment.md` | `7ac90ee` | pi-50 | 2026-09-12 | 11,359 | Assessment of the third external review (Grok 4.6, bus #223) — and a v<br>*CITABLE - review-of-review 3; source of the Wilson clustering self-correction* |
+| `docs/reviews/2026-09-12_pi-50_external-review-4-assessment.md` | `3a10e06` | pi-50 | 2026-09-12 | 13,951 | Assessment of the fourth external review (Kimi 2.x, bus #229) — plus a<br>*CITABLE - review-of-review 4; source of the TAB-corruption diagnosis + 4 extra bibitem defects* |
 | `docs/reviews/2026-09-12_pi-50_external-review-assessment.md` | `af2fbef` | pi-50 | 2026-09-12 | 9,842 | Assessment of the first external review (Qwen3.7-Plus, relayed at bus <br>*CITABLE - review-of-the-review; source of the 83%-qualifier finding* |
 | `docs/reviews/2026-09-12_pi-50_rev4-adversarial-pass.md` | `32c8c3a` | pi-50 | 2026-09-12 | 10,526 | Adversarial pass — rev-4 manuscript (`docs/papers/rev4-bdh-manuscript.<br>*CITABLE - second-seat review of rev-4 with artifact-anchored objections* |
 
@@ -192,7 +193,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `docs/papers/rev4-bdh-manuscript.aux` | `a8caa63` | Quinn (Agent Zero) | 2026-09-12 | 16,210 | \relax<br>*unclassified* |
 | `docs/papers/rev4-bdh-manuscript.md` | `a8caa63` | Quinn (Agent Zero) | 2026-09-12 | 73,654 | Append-Only Neural Memory: Storage, Addressing, and Growth<br>*unclassified* |
 | `docs/papers/rev4-bdh-manuscript.pdf` | `a8caa63` | Quinn (Agent Zero) | 2026-09-12 | 580,786 | %PDF-1.7<br>*unclassified* |
-| `docs/papers/rev4-bdh-manuscript.tex` | `a8caa63` | Quinn (Agent Zero) | 2026-09-12 | 72,167 | \documentclass[11pt]{article}<br>*unclassified* |
+| `docs/papers/rev4-bdh-manuscript.tex` | `a8caa63` | Quinn (Agent Zero) | 2026-09-12 | 72,107 | \documentclass[11pt]{article}<br>*unclassified* |
 
 ## archive/  (8 files)
 
@@ -222,7 +223,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 | `scripts/pi50/exp4b_budget.py` | `045a61c` | pi-50 | 2026-09-11 | 4,163 | """A2 follow-ups: how much calibration does likelihood selection actua<br>*TOOLING* |
 | `scripts/pi50/matrix_eval.sh` | `dd40e3a` | pi-50 | 2026-09-10 | 7,423 | !/usr/bin/env bash<br>*TOOLING - reusable serving-matrix runner, guards ALLOW_EVAL+ANNOUNCED* |
 | `scripts/pi50/ood_script_census.py` | `15e55ad` | pi-50 | 2026-09-12 | 1,344 | import re<br>*TOOLING - script-composition census that established the iu contamination (bus 188)* |
-| `scripts/pi50/phase1_manifest.py` | `7ac90ee` | pi-50 | 2026-09-12 | 8,512 | """Generate docs/PHASE1-MANIFEST.md - a living index of the phase-1 ev<br>*TOOLING - generates this file* |
+| `scripts/pi50/phase1_manifest.py` | `3a10e06` | pi-50 | 2026-09-12 | 8,766 | """Generate docs/PHASE1-MANIFEST.md - a living index of the phase-1 ev<br>*TOOLING - generates this file* |
 | `scripts/pi50/protocol_4090.sh` | `dd40e3a` | pi-50 | 2026-09-10 | 9,388 | !/usr/bin/env bash<br>*TOOLING - preflight guard, refuses during live jobs* |
 | `scripts/pi50/r1_readout_operators.py` | `0f1763b` | pi-50 | 2026-09-11 | 6,082 | """P-R1 READOUT WIDTH-INVARIANCE (pre-registered bus #165).<br>*TOOLING* |
 | `scripts/pi50/r1b_relative_reweight.py` | `5d47c9e` | pi-50 | 2026-09-11 | 6,924 | """P-R1b RELATIVE TERRITORY REWEIGHTING (pre-registered bus #175).<br>*TOOLING* |
@@ -237,7 +238,7 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
 
 ## Gaps this manifest exposes
 
-- **147 of 178 files carry no declared status.** Those are the ones most likely to be
+- **147 of 179 files carry no declared status.** Those are the ones most likely to be
   mis-cited during a revision: something is either citable or it is not, and 'nobody wrote it down'
   reads as permission.
 - The prior-art note still labels HSP and PCANets unverified in-file; that must be closed or
@@ -246,4 +247,4 @@ claim) · **unclassified** (nobody has declared it - gap, not absence).
   `~/bdh-review/reports/` on gx10 are ephemeral; anything quoted in the manuscript must have its
   generating log inside the repo.
 
-_Generated 2026-09-12 07:30:42 +0200 from HEAD `a8caa63`._
+_Generated 2026-09-12 14:52:36 +0200 from HEAD `3a10e06`._
