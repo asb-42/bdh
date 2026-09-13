@@ -1,8 +1,10 @@
 """Label-free likelihood routing over grown BDH stacks (prefix experts).
 
 Each route (neuron-prefix mask) scores the EARLY positions of a block; arg-min
-routes the LATE positions. Reports routing accuracy vs true domain plus
-routed/oracle/joint perplexity on the served positions.
+routes the LATE positions. Reports routing accuracy vs true domain plus routed
+and joint perplexity on the served positions. An oracle served-ppl column is
+computed only when --oracle-routes name:width,... is supplied (per-domain true
+prefix width); without it, no oracle quantity is promised or printed.
 
 Usage:
     PYTHONPATH=. python scripts/eval_router.py <ckpt> \
@@ -28,6 +30,8 @@ def main():
     ap.add_argument("--window", type=int, default=128)
     ap.add_argument("--crops", type=int, default=40)
     ap.add_argument("--batch", type=int, default=4)
+    ap.add_argument("--oracle-routes", default=None,
+                    help="optional name:width,... per-domain true prefix widths; adds an oracle served-ppl column")
     args = ap.parse_args()
 
     from pipeline.analyze import _load_model
@@ -53,6 +57,15 @@ def main():
             model.decoder.data.copy_(dec_b * m.repeat(nh).unsqueeze(1))
 
     routes = [int(r) for r in args.routes.split(",")]
+    oracle_map = {}
+    if args.oracle_routes:
+        for item in filter(None, map(str.strip, args.oracle_routes.split(","))):
+            name, w = item.split(":", 1)
+            w = int(w)
+            if w not in routes:
+                print(f"error: oracle width {w} for {name} is not in --routes", file=sys.stderr)
+                sys.exit(2)
+            oracle_map[name] = routes.index(w)
     doms = []
     g = torch.Generator().manual_seed(1234)
     for item in filter(None, map(str.strip, args.domains.split(","))):
@@ -71,6 +84,7 @@ def main():
     R = len(routes)
     conf = torch.zeros(len(doms), R, dtype=torch.int64)
     routed_ppl = {}
+    oracle_ppl = {}
     joint_losses = []
 
     for ti, (tname, blocks) in enumerate(doms):
@@ -94,6 +108,10 @@ def main():
 
         conf[ti] += torch.bincount(choice, minlength=R)
         routed_ppl[tname] = math.exp(served.mean().item())
+        if tname in oracle_map:
+            oi = oracle_map[tname]
+            oserved = rl[oi, torch.arange(args.crops), args.window:].mean(dim=1)
+            oracle_ppl[tname] = math.exp(oserved.mean().item())
 
         set_prefix(N_full)
         amp = torch.autocast("cuda", dtype=torch.bfloat16, enabled=device.type == "cuda")
@@ -111,9 +129,14 @@ def main():
     print("          " + "".join(f"{r:>9}" for r in routes))
     for i, n in enumerate(names):
         print(f"{n:>9} " + "".join(f"{conf[i, j].item():>9}" for j in range(R)))
-    print(f"\n{'domain':>9} {'routed':>8}")
-    for n in names:
-        print(f"{n:>9} {routed_ppl[n]:>8.2f}")
+    if oracle_ppl:
+        print(f"\n{'domain':>9} {'routed':>8} {'oracle':>8}")
+        for n in names:
+            print(f"{n:>9} {routed_ppl[n]:>8.2f} {oracle_ppl.get(n, float('nan')):>8.2f}")
+    else:
+        print(f"\n{'domain':>9} {'routed':>8}")
+        for n in names:
+            print(f"{n:>9} {routed_ppl[n]:>8.2f}")
     print(f"\njoint full-width reference: ppl {math.exp(sum(joint_losses)/len(joint_losses)):.2f}"
           f"  (served positions only)")
 

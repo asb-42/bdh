@@ -15,8 +15,8 @@ new capabilities phase after phase without catastrophically forgetting — and i
 weights is not enough (we show it is not), what actually works?
 
 The full study is written up in
-[`docs/papers/cl-bdh-manuscript.pdf`](docs/papers/cl-bdh-manuscript.pdf)
-(*Computation Isolation for Continual Learning in a Depth-Recurrent Language Model*, 2026),
+[`docs/papers/rev4-bdh-manuscript.pdf`](docs/papers/rev4-bdh-manuscript.pdf)
+(*Append-Only Neural Memory: Storage, Addressing, and Growth in a Depth-Recurrent Language Model*, Revision 4.5, 2026),
 with complete intermediate tables in
 [`docs/reports/`](docs/reports/).
 
@@ -70,8 +70,8 @@ Hardware: single RTX 4090 (24 GB); every result in the paper reproduces on it.
 
 ## Current experiment
 
-A 20-language phase-count ladder (does isolation survive accumulation?) is running /
-being analyzed — see [`docs/plans/`](docs/plans/) for the pre-registered plan and
+A 20-language phase-count ladder (does isolation survive accumulation?) completed
+2026-09-10; analysis is reported in the rev-4.5 manuscript and under `docs/reports/` — see [`docs/plans/`](docs/plans/) for the pre-registered plan and
 falsifiers.
 
 ## Upstream
